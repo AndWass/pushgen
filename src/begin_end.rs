@@ -1,0 +1,64 @@
+use std::marker::PhantomData;
+use crate::{InputStage, InputOutputStage};
+
+pub struct Begin<T> {
+    _phantom: PhantomData<T>,
+}
+
+impl<T> Begin<T> {
+    pub fn new() -> Self {
+        Self {
+            _phantom: PhantomData,
+        }
+    }
+}
+
+impl<T> InputStage for Begin<T> {
+    type Input = T;
+
+    #[inline(always)]
+    fn process(&mut self, _value: Self::Input) -> bool {
+        true
+    }
+}
+
+impl<T> InputOutputStage for Begin<T> {
+    type Output = T;
+
+    #[inline(always)]
+    fn process_and_then(
+        &mut self,
+        value: Self::Input,
+        next: &mut dyn InputStage<Input = Self::Output>,
+    ) -> bool {
+        next.process(value)
+    }
+}
+
+pub struct End<F, A> {
+    consumer: F,
+    _phantom: PhantomData<A>,
+}
+
+impl<F, A, R> End<F, A>
+    where
+        F: FnMut(A) -> R,
+{
+    pub fn new(consumer: F) -> Self {
+        Self {
+            consumer,
+            _phantom: PhantomData,
+        }
+    }
+}
+
+impl<F, A> InputStage for End<F, A>
+    where
+        F: FnMut(A) -> bool,
+{
+    type Input = A;
+    #[inline(always)]
+    fn process(&mut self, value: Self::Input) -> bool {
+        (self.consumer)(value)
+    }
+}
