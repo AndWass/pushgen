@@ -2,6 +2,8 @@ use std::marker::PhantomData;
 
 use crate::{InputStage, InputOutputStage};
 
+/// Filters values using a closure predicate. See [`.filter()`](crate::StageExt::filter) for
+/// more information.
 pub struct Filter<F, A>
 where
     F: FnMut(&A) -> bool,

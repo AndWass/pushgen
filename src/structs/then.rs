@@ -19,6 +19,7 @@ where
     }
 }
 
+/// Combines two stages, where the first must implement [`InputOutputStage`](crate::InputOutputStage).
 pub struct Then<T, U> {
     first: T,
     second: U,

@@ -1,6 +1,8 @@
 use std::marker::PhantomData;
 use crate::{InputStage, InputOutputStage};
 
+/// An input-output stage that just forwards values to the next staqe. See [`begin()`](crate::begin)
+/// for more details.
 pub struct Begin<T> {
     _phantom: PhantomData<T>,
 }
@@ -35,6 +37,8 @@ impl<T> InputOutputStage for Begin<T> {
     }
 }
 
+/// An end-stage that calls a closure for each value produced. See [`.end()`](crate::StageExt::end)
+/// for more details.
 pub struct End<F, A> {
     consumer: F,
     _phantom: PhantomData<A>,
@@ -63,8 +67,8 @@ impl<F, A> InputStage for End<F, A>
     }
 }
 
-/// A variant of [`End`](crate::StageExt::end) that always returns true. See [`.collect()`](crate::StageExt::collect)
-/// for more information.
+/// A variant of [`.end()`](crate::StageExt::end) that always returns true. See [`.collect()`](crate::StageExt::collect)
+/// for details.
 pub struct Collect<Func, Arg> {
     collector: Func,
     _phantom: PhantomData<Arg>,
