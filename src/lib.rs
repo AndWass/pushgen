@@ -1,18 +1,20 @@
 mod begin_end;
+mod dedup;
+mod filter;
 mod stage;
 mod stage_ext;
-mod filter;
-mod transform;
-mod then;
 mod take_skip;
+mod then;
+mod transform;
 
 pub use begin_end::*;
+pub use dedup::Dedup;
+pub use filter::Filter;
 pub use stage::*;
 pub use stage_ext::*;
-pub use filter::Filter;
-pub use transform::Transform;
+pub use take_skip::{Skip, Take};
 pub use then::Then;
-pub use take_skip::{Take, Skip};
+pub use transform::Transform;
 
 #[cfg(test)]
 mod tests {
