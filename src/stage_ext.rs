@@ -1,5 +1,5 @@
 use crate::transform::Transform;
-use crate::{End, Filter, InputOutputStage, Then, Take, Skip, Dedup};
+use crate::{End, Filter, InputOutputStage, Then, Take, Skip, Dedup, Collect};
 
 pub trait StageExt: InputOutputStage {
     fn take(self, amount: usize) -> Then<Self, Take<Self::Output>>
@@ -55,6 +55,26 @@ pub trait StageExt: InputOutputStage {
         Self: Sized,
         Self::Output: PartialEq + Clone {
         Then::new(self, Dedup::new())
+    }
+
+    /// Collect all outputted values using a collector function. The collector function
+    /// will always return true.
+    ///
+    /// ## Example
+    /// ```
+    /// # use pipe_chan::{StageExt, InputStage};
+    /// let mut output = Vec::<i32>::new();
+    /// let mut pipe = pipe_chan::Transform::new(|x| x*2).collect(|x| output.push(x));
+    /// for x in &[1,2,3] {
+    ///     pipe.process(*x);
+    /// }
+    /// assert_eq!(output, [2,4,6]);
+    /// ```
+    fn collect<Func>(self, collector: Func) -> Then<Self, Collect<Func, Self::Output>>
+    where
+        Self: Sized,
+        Func: FnMut(Self::Output) {
+        Then::new(self, Collect::new(collector))
     }
 
     fn end<T>(self, consumer: T) -> Then<Self, End<T, Self::Output>>

@@ -62,3 +62,33 @@ impl<F, A> InputStage for End<F, A>
         (self.consumer)(value)
     }
 }
+
+/// A variant of [`End`](crate::End) that always returns true. See [`.collect()`](crate::StageExt::collect)
+/// for more information.
+pub struct Collect<Func, Arg> {
+    collector: Func,
+    _phantom: PhantomData<Arg>,
+}
+
+impl<Func, Arg> Collect<Func, Arg>
+where
+    Func: FnMut(Arg) {
+    pub fn new(collector: Func) -> Self {
+        Self {
+            collector,
+            _phantom: PhantomData
+        }
+    }
+}
+
+impl<Func, Arg> InputStage for Collect<Func, Arg>
+where
+    Func: FnMut(Arg) {
+    type Input = Arg;
+
+    #[inline(always)]
+    fn process(&mut self, value: Self::Input) -> bool {
+        (self.collector)(value);
+        true
+    }
+}
