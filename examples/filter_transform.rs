@@ -19,7 +19,7 @@ fn by_iterator(data: &Vec<i32>) -> i32 {
 
 fn pipeline(data: &Vec<i32>) -> i32 {
     let mut result = 0i32;
-    let mut pipe = pipe_chan::Begin::<i32>::new()
+    let mut pipe = pipe_chan::begin::<i32>()
         .filter(|x| (*x % 2) == 0)
         .transform(|x| x * 3)
         .end(|x| {

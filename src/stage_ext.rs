@@ -1,5 +1,5 @@
-use crate::transform::Transform;
-use crate::{End, Filter, InputOutputStage, Then, Take, Skip, Dedup, Collect};
+use crate::structs::{End, Filter, Then, Take, Skip, Dedup, Collect, Transform};
+use crate::InputOutputStage;
 
 pub trait StageExt: InputOutputStage {
     fn take(self, amount: usize) -> Then<Self, Take<Self::Output>>
@@ -39,7 +39,7 @@ pub trait StageExt: InputOutputStage {
     /// ```
     /// # use pipe_chan::{StageExt, InputStage};
     /// let mut output = Vec::<i32>::new();
-    /// let mut pipe = pipe_chan::Dedup::new().end(|x| {
+    /// let mut pipe = pipe_chan::begin().dedup().end(|x| {
     ///     output.push(x);
     ///     true
     /// });
@@ -64,7 +64,7 @@ pub trait StageExt: InputOutputStage {
     /// ```
     /// # use pipe_chan::{StageExt, InputStage};
     /// let mut output = Vec::<i32>::new();
-    /// let mut pipe = pipe_chan::Transform::new(|x| x*2).collect(|x| output.push(x));
+    /// let mut pipe = pipe_chan::begin().transform(|x| x*2).collect(|x| output.push(x));
     /// for x in &[1,2,3] {
     ///     pipe.process(*x);
     /// }

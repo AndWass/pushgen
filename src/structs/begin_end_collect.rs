@@ -63,7 +63,7 @@ impl<F, A> InputStage for End<F, A>
     }
 }
 
-/// A variant of [`End`](crate::End) that always returns true. See [`.collect()`](crate::StageExt::collect)
+/// A variant of [`End`](crate::StageExt::end) that always returns true. See [`.collect()`](crate::StageExt::collect)
 /// for more information.
 pub struct Collect<Func, Arg> {
     collector: Func,
