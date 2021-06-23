@@ -38,7 +38,7 @@ impl<F, A> InputOutputStage for Filter<F, A>
 where F: FnMut(&A) -> bool {
     type Output = A;
 
-    #[inline(always)]
+    #[inline]
     fn process_and_then(&mut self, value: Self::Input, next: &mut dyn InputStage<Input=Self::Output>) -> bool {
         if (self.predicate)(&value) {
             next.process(value)

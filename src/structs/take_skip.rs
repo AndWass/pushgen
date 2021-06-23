@@ -1,6 +1,7 @@
 use std::marker::PhantomData;
 use crate::{InputStage, InputOutputStage};
 
+/// Takes N values, and then no more. See [`.take()`](crate::StageExt::take) for more details.
 pub struct Take<T> {
     amount: usize,
     _phantom: PhantomData<T>,
@@ -45,6 +46,8 @@ impl<T> InputOutputStage for Take<T> {
     }
 }
 
+/// Skips N values and then forwards any remaining values after that. See [`.skip()`](crate::StageExt::skip)
+/// for more details.
 pub struct Skip<T> {
     amount: usize,
     _phantom: PhantomData<T>,
@@ -61,7 +64,7 @@ impl<T> Skip<T> {
 
 impl<T> InputStage for Skip<T> {
     type Input = T;
-    #[inline(always)]
+    #[inline(never)]
     fn process(&mut self, _value: Self::Input) -> bool {
         if self.amount > 0 {
             self.amount -= 1;
@@ -73,7 +76,7 @@ impl<T> InputStage for Skip<T> {
 impl<T> InputOutputStage for Skip<T> {
     type Output = T;
 
-    #[inline(always)]
+    #[inline]
     fn process_and_then(&mut self, value: Self::Input, next: &mut dyn InputStage<Input=Self::Output>) -> bool {
         if self.amount > 0 {
             self.amount -= 1;

@@ -2,6 +2,18 @@ use crate::structs::{End, Filter, Then, Take, Skip, Dedup, Collect, Transform};
 use crate::InputOutputStage;
 
 pub trait StageExt: InputOutputStage {
+    /// Take `amount` values and ignore any other values after that.
+    ///
+    /// ## Example
+    /// ```
+    /// # use pipe_chan::{begin, InputStage, StageExt};
+    /// let mut output = Vec::new();
+    /// let mut pipe = pipe_chan::begin().take(3).collect(|x| output.push(x));
+    /// for x in &[1,2,3,4,5] {
+    ///     pipe.process(*x);
+    /// }
+    /// assert_eq!(output, [1,2,3]);
+    /// ```
     fn take(self, amount: usize) -> Then<Self, Take<Self::Output>>
     where
         Self: Sized
@@ -9,6 +21,18 @@ pub trait StageExt: InputOutputStage {
         Then::new(self, Take::new(amount))
     }
 
+    /// Skip `amount` values, then forward any remaining values after that.
+    ///
+    /// ## Example
+    /// ```
+    /// # use pipe_chan::{begin, InputStage, StageExt};
+    /// let mut output = Vec::new();
+    /// let mut pipe = pipe_chan::begin().skip(3).collect(|x| output.push(x));
+    /// for x in &[1,2,3,4,5] {
+    ///     pipe.process(*x);
+    /// }
+    /// assert_eq!(output, [4,5]);
+    /// ```
     fn skip(self, amount: usize) -> Then<Self, Skip<Self::Output>>
         where
             Self: Sized
@@ -16,6 +40,18 @@ pub trait StageExt: InputOutputStage {
         Then::new(self, Skip::new(amount))
     }
 
+    /// Filter values based on a predicate.
+    ///
+    /// ## Example
+    /// ```
+    /// # use pipe_chan::{begin, InputStage, StageExt};
+    /// let mut output = Vec::new();
+    /// let mut pipe = pipe_chan::begin().filter(|x| x % 2 == 0).collect(|x| output.push(x));
+    /// for x in 0..10 {
+    ///     pipe.process(x);
+    /// }
+    /// assert_eq!(output, [0, 2, 4, 6, 8]);
+    /// ```
     fn filter<P>(self, predicate: P) -> Then<Self, Filter<P, Self::Output>>
     where
         Self: Sized,
@@ -24,6 +60,18 @@ pub trait StageExt: InputOutputStage {
         Then::new(self, Filter::new(predicate))
     }
 
+    /// Transform values using a transform function.
+    ///
+    /// ## Example
+    /// ```
+    /// # use pipe_chan::{begin, InputStage, StageExt};
+    /// let mut output = Vec::new();
+    /// let mut pipe = pipe_chan::begin().transform(|x| x*3).collect(|x| output.push(x));
+    /// for x in 1..=3 {
+    ///     pipe.process(x);
+    /// }
+    /// assert_eq!(output, [3,6,9]);
+    /// ```
     fn transform<T, R>(self, transform: T) -> Then<Self, Transform<Self::Output, R, T>>
     where
         Self: Sized,
