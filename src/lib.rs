@@ -1,13 +1,8 @@
-mod stage;
-mod stage_ext;
-mod stream;
+mod combine;
 
-pub mod structs;
+pub mod generator;
+pub mod value;
 
-pub use stage::{InputStage, InputOutputStage};
-pub use stage_ext::StageExt;
-
-
-pub fn begin<T>() -> structs::Begin<T> {
-    structs::Begin::new()
-}
+pub use combine::Combine;
+pub use generator::{Generator, GeneratorResult, GenericGenerator};
+pub use value::ValueResult;
