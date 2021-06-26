@@ -1,10 +1,12 @@
-use pipe_chan::{Generator, ValueResult, GeneratorResult, Combine};
-use pipe_chan::generator::structs::{Skip};
-use pipe_chan::value::structs::{Filter, Transform};
+use pipe_chan::generator::{GeneratorExt, SliceGenerator};
+use pipe_chan::{
+    Generator, GeneratorResult, ValueResult,
+};
 
 fn by_hand(data: &Vec<i32>) -> i32 {
-    let mut retval = 100i32;
-    for x in data {
+    let mut retval = 0i32;
+    for index in 100..(data.len().saturating_sub(100000)) {
+        let x = unsafe { data.get_unchecked(index) };
         if x % 2 == 0 {
             retval = retval.wrapping_add(x * 3);
         }
@@ -16,6 +18,7 @@ fn by_iterator(data: &Vec<i32>) -> i32 {
     let mut result = 0i32;
     data.iter()
         .skip(100)
+        .take(data.len().saturating_sub(100000))
         .filter(|x| **x % 2 == 0)
         .map(|x| x * 3)
         .for_each(|x| result = result.wrapping_add(x));
@@ -44,14 +47,12 @@ impl<'a> Generator for VectorGenerator<'a> {
 
 fn stream(data: &Vec<i32>) -> i32 {
     let mut result = 0i32;
-    let generator = Skip::new(VectorGenerator {
-        index: 0,
-        data,
-    }, 100);
-    let filter_transform = Combine::new(
-        Filter::new(|x| x % 2 == 0),
-        Transform::new(|x| x * 3));
-    let mut generator = Combine::new(generator, filter_transform);
+    let mut generator = //VectorGenerator{index: 0, data}
+        SliceGenerator::new(data.as_slice())
+        .skip(100)
+        .take(data.len().saturating_sub(100000))
+        .filter(|x| *x % 2 == 0)
+        .transform(|x| x * 3);
     generator.run(|x| {
         result = result.wrapping_add(x);
         ValueResult::MoreValues
@@ -62,7 +63,7 @@ fn stream(data: &Vec<i32>) -> i32 {
 fn main() {
     let arg = std::env::args().skip(1).collect::<Vec<String>>();
 
-    let mut count = 1000_000;
+    let mut count = 2000_000;
     let mut cycles = 100;
     if let Some(arg) = arg.get(0) {
         count = arg.parse().unwrap();

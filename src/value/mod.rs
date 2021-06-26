@@ -1,4 +1,3 @@
-pub mod structs;
 
 #[derive(Ord, PartialOrd, Eq, PartialEq, Copy, Clone, Debug)]
 #[repr(u8)]

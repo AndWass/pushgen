@@ -1,4 +1,7 @@
+mod generator_ext;
 pub mod structs;
+
+pub use generator_ext::GeneratorExt;
 
 use std::marker::PhantomData;
 use crate::ValueResult;
@@ -102,12 +105,91 @@ impl<Out, Gen> Generator for GenericGenerator<Out, Gen>
         Gen: FnMut() -> Option<Out>,
 {
     type Output = Out;
-
+    #[inline]
     fn run(&mut self, mut output: impl FnMut(Self::Output) -> ValueResult) -> GeneratorResult {
         while let Some(value) = (self.generator)() {
             if output(value) == ValueResult::Stop {
                 return GeneratorResult::Stopped;
             }
+        }
+        GeneratorResult::Complete
+    }
+}
+
+/// A helper generator that adapts an iterator to a generator.
+///
+/// ## Example
+/// ```
+/// # use pipe_chan::{Generator, IteratorGenerator, ValueResult, GeneratorResult};
+/// let input = [1,2,3,4];
+/// let mut output: Vec<i32> = Vec::new();
+/// let run = IteratorGenerator::new(input.iter()).run(|x| {
+///     output.push(*x);
+///     ValueResult::MoreValues
+/// });
+/// assert_eq!(run, GeneratorResult::Complete);
+/// assert_eq!(output, [1,2,3,4]);
+/// ```
+pub struct IteratorGenerator<Iter>
+{
+    iter: Iter,
+}
+
+impl<Iter> IteratorGenerator<Iter>
+where
+    Iter: Iterator
+{
+    pub fn new(iter: Iter) -> Self {
+        Self {
+            iter
+        }
+    }
+}
+
+impl<Iter> Generator for IteratorGenerator<Iter>
+where
+    Iter: Iterator
+{
+    type Output = Iter::Item;
+    #[inline]
+    fn run(&mut self, mut output: impl FnMut(Self::Output) -> ValueResult) -> GeneratorResult {
+        while let Some(value) = self.iter.next() {
+            if output(value) == ValueResult::Stop {
+                return GeneratorResult::Stopped;
+            }
+        }
+        GeneratorResult::Complete
+    }
+}
+
+pub struct SliceGenerator<'a, T>
+{
+    slice: &'a [T],
+    index: usize
+}
+
+impl<'a, T> SliceGenerator<'a, T>
+{
+    pub fn new(slice: &'a[T]) -> Self {
+        Self {
+            slice,
+            index: 0
+        }
+    }
+}
+
+impl<'a, T> Generator for SliceGenerator<'a, T> {
+    type Output = &'a T;
+
+    #[inline]
+    fn run(&mut self, mut output: impl FnMut(Self::Output) -> ValueResult) -> GeneratorResult {
+        let len = self.slice.len();
+        while self.index < len {
+            if output(unsafe { self.slice.get_unchecked(self.index) }) == ValueResult::Stop {
+                self.index += 1;
+                return GeneratorResult::Stopped;
+            }
+            self.index += 1;
         }
         GeneratorResult::Complete
     }
