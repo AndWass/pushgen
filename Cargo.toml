@@ -17,3 +17,7 @@ harness = false
 [[bench]]
 name = "take_filter_transform"
 harness = false
+
+[[bench]]
+name = "chain_take_filter_transform"
+harness = false
