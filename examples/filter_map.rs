@@ -1,5 +1,4 @@
-use pipe_chan::generator::SliceGenerator;
-use pipe_chan::{GeneratorExt, GeneratorResult};
+use pipe_chan::{GeneratorExt, GeneratorResult, SliceGenerator};
 
 fn make_data() -> Vec<i32> {
     let mut data = Vec::new();

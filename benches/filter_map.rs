@@ -1,6 +1,5 @@
 use criterion::{black_box, criterion_group, criterion_main, Criterion};
-use pipe_chan::generator::SliceGenerator;
-use pipe_chan::GeneratorExt;
+use pipe_chan::{SliceGenerator, GeneratorExt};
 
 fn run_iterator(data: &Vec<i32>) {
     let mut result = 0i32;

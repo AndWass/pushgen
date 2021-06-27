@@ -7,7 +7,7 @@ use crate::{Generator, ValueResult, GeneratorResult};
 /// ## Example
 /// ```
 /// # use pipe_chan::*;
-/// # use pipe_chan::generator::structs::Filter;
+/// # use pipe_chan::structs::Filter;
 /// let input = [1,2,3,4];
 /// let mut output: Vec<i32> = Vec::new();
 /// let run_result = Filter::new(IteratorGenerator::new(input.iter()), |x| *x % 2 == 0).for_each(|x| output.push(*x));
@@ -30,7 +30,7 @@ where
     /// ## Example
     /// ```
     /// # use pipe_chan::*;
-    /// # use pipe_chan::generator::structs::Filter;
+    /// # use pipe_chan::structs::Filter;
     /// let input = [1,2,3,4];
     /// let even_value_filter = Filter::new(IteratorGenerator::new(input.iter()), |x| *x % 2 == 0);
     /// ```

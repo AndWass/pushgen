@@ -38,8 +38,8 @@ where
 
 #[cfg(test)]
 mod tests {
-    use crate::generator::structs::chain::Chain;
-    use crate::generator::SliceGenerator;
+    use crate::structs::chain::Chain;
+    use crate::SliceGenerator;
     use crate::{Generator, ValueResult, GeneratorResult};
 
     #[test]

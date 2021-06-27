@@ -4,7 +4,7 @@ use crate::{Generator, GeneratorResult, ValueResult};
 /// ## Example
 ///```
 /// # use pipe_chan::{GenericGenerator, GeneratorExt, ValueResult};
-/// # use pipe_chan::generator::structs::Skip;
+/// # use pipe_chan::structs::Skip;
 /// let input = [1,2,3,4];
 /// let mut iter = input.iter();
 /// let generator = GenericGenerator::new(|| iter.next());

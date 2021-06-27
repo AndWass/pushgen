@@ -45,7 +45,7 @@ impl<Src: Generator> Generator for Take<Src> {
 
 #[cfg(test)]
 mod tests {
-    use crate::generator::structs::Take;
+    use crate::structs::Take;
     use crate::{Generator, GeneratorResult, IteratorGenerator, ValueResult};
 
     #[test]

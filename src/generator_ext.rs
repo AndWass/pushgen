@@ -1,4 +1,4 @@
-use crate::generator::structs::{Chain, Filter, Skip, Take, Map};
+use crate::structs::{Chain, Filter, Skip, Take, Map};
 use crate::{Generator, GeneratorResult, ValueResult};
 
 pub trait Sealed {}
@@ -51,8 +51,7 @@ pub trait GeneratorExt: Sealed + Generator {
     /// to abort processing early. If early break is needed, use [`Generator::run`](crate::Generator::run)
     /// ## Example
     /// ```
-    /// # use pipe_chan::generator::SliceGenerator;
-    /// # use pipe_chan::{GeneratorExt, GeneratorResult};
+    /// # use pipe_chan::{GeneratorExt, GeneratorResult, SliceGenerator};
     /// let mut sum = 0i32;
     /// let data = [1,2,3];
     /// let result = SliceGenerator::new(&data).for_each(|x| sum += x);
