@@ -11,13 +11,13 @@ edition = "2018"
 criterion = "0.3"
 
 [[bench]]
-name = "filter_transform"
+name = "filter_map"
 harness = false
 
 [[bench]]
-name = "take_filter_transform"
+name = "take_filter_map"
 harness = false
 
 [[bench]]
-name = "chain_take_filter_transform"
+name = "chain_take_filter_map"
 harness = false

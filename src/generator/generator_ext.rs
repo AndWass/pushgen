@@ -1,4 +1,4 @@
-use crate::generator::structs::{Chain, Filter, Skip, Take, Transform};
+use crate::generator::structs::{Chain, Filter, Skip, Take, Map};
 use crate::{Generator, GeneratorResult, ValueResult};
 
 pub trait Sealed {}
@@ -22,12 +22,12 @@ pub trait GeneratorExt: Sealed + Generator {
         Filter::new(self, predicate)
     }
 
-    fn transform<Trans, Out>(self, transform_fn: Trans) -> Transform<Self, Trans, Out>
+    fn map<Trans, Out>(self, transform_fn: Trans) -> Map<Self, Trans, Out>
     where
         Self: Sized,
         Trans: FnMut(Self::Output) -> Out,
     {
-        Transform::new(self, transform_fn)
+        Map::new(self, transform_fn)
     }
 
     fn skip(self, amount: usize) -> Skip<Self>

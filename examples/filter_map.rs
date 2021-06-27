@@ -20,7 +20,7 @@ fn main() {
     let mut generator_sum = 0i32;
     let generator_result = SliceGenerator::new(data.as_slice())
         .filter(|x| *x % 2 == 0)
-        .transform(|x| x * 3)
+        .map(|x| x * 3)
         .for_each(|x| generator_sum += x);
 
     assert_eq!(generator_result, GeneratorResult::Complete);

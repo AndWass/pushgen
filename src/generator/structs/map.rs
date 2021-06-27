@@ -1,14 +1,14 @@
 use std::marker::PhantomData;
 use crate::{Generator, ValueResult, GeneratorResult};
 
-pub struct Transform<Gen, Func, Out>
+pub struct Map<Gen, Func, Out>
 {
     source: Gen,
     transform: Func,
     _phantom: PhantomData<Out>
 }
 
-impl<Gen, Func, Out> Transform<Gen, Func, Out>
+impl<Gen, Func, Out> Map<Gen, Func, Out>
 where
     Gen: Generator,
     Func: FnMut(Gen::Output) -> Out
@@ -23,7 +23,7 @@ where
     }
 }
 
-impl<Gen, Func, Out> Generator for Transform<Gen, Func, Out>
+impl<Gen, Func, Out> Generator for Map<Gen, Func, Out>
 where
     Gen: Generator,
     Func: FnMut(Gen::Output) -> Out {
