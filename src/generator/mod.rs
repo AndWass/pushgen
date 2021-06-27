@@ -120,13 +120,10 @@ impl<Out, Gen> Generator for GenericGenerator<Out, Gen>
 ///
 /// ## Example
 /// ```
-/// # use pipe_chan::{Generator, IteratorGenerator, ValueResult, GeneratorResult};
+/// # use pipe_chan::{GeneratorExt, IteratorGenerator, GeneratorResult};
 /// let input = [1,2,3,4];
 /// let mut output: Vec<i32> = Vec::new();
-/// let run = IteratorGenerator::new(input.iter()).run(|x| {
-///     output.push(*x);
-///     ValueResult::MoreValues
-/// });
+/// let run = IteratorGenerator::new(input.iter()).for_each(|x| output.push(*x));
 /// assert_eq!(run, GeneratorResult::Complete);
 /// assert_eq!(output, [1,2,3,4]);
 /// ```

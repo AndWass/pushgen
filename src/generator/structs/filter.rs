@@ -10,10 +10,7 @@ use crate::{Generator, ValueResult, GeneratorResult};
 /// # use pipe_chan::generator::structs::Filter;
 /// let input = [1,2,3,4];
 /// let mut output: Vec<i32> = Vec::new();
-/// let run_result = Filter::new(IteratorGenerator::new(input.iter()), |x| *x % 2 == 0).run(|x| {
-///     output.push(*x);
-///     ValueResult::MoreValues
-/// });
+/// let run_result = Filter::new(IteratorGenerator::new(input.iter()), |x| *x % 2 == 0).for_each(|x| output.push(*x));
 /// assert_eq!(run_result, GeneratorResult::Complete);
 /// assert_eq!(output, [2,4]);
 /// ```

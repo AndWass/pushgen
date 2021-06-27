@@ -3,17 +3,14 @@ use crate::{Generator, GeneratorResult, ValueResult};
 ///
 /// ## Example
 ///```
-/// # use pipe_chan::{GenericGenerator, Generator, ValueResult};
+/// # use pipe_chan::{GenericGenerator, GeneratorExt, ValueResult};
 /// # use pipe_chan::generator::structs::Skip;
 /// let input = [1,2,3,4];
 /// let mut iter = input.iter();
 /// let generator = GenericGenerator::new(|| iter.next());
 /// let mut skipped_generator = Skip::new(generator, 2);
 /// let mut output: Vec<i32> = Vec::new();
-/// skipped_generator.run(|x| {
-///     output.push(*x);
-///     ValueResult::MoreValues
-/// });
+/// skipped_generator.for_each(|x| output.push(*x));
 /// assert_eq!(output, [3,4]);
 /// ```
 pub struct Skip<Gen>

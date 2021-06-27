@@ -1,6 +1,6 @@
 use criterion::{black_box, criterion_group, criterion_main, Criterion};
 use pipe_chan::generator::SliceGenerator;
-use pipe_chan::{Generator, GeneratorExt, ValueResult};
+use pipe_chan::{GeneratorExt};
 
 fn run_iterator(data: &Vec<i32>) {
     let mut result = 0i32;
@@ -20,10 +20,7 @@ fn run_generator(data: &Vec<i32>) {
         .take(3 * data.len() / 2)
         .filter(|x| *x % 2 == 0)
         .transform(|x| x * 3);
-    generator.run(|x| {
-        result = result.wrapping_add(x);
-        ValueResult::MoreValues
-    });
+    generator.for_each(|x| result = result.wrapping_add(x));
     black_box(result);
 }
 
