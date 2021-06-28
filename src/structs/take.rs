@@ -46,14 +46,14 @@ impl<Src: Generator> Generator for Take<Src> {
 #[cfg(test)]
 mod tests {
     use crate::structs::Take;
-    use crate::{Generator, GeneratorResult, IteratorGenerator, ValueResult};
+    use crate::{Generator, GeneratorResult, ValueResult, SliceGenerator};
 
     #[test]
     fn take() {
         let data = [1, 2, 3, 4, 5];
         let mut output: Vec<i32> = Vec::new();
 
-        let result = Take::new(IteratorGenerator::new(data.iter()), 2).run(|x| {
+        let result = Take::new(SliceGenerator::new(&data), 2).run(|x| {
             output.push(*x);
             ValueResult::MoreValues
         });
@@ -66,7 +66,7 @@ mod tests {
         let data = [1, 2, 3, 4, 5];
         let mut output: Vec<i32> = Vec::new();
 
-        let mut generator = Take::new(IteratorGenerator::new(data.iter()), 4);
+        let mut generator = Take::new(SliceGenerator::new(&data), 4);
 
         let result = generator.run(|x| {
             output.push(*x);

@@ -2,8 +2,6 @@ mod generator_ext;
 
 pub mod structs;
 
-use std::marker::PhantomData;
-
 pub use crate::generator_ext::GeneratorExt;
 
 #[derive(Ord, PartialOrd, Eq, PartialEq, Copy, Clone, Debug)]
@@ -104,93 +102,6 @@ pub trait Generator {
     fn run(&mut self, output: impl FnMut(Self::Output) -> crate::ValueResult) -> GeneratorResult;
 }
 
-/// A generic generator that adapts a closure as a generator.
-///
-/// The closure must have the form
-/// `FnMut() -> Option<T>` and the generator will have `Generator::Output=T`.
-pub struct GenericGenerator<Out, Gen> {
-    generator: Gen,
-    _phantom: PhantomData<Out>,
-}
-
-impl<Out, Gen> GenericGenerator<Out, Gen>
-    where
-        Gen: FnMut() -> Option<Out>,
-{
-    /// Create a new GenericGenerator.
-    ///
-    /// ## Example
-    /// ```
-    /// # use pipe_chan::GenericGenerator;
-    /// let always42 = GenericGenerator::new(|| Some(42));
-    /// ```
-    pub fn new(generator: Gen) -> Self {
-        Self {
-            generator,
-            _phantom: PhantomData,
-        }
-    }
-}
-
-impl<Out, Gen> Generator for GenericGenerator<Out, Gen>
-    where
-        Gen: FnMut() -> Option<Out>,
-{
-    type Output = Out;
-    #[inline]
-    fn run(&mut self, mut output: impl FnMut(Self::Output) -> ValueResult) -> GeneratorResult {
-        while let Some(value) = (self.generator)() {
-            if output(value) == ValueResult::Stop {
-                return GeneratorResult::Stopped;
-            }
-        }
-        GeneratorResult::Complete
-    }
-}
-
-/// A helper generator that adapts an iterator to a generator.
-///
-/// ## Example
-/// ```
-/// # use pipe_chan::{GeneratorExt, IteratorGenerator, GeneratorResult};
-/// let input = [1,2,3,4];
-/// let mut output: Vec<i32> = Vec::new();
-/// let run = IteratorGenerator::new(input.iter()).for_each(|x| output.push(*x));
-/// assert_eq!(run, GeneratorResult::Complete);
-/// assert_eq!(output, [1,2,3,4]);
-/// ```
-pub struct IteratorGenerator<Iter>
-{
-    iter: Iter,
-}
-
-impl<Iter> IteratorGenerator<Iter>
-    where
-        Iter: Iterator
-{
-    pub fn new(iter: Iter) -> Self {
-        Self {
-            iter
-        }
-    }
-}
-
-impl<Iter> Generator for IteratorGenerator<Iter>
-    where
-        Iter: Iterator
-{
-    type Output = Iter::Item;
-    #[inline]
-    fn run(&mut self, mut output: impl FnMut(Self::Output) -> ValueResult) -> GeneratorResult {
-        while let Some(value) = self.iter.next() {
-            if output(value) == ValueResult::Stop {
-                return GeneratorResult::Stopped;
-            }
-        }
-        GeneratorResult::Complete
-    }
-}
-
 /// A generator that generates values from a slice.
 ///
 ///
@@ -205,6 +116,7 @@ impl<Iter> Generator for IteratorGenerator<Iter>
 pub struct SliceGenerator<'a, T>
 {
     slice: &'a [T],
+    len: usize,
     index: usize
 }
 
@@ -213,6 +125,7 @@ impl<'a, T> SliceGenerator<'a, T>
     pub fn new(slice: &'a[T]) -> Self {
         Self {
             slice,
+            len: slice.len(),
             index: 0
         }
     }
@@ -223,8 +136,7 @@ impl<'a, T> Generator for SliceGenerator<'a, T> {
 
     #[inline]
     fn run(&mut self, mut output: impl FnMut(Self::Output) -> ValueResult) -> GeneratorResult {
-        let len = self.slice.len();
-        while self.index < len {
+        while self.index < self.len {
             if output(unsafe { self.slice.get_unchecked(self.index) }) == ValueResult::Stop {
                 self.index += 1;
                 return GeneratorResult::Stopped;
