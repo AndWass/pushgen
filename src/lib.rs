@@ -136,7 +136,8 @@ impl<'a, T> Generator for SliceGenerator<'a, T> {
 
     #[inline]
     fn run(&mut self, mut output: impl FnMut(Self::Output) -> ValueResult) -> GeneratorResult {
-        while self.index < self.len {
+        let len = self.slice.len();
+        while self.index < len {
             if output(unsafe { self.slice.get_unchecked(self.index) }) == ValueResult::Stop {
                 self.index += 1;
                 return GeneratorResult::Stopped;
