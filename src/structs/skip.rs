@@ -1,18 +1,6 @@
 use crate::{Generator, GeneratorResult, ValueResult};
 
-///
-/// ## Example
-///```
-/// # use pipe_chan::{GenericGenerator, GeneratorExt, ValueResult};
-/// # use pipe_chan::structs::Skip;
-/// let input = [1,2,3,4];
-/// let mut iter = input.iter();
-/// let generator = GenericGenerator::new(|| iter.next());
-/// let mut skipped_generator = Skip::new(generator, 2);
-/// let mut output: Vec<i32> = Vec::new();
-/// skipped_generator.for_each(|x| output.push(*x));
-/// assert_eq!(output, [3,4]);
-/// ```
+/// Skip over a set amount of values. See [`.skip()`](crate::GeneratorExt::skip) for more details.
 pub struct Skip<Gen>
 {
     generator: Gen,
@@ -21,7 +9,7 @@ pub struct Skip<Gen>
 
 impl<Gen> Skip<Gen>
 {
-    pub fn new(generator: Gen, amount: usize) -> Self {
+    pub(crate) fn new(generator: Gen, amount: usize) -> Self {
         Self {
             generator,
             amount

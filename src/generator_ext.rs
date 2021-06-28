@@ -14,6 +14,19 @@ pub trait GeneratorExt: Sealed + Generator {
         Chain::new(self, other)
     }
 
+    /// Create a filtered generator. Only values for which the predicate returns true will be passed on.
+    ///
+    /// The predicate must implement `FnMut(&Gen::Output) -> bool`.
+    ///
+    /// ## Example
+    /// ```
+    /// # use pipe_chan::*;
+    /// let input = [1,2,3,4];
+    /// let mut output: Vec<i32> = Vec::new();
+    /// let run_result = SliceGenerator::new(&input).filter(|x| *x % 2 == 0).for_each(|x| output.push(*x));
+    /// assert_eq!(run_result, GeneratorResult::Complete);
+    /// assert_eq!(output, [2,4]);
+    /// ```
     fn filter<Pred>(self, predicate: Pred) -> Filter<Self, Pred>
     where
         Self: Sized,
@@ -30,6 +43,19 @@ pub trait GeneratorExt: Sealed + Generator {
         Map::new(self, transform_fn)
     }
 
+    /// Skips over `amount` number of values, consuming and ignoring them.
+    ///
+    ///
+    /// ## Example
+    ///```
+    /// # use pipe_chan::{GeneratorExt, SliceGenerator};
+    /// # use pipe_chan::structs::Skip;
+    /// let input = [1,2,3,4];
+    /// let mut skipped_generator = SliceGenerator::new(&input).skip(2);
+    /// let mut output: Vec<i32> = Vec::new();
+    /// skipped_generator.for_each(|x| output.push(*x));
+    /// assert_eq!(output, [3,4]);
+    /// ```
     fn skip(self, amount: usize) -> Skip<Self>
     where
         Self: Sized,
