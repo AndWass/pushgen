@@ -136,8 +136,11 @@ impl<'a, T> Generator for SliceGenerator<'a, T> {
 
     #[inline]
     fn run(&mut self, mut output: impl FnMut(Self::Output) -> ValueResult) -> GeneratorResult {
+        // Read the len once. The Rust compiler seems to have trouble optimizing self.slice.len()
+        // so read it once and use that in the loop condition instead.
         let len = self.slice.len();
         while self.index < len {
+            // Safety: self.index < self.slice.len() always true.
             if output(unsafe { self.slice.get_unchecked(self.index) }) == ValueResult::Stop {
                 self.index += 1;
                 return GeneratorResult::Stopped;
