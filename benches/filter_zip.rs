@@ -1,5 +1,5 @@
 use criterion::{black_box, criterion_group, criterion_main, Criterion};
-use pipe_chan::{SliceGenerator, GeneratorExt};
+use pushgen::{SliceGenerator, GeneratorExt};
 
 fn run_handwritten(data: &Vec<i32>) {
     let mut result = 0i32;

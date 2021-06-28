@@ -67,7 +67,7 @@ impl From<bool> for GeneratorResult {
 ///
 /// A generic generator can be written like this:
 /// ```
-/// use pipe_chan::{Generator, ValueResult, GeneratorResult};
+/// use pushgen::{Generator, ValueResult, GeneratorResult};
 /// struct GenericGenerator<Out, Gen>
 /// where
 ///     Gen: FnMut() -> Option<Out>,
@@ -107,7 +107,7 @@ pub trait Generator {
 ///
 /// ## Example
 /// ```
-/// # use pipe_chan::{SliceGenerator, GeneratorExt};
+/// # use pushgen::{SliceGenerator, GeneratorExt};
 /// let data = [1, 2, 3, 4];
 /// let mut sum = 0;
 /// SliceGenerator::new(&data).for_each(|x| sum += x);
@@ -116,7 +116,6 @@ pub trait Generator {
 pub struct SliceGenerator<'a, T>
 {
     slice: &'a [T],
-    len: usize,
     index: usize
 }
 
@@ -125,7 +124,6 @@ impl<'a, T> SliceGenerator<'a, T>
     pub fn new(slice: &'a[T]) -> Self {
         Self {
             slice,
-            len: slice.len(),
             index: 0
         }
     }

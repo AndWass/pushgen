@@ -20,7 +20,7 @@ pub trait GeneratorExt: Sealed + Generator {
     ///
     /// ## Example
     /// ```
-    /// # use pipe_chan::*;
+    /// # use pushgen::*;
     /// let input = [1,2,3,4];
     /// let mut output: Vec<i32> = Vec::new();
     /// let run_result = SliceGenerator::new(&input).filter(|x| *x % 2 == 0).for_each(|x| output.push(*x));
@@ -48,8 +48,8 @@ pub trait GeneratorExt: Sealed + Generator {
     ///
     /// ## Example
     ///```
-    /// # use pipe_chan::{GeneratorExt, SliceGenerator};
-    /// # use pipe_chan::structs::Skip;
+    /// # use pushgen::{GeneratorExt, SliceGenerator};
+    /// # use pushgen::structs::Skip;
     /// let input = [1,2,3,4];
     /// let mut skipped_generator = SliceGenerator::new(&input).skip(2);
     /// let mut output: Vec<i32> = Vec::new();
@@ -77,7 +77,7 @@ pub trait GeneratorExt: Sealed + Generator {
     /// to abort processing early. If early break is needed, use [`Generator::run`](crate::Generator::run)
     /// ## Example
     /// ```
-    /// # use pipe_chan::{GeneratorExt, GeneratorResult, SliceGenerator};
+    /// # use pushgen::{GeneratorExt, GeneratorResult, SliceGenerator};
     /// let mut sum = 0i32;
     /// let data = [1,2,3];
     /// let result = SliceGenerator::new(&data).for_each(|x| sum += x);
