@@ -21,3 +21,11 @@ harness = false
 [[bench]]
 name = "chain_take_filter_map"
 harness = false
+
+[[bench]]
+name = "zip"
+harness = false
+
+[[bench]]
+name = "filter_zip"
+harness = false

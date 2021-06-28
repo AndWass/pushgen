@@ -1,4 +1,4 @@
-use crate::structs::{Chain, Filter, Skip, Take, Map};
+use crate::structs::{Chain, Filter, Skip, Take, Map, Zip};
 use crate::{Generator, GeneratorResult, ValueResult};
 
 pub trait Sealed {}
@@ -94,6 +94,22 @@ pub trait GeneratorExt: Sealed + Generator {
             func(value);
             ValueResult::MoreValues
         })
+    }
+
+    /// Zips the output of two generators into a single generator of pairs.
+    ///
+    /// `zip()` returns a new generator that will use values from two generators, outputting
+    /// a tuple where the first element comes from the first generator, and the second element comes
+    /// from the second generator.
+    ///
+    /// The zip generator will complete when either generator completes.
+    #[inline]
+    fn zip<Right>(self, right: Right) -> Zip<Self, Right>
+    where
+        Self: Sized,
+        Right: Generator,
+    {
+        Zip::new(self, right)
     }
 }
 
