@@ -1,5 +1,6 @@
 use crate::{Generator, GeneratorResult, ValueResult};
 
+/// Take `n` values from a generator. See [`.take()`](crate::GeneratorExt::take) for details.
 pub struct Take<Src> {
     source: Src,
     amount_left: usize,

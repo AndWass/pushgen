@@ -1,3 +1,5 @@
+//! Generator adaptor implementations. See [`GeneratorExt`](crate::GeneratorExt) for more info.
+
 mod skip;
 mod filter;
 mod map;

@@ -1,6 +1,7 @@
 use core::marker::PhantomData;
 use crate::{Generator, ValueResult, GeneratorResult};
 
+/// Implements a mapped generator. See [`.map()`](crate::GeneratorExt::map) for details.
 pub struct Map<Gen, Func, Out>
 {
     source: Gen,

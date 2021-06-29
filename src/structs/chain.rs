@@ -1,5 +1,6 @@
 use crate::{Generator, GeneratorResult, ValueResult};
 
+/// Implements a chained generator. See [`.chain()`](crate::GeneratorExt::chain) for details.
 pub struct Chain<First, Second> {
     first: First,
     second: Second,

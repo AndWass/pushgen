@@ -1,5 +1,6 @@
 use crate::{Generator, ValueResult, GeneratorResult};
 
+/// Zip two generators. See [`.zip()`](crate::GeneratorExt::zip) for details.
 pub struct Zip<Left, Right>
 {
     left: Left,

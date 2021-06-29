@@ -5,7 +5,29 @@ pub trait Sealed {}
 
 impl<T> Sealed for T where T: Generator {}
 
+/// Provides extension-methods for all generators.
+///
+/// This allows generators to be composed to new generators, or consumed.
+///
+/// ## Example
+/// ```
+/// use pushgen::{SliceGenerator, GeneratorExt};
+/// let data = [1, 2, 3, 4];
+/// let mut output: Vec<i32> = Vec::new();
+/// SliceGenerator::new(&data).map(|x| x*3).for_each(|x| output.push(x));
+/// assert_eq!(output, [3,6,9,12]);
+/// ```
 pub trait GeneratorExt: Sealed + Generator {
+    /// Creates a generator by chaining two generators, running them one after the other.
+    ///
+    /// ## Example
+    /// ```
+    /// use pushgen::{SliceGenerator, GeneratorExt};
+    /// let data = [1, 2, 3];
+    /// let mut output: Vec<i32> = Vec::new();
+    /// SliceGenerator::new(&data).chain(SliceGenerator::new(&data)).for_each(|x| output.push(*x));
+    /// assert_eq!(output, [1, 2, 3, 1, 2, 3]);
+    /// ```
     fn chain<Gen>(self, other: Gen) -> Chain<Self, Gen>
     where
         Self: Sized,
@@ -35,6 +57,16 @@ pub trait GeneratorExt: Sealed + Generator {
         Filter::new(self, predicate)
     }
 
+    /// Takes a closure and creates a generator which  calls the closure on each value.
+    ///
+    /// ## Example
+    /// ```
+    /// use pushgen::{SliceGenerator, GeneratorExt};
+    /// let data = [1, 2, 3];
+    /// let mut output: Vec<String> = Vec::new();
+    /// SliceGenerator::new(&data).map(|x| x.to_string()).for_each(|x| output.push(x));
+    /// assert_eq!(output, ["1", "2", "3"]);
+    /// ```
     fn map<Trans, Out>(self, transform_fn: Trans) -> Map<Self, Trans, Out>
     where
         Self: Sized,
@@ -43,8 +75,7 @@ pub trait GeneratorExt: Sealed + Generator {
         Map::new(self, transform_fn)
     }
 
-    /// Skips over `amount` number of values, consuming and ignoring them.
-    ///
+    /// Skips over `n` values, consuming and ignoring them.
     ///
     /// ## Example
     ///```
@@ -56,25 +87,35 @@ pub trait GeneratorExt: Sealed + Generator {
     /// skipped_generator.for_each(|x| output.push(*x));
     /// assert_eq!(output, [3,4]);
     /// ```
-    fn skip(self, amount: usize) -> Skip<Self>
+    fn skip(self, n: usize) -> Skip<Self>
     where
         Self: Sized,
     {
-        Skip::new(self, amount)
+        Skip::new(self, n)
     }
 
-    fn take(self, amount: usize) -> Take<Self>
+    /// Takes `n` values and then completes the generator.
+    ///
+    /// ## Example
+    /// ```
+    /// use pushgen::{SliceGenerator, GeneratorExt};
+    /// let data = [1, 2, 3, 4];
+    /// let mut output: Vec<i32> = Vec::new();
+    /// SliceGenerator::new(&data).take(2).for_each(|x| output.push(*x));
+    /// assert_eq!(output, [1, 2]);
+    /// ```
+    fn take(self, n: usize) -> Take<Self>
     where
         Self: Sized,
     {
-        Take::new(self, amount)
+        Take::new(self, n)
     }
 
-    /// Run a generator to completion (or until it is stopped) and apply a function for each value
+    /// Run a generator to completion, or until it is stopped, and call a closure for each value
     /// produced by the generator.
     ///
     /// The closure will be called for as long as the generator produces values, it is not possible
-    /// to abort processing early. If early break is needed, use [`Generator::run`](crate::Generator::run)
+    /// to abort processing early. If early abort is needed, use [`Generator::run`](crate::Generator::run)
     /// ## Example
     /// ```
     /// # use pushgen::{GeneratorExt, GeneratorResult, SliceGenerator};
@@ -103,6 +144,16 @@ pub trait GeneratorExt: Sealed + Generator {
     /// from the second generator.
     ///
     /// The zip generator will complete when either generator completes.
+    ///
+    /// ## Example
+    /// ```
+    /// use pushgen::{SliceGenerator, GeneratorExt};
+    /// let left = [1, 2, 3];
+    /// let right = [4, 5, 6];
+    /// let mut output: Vec<(i32, i32)> = Vec::new();
+    /// SliceGenerator::new(&left).zip(SliceGenerator::new(&right)).for_each(|(a, b)| output.push((*a, *b)));
+    /// assert_eq!(output, [(1,4), (2, 5), (3, 6)]);
+    /// ```
     #[inline]
     fn zip<Right>(self, right: Right) -> Zip<Self, Right>
     where
