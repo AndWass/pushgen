@@ -1,4 +1,4 @@
-use std::marker::PhantomData;
+use core::marker::PhantomData;
 use crate::{Generator, ValueResult, GeneratorResult};
 
 pub struct Map<Gen, Func, Out>

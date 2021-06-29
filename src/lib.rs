@@ -1,3 +1,5 @@
+#![cfg_attr(not(test), no_std)]
+
 mod generator_ext;
 
 pub mod structs;
