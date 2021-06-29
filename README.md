@@ -1,4 +1,12 @@
+
 # pushgen
+
+
+[![Crates.io][crates-badge]][crates-url]
+![https://docs.rs/pushgen](https://docs.rs/pushgen/badge.svg)
+
+[crates-badge]: https://img.shields.io/crates/v/pushgen.svg
+[crates-url]: https://crates.io/crates/pushgen
 
 Push-style design pattern for processing of ranges and data-streams.
 
