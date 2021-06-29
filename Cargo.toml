@@ -6,7 +6,9 @@ license = "MIT/Apache-2.0"
 repository = "https://github.com/AndWass/pushgen"
 authors = ["andwass"]
 
+homepage = "https://github.com/AndWass/pushgen"
 description = "Push-style design pattern for processing of ranges and data-streams."
+keywords = ["push", "generator", "stream"]
 
 
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
