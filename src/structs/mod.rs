@@ -6,6 +6,7 @@ mod map;
 mod take;
 mod chain;
 mod zip;
+mod dedup;
 
 pub use map::Map;
 pub use skip::Skip;
@@ -13,3 +14,4 @@ pub use filter::Filter;
 pub use take::Take;
 pub use chain::Chain;
 pub use zip::Zip;
+pub use dedup::Dedup;
