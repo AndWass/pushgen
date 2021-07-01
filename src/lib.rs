@@ -35,6 +35,9 @@ mod generator_ext;
 
 pub mod structs;
 
+#[cfg(test)]
+pub mod test;
+
 pub use crate::generator_ext::GeneratorExt;
 
 /// Value-consumption result.
