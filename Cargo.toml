@@ -47,3 +47,11 @@ harness = false
 [[bench]]
 name = "dedup_filter"
 harness = false
+
+[[bench]]
+name = "flatten_dedup_filter_map"
+harness = false
+
+[[bench]]
+name = "dedup_flatten_filter_map"
+harness = false
