@@ -107,65 +107,17 @@ mod tests {
 
     #[test]
     fn dedup_stopping_source() {
-        struct StoppingGen<'a> {
-            stop_at: i32,
-            stopped_data: Option<&'a i32>,
-            data: SliceGenerator<'a, i32>,
-        }
-
-        impl<'a> Generator for StoppingGen<'a> {
-            type Output = i32;
-
-            fn run(
-                &mut self,
-                mut output: impl FnMut(Self::Output) -> ValueResult,
-            ) -> GeneratorResult {
-                if self.stop_at == 0 {
-                    self.stop_at -= 1;
-                    return GeneratorResult::Stopped;
-                }
-
-                if let Some(x) = self.stopped_data.take() {
-                    if output(*x) == ValueResult::Stop {
-                        return GeneratorResult::Stopped;
-                    }
-                }
-
-                let stored_stop = &mut self.stopped_data;
-                let stop_at = &mut self.stop_at;
-                let result =
-                self.data.run(|x| {
-                    let old_stop_at = *stop_at;
-                    *stop_at -= 1;
-                    if old_stop_at == 0 {
-                        *stored_stop = Some(x);
-                        ValueResult::Stop
-                    }
-                    else {
-                        output(*x)
-                    }
-                });
-                if result == GeneratorResult::Complete {
-                    *stop_at = -1;
-                }
-                result
-            }
-        }
 
         let data = [1, 2, 2, 3, 3, 4];
 
-        //for x in 0..10 {
-            let gen = StoppingGen {
-                stop_at: 5,
-                data: SliceGenerator::new(&data),
-                stopped_data: None,
-            };
+        for x in 0..10 {
+            let gen = crate::test::StoppingGen::new(x, &data);
 
-            let out = run(Dedup::new(gen));
+            let out = run(Dedup::new(gen).map(|x| *x));
             if out != [1, 2, 3, 4] {
-                //println!("Failed x = {}", x);
+                println!("Failed x = {}", x);
             }
             assert_eq!(out, [1, 2, 3, 4]);
-        //}
+        }
     }
 }
