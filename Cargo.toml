@@ -55,3 +55,7 @@ harness = false
 [[bench]]
 name = "dedup_flatten_filter_map"
 harness = false
+
+[[bench]]
+name = "transrangers_test6"
+harness = false
