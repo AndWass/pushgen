@@ -9,6 +9,7 @@ pub struct Skip<Gen>
 
 impl<Gen> Skip<Gen>
 {
+    #[inline]
     pub(crate) fn new(generator: Gen, amount: usize) -> Self {
         Self {
             generator,

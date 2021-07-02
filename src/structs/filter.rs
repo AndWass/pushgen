@@ -12,6 +12,7 @@ where
     Gen: Generator,
     Pred: FnMut(&Gen::Output) -> bool
 {
+    #[inline]
     pub(crate) fn new(generator: Gen, predicate: Pred) -> Self {
         Self {
             generator,

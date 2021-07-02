@@ -7,6 +7,7 @@ pub struct Take<Src> {
 }
 
 impl<Src: Generator> Take<Src> {
+    #[inline]
     pub fn new(source: Src, amount: usize) -> Self {
         Self {
             source,

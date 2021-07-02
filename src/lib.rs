@@ -163,6 +163,7 @@ pub struct SliceGenerator<'a, T>
 
 impl<'a, T> SliceGenerator<'a, T>
 {
+    #[inline]
     pub fn new(slice: &'a[T]) -> Self {
         Self {
             slice,

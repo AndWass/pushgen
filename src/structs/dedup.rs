@@ -15,6 +15,7 @@ where
     Src: Generator,
     Src::Output: PartialEq,
 {
+    #[inline]
     pub(crate) fn new(source: Src) -> Self {
         Self {
             source,

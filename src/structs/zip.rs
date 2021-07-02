@@ -9,7 +9,8 @@ pub struct Zip<Left, Right>
 
 impl<Left, Right> Zip<Left, Right>
 {
-    pub fn new(left: Left, right: Right) -> Self {
+    #[inline]
+    pub(crate) fn new(left: Left, right: Right) -> Self {
         Self {
             left,
             right
@@ -24,7 +25,7 @@ where
 {
     type Output = (Left::Output, Right::Output);
 
-    #[inline(always)]
+    #[inline]
     fn run(&mut self, mut output: impl FnMut(Self::Output) -> ValueResult) -> GeneratorResult {
         let right = &mut self.right;
         let left = &mut self.left;

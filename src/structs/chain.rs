@@ -8,7 +8,8 @@ pub struct Chain<First, Second> {
 }
 
 impl<First, Second> Chain<First, Second> {
-    pub fn new(first: First, second: Second) -> Self {
+    #[inline]
+    pub(crate) fn new(first: First, second: Second) -> Self {
         Self {
             first,
             second,
