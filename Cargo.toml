@@ -21,41 +21,97 @@ criterion = "0.3"
 itertools = "0.10.1"
 
 [[bench]]
-name = "filter_map"
+name = "iter_next_filter_map"
 harness = false
 
 [[bench]]
-name = "take_filter_map"
+name = "for_each_filter_map"
 harness = false
 
 [[bench]]
-name = "chain_take_filter_map"
+name = "try_for_each_filter_map"
 harness = false
 
 [[bench]]
-name = "zip"
+name = "pushgen_filter_map"
 harness = false
 
 [[bench]]
-name = "filter_zip"
+name = "iter_next_chain_take_filter_map"
 harness = false
 
 [[bench]]
-name = "map_dedup"
+name = "for_each_chain_take_filter_map"
 harness = false
 
 [[bench]]
-name = "dedup_filter"
+name = "try_for_each_chain_take_filter_map"
 harness = false
 
 [[bench]]
-name = "flatten_dedup_filter_map"
+name = "pushgen_chain_take_filter_map"
 harness = false
 
 [[bench]]
-name = "dedup_flatten_filter_map"
+name = "for_each_dedup_filter"
 harness = false
 
 [[bench]]
-name = "transrangers_test6"
+name = "iter_next_dedup_filter"
+harness = false
+
+[[bench]]
+name = "try_for_each_dedup_filter"
+harness = false
+
+[[bench]]
+name = "pushgen_dedup_filter"
+harness = false
+
+[[bench]]
+name = "for_each_flatten_dedup_filter_map"
+harness = false
+
+[[bench]]
+name = "iter_next_flatten_dedup_filter_map"
+harness = false
+
+[[bench]]
+name = "try_for_each_flatten_dedup_filter_map"
+harness = false
+
+[[bench]]
+name = "pushgen_flatten_dedup_filter_map"
+harness = false
+
+[[bench]]
+name = "for_each_dedup_flatten_filter_map"
+harness = false
+
+[[bench]]
+name = "try_for_each_dedup_flatten_filter_map"
+harness = false
+
+[[bench]]
+name = "iter_next_dedup_flatten_filter_map"
+harness = false
+
+[[bench]]
+name = "pushgen_dedup_flatten_filter_map"
+harness = false
+
+[[bench]]
+name = "for_each_transrangers_test6"
+harness = false
+
+[[bench]]
+name = "try_for_each_transrangers_test6"
+harness = false
+
+[[bench]]
+name = "iter_next_transrangers_test6"
+harness = false
+
+[[bench]]
+name = "pushgen_transrangers_test6"
 harness = false
