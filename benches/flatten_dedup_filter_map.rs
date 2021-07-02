@@ -16,7 +16,8 @@ fn run_iterator(data: &Vec<Vec<i32>>) {
 fn run_generator(data: &Vec<Vec<i32>>) {
     let mut result = 0i32;
     SliceGenerator::new(data.as_slice())
-        .flatten(|x| SliceGenerator::new(x.as_slice()))
+        .map(|x| SliceGenerator::new(x.as_slice()))
+        .flatten()
         .dedup()
         .filter(|x| *x % 2 == 0)
         .map(|x| x * 3)

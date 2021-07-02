@@ -26,12 +26,12 @@ Test 6 | transrangers_test6.rs       |
 
 All values are the benchmarked elapsed time in micro-seconds.
 
-Test    | g++ Transrangers | g++ Ranges-v3 | clang Transrangers | clang Ranges-v3 | Rust iterators | pushgen |
---------|------------------|---------------|--------------------|-----------------|----------------|---------|
-Test 1  | 203              | 485           | 174                | 524             | 174            | 174     |
-Test 2  | 1080             | 4011          | 1039               | 7075            | 1267           | 813     |
-Test 3  | 24               | 71            | 22                 | 77              |  94            | 24      |
-Test 4  | 700              | 602           | 253                | 887             | 520            | 271     |
-Test 5  | 283              | 1011          | 266                | 938             | 237            | 174     |
-Test 6  | 899              | 1002          | 347                | 1172            | 348            | 348     |
+Test    | g++ Transrangers | g++ Ranges-v3 | clang Transrangers | clang Ranges-v3 | Rust Iterator::for_each | pushgen |
+--------|------------------|---------------|--------------------|-----------------|-------------------------|---------|
+Test 1  | 203              | 485           | 174                | 524             | 174                     | 174     |
+Test 2  | 1080             | 4011          | 1039               | 7075            | 1267                    | 813     |
+Test 3  | 24               | 71            | 22                 | 77              |  94                     | 24      |
+Test 4  | 700              | 602           | 253                | 887             | 536                     | 303     |
+Test 5  | 283              | 1011          | 266                | 938             | 319                     | 301     |
+Test 6  | 899              | 1002          | 354                | 1172            | 356                     | 359     |
 

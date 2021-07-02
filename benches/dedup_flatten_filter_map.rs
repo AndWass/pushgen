@@ -2,30 +2,25 @@ use criterion::{black_box, criterion_group, criterion_main, Criterion};
 use pushgen::{SliceGenerator, GeneratorExt};
 use itertools::Itertools;
 
-static mut ITER_RESULT: i32 = 0;
-static mut GENERATOR_RESULT: i32 = 0;
-
 fn run_iterator(data: &Vec<Vec<i32>>) {
     let mut result = 0i32;
     data.iter()
-        .dedup()
+        .map(|x| x.iter().dedup())
         .flatten()
         .filter(|x| *x % 2 == 0)
         .map(|x| x * 3)
         .for_each(|x| result = result.wrapping_add(x));
-    unsafe { ITER_RESULT = result };
     black_box(result);
 }
 
 fn run_generator(data: &Vec<Vec<i32>>) {
     let mut result = 0i32;
     SliceGenerator::new(data.as_slice())
-        .dedup()
-        .flatten(|x| SliceGenerator::new(x.as_slice()))
+        .map(|x| SliceGenerator::new(x.as_slice()).dedup())
+        .flatten()
         .filter(|x| *x % 2 == 0)
         .map(|x| x * 3)
         .for_each(|x| result = result.wrapping_add(x));
-    unsafe { GENERATOR_RESULT = result };
     black_box(result);
 }
 

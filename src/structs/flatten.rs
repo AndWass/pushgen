@@ -1,53 +1,51 @@
 use crate::{Generator, GeneratorResult, ValueResult};
 
 /// Flatten generator implementation. See [`.flatten()`](crate::GeneratorExt::flatten) for details.
-pub struct Flatten<Src, AdaptorFn, Adaptor>
+pub struct Flatten<Src>
 where
     Src: Generator,
-    Adaptor: Generator,
-    AdaptorFn: FnMut(Src::Output) -> Adaptor,
+    Src::Output: Generator,
 {
     source: Src,
-    adaptor_gen: AdaptorFn,
-    current_adaptor: Option<Adaptor>,
+    current_generator: Option<Src::Output>,
 }
 
-impl<Src, AdaptorFn, Adaptor> Flatten<Src, AdaptorFn, Adaptor>
+impl<Src> Flatten<Src>
 where
     Src: Generator,
-    Adaptor: Generator,
-    AdaptorFn: FnMut(Src::Output) -> Adaptor,
+    Src::Output: Generator,
 {
-    pub(crate) fn new(source: Src, adaptor_gen: AdaptorFn) -> Self {
+    pub(crate) fn new(source: Src) -> Self {
         Self {
             source,
-            adaptor_gen,
-            current_adaptor: None,
+            current_generator: None,
         }
     }
 }
 
-impl<Src, AdaptorFn, Adaptor> Generator for Flatten<Src, AdaptorFn, Adaptor>
+impl<Src> Generator for Flatten<Src>
 where
     Src: Generator,
-    Adaptor: Generator,
-    AdaptorFn: FnMut(Src::Output) -> Adaptor,
+    Src::Output: Generator,
 {
-    type Output = Adaptor::Output;
+    type Output = <<Src as Generator>::Output as Generator>::Output;
 
     #[inline]
     fn run(&mut self, mut output: impl FnMut(Self::Output) -> ValueResult) -> GeneratorResult {
-        if let Some(current) = self.current_adaptor.as_mut() {
+        if let Some(current) = self.current_generator.as_mut() {
             if current.run(|x| output(x)) == GeneratorResult::Stopped {
                 return GeneratorResult::Stopped;
             }
         }
 
-        let current_adaptor = &mut self.current_adaptor;
-        let adaptor_gen = &mut self.adaptor_gen;
+        let current_generator = &mut self.current_generator;
         self.source.run(|x| {
-            *current_adaptor = Some(adaptor_gen(x));
-            match current_adaptor.as_mut().unwrap().run(|value| output(value)) {
+            *current_generator = Some(x);
+            match current_generator
+                .as_mut()
+                .unwrap()
+                .run(|value| output(value))
+            {
                 GeneratorResult::Stopped => ValueResult::Stop,
                 GeneratorResult::Complete => ValueResult::MoreValues,
             }
@@ -64,10 +62,10 @@ mod tests {
     fn vector_flatten() {
         let data = vec![vec![1, 2, 3], vec![4, 5, 6], vec![7, 8, 9], vec![10]];
         let mut output: Vec<i32> = Vec::new();
-        let result = Flatten::new(SliceGenerator::new(data.as_slice()), |x| {
-            SliceGenerator::new(x.as_slice())
-        })
-        .for_each(|x| output.push(*x));
+        let result = SliceGenerator::new(data.as_slice())
+            .map(|x| SliceGenerator::new(x.as_slice()))
+            .flatten()
+            .for_each(|x| output.push(*x));
 
         assert_eq!(output, [1, 2, 3, 4, 5, 6, 7, 8, 9, 10]);
         assert_eq!(result, GeneratorResult::Complete);
@@ -78,7 +76,8 @@ mod tests {
         let data = [[1, 2, 3, 4], [5, 6, 7, 8], [9, 10, 11, 12]];
         let mut output = Vec::new();
         let result = SliceGenerator::new(&data)
-            .flatten(|x| SliceGenerator::new(x))
+            .map(|x| SliceGenerator::new(x))
+            .flatten()
             .for_each(|x| output.push(*x));
         assert_eq!(result, GeneratorResult::Complete);
         assert_eq!(output, [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12]);
@@ -90,7 +89,7 @@ mod tests {
         let expected = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12];
         for x in 0..10 {
             let mut gen =
-                crate::test::StoppingGen::new(x, &data).flatten(|v| SliceGenerator::new(v));
+                crate::test::StoppingGen::new(x, &data).map(|x| SliceGenerator::new(x)).flatten();
 
             let mut output = Vec::new();
 

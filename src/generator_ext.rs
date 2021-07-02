@@ -137,12 +137,9 @@ pub trait GeneratorExt: Sealed + Generator {
         })
     }
 
-    /// Creates a generator that flattens nested structures using a generator adaptor.
+    /// Creates a generator that removes a level generators.
     ///
-    /// The adaptor closure must implement `FnMut(Self::Output) -> impl Generator`.
-    ///
-    /// This is useful if you have a range of ranges, and you want to remove on or several levels
-    /// of indirection.
+    /// A generator that outputs generators can be flattened to "remove" middle-layer generator.
     ///
     /// ## Example
     /// ```
@@ -150,16 +147,17 @@ pub trait GeneratorExt: Sealed + Generator {
     /// let data = vec![vec![1, 2, 3, 4], vec![5, 6]];
     /// let mut flatted = Vec::new();
     /// SliceGenerator::new(data.as_slice())
-    ///     .flatten(|x| SliceGenerator::new(x.as_slice()))
+    ///     .map(|x| SliceGenerator::new(x.as_slice()))
+    ///     .flatten()
     ///     .for_each(|x| flatted.push(*x));
     /// assert_eq!(flatted, [1, 2, 3, 4, 5, 6]);
     /// ```
-    fn flatten<AdaptorFn, Adaptor>(self, adaptor: AdaptorFn) -> Flatten<Self, AdaptorFn, Adaptor>
+    fn flatten(self) -> Flatten<Self>
     where
         Self: Sized,
-        Adaptor: Generator,
-        AdaptorFn: FnMut(Self::Output) -> Adaptor {
-        Flatten::new(self, adaptor)
+        Self::Output: Generator,
+    {
+        Flatten::new(self)
     }
 
     /// Zips the output of two generators into a single generator of pairs.
