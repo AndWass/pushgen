@@ -17,8 +17,8 @@ like C++ does).
 
 ## Example
 ```rust
-# fn process(x: i32) {}
-# let data = [1, 2, 3, 4, 5];
+fn process(x: i32) { /*...*/ }
+let data = [1, 2, 3, 4, 5];
 
 for item in data.iter().filter(|x| *x % 2 == 0).map(|x| x * 3) {
     process(item);
@@ -28,9 +28,8 @@ for item in data.iter().filter(|x| *x % 2 == 0).map(|x| x * 3) {
 can be rewritten as
 ```rust
 use pushgen::{SliceGenerator, GeneratorExt};
-# fn process(_x: i32) {}
-# let data = [1, 2, 3, 4, 5];
-// Assume data is a slice
+fn process(_x: i32) { /*...*/ }
+let data = [1, 2, 3, 4, 5];
 SliceGenerator::new(&data).filter(|x| *x % 2 == 0).map(|x| x * 3).for_each(process);
 ```
 
