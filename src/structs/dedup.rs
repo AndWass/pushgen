@@ -30,7 +30,7 @@ where
 
     #[inline]
     fn run(&mut self, mut output: impl FnMut(Self::Output) -> ValueResult) -> GeneratorResult {
-        if !self.next.is_some() {
+        if self.next.is_none() {
             let next = &mut self.next;
             // Try to get the initial value
             let take_one_res = self.source.run(|x| {
@@ -48,11 +48,11 @@ where
 
         let mut result = self.source.run(|x| {
             let next_value = next.take().unwrap();
-            if x == next_value {
-                *next = Some(x);
+            let is_equal = x == next_value;
+            *next = Some(x);
+            if is_equal {
                 ValueResult::MoreValues
             } else {
-                *next = Some(x);
                 output(next_value)
             }
         });
@@ -60,10 +60,10 @@ where
         // If the source generator was stopped we might have more values coming later runs,
         // but if it was complete we assume no more values will be generated and
         // we need to output the last held value.
-        if result == GeneratorResult::Complete {
-            if output(self.next.take().unwrap()) == ValueResult::Stop {
-                result = GeneratorResult::Stopped;
-            }
+        if result == GeneratorResult::Complete
+            && output(self.next.take().unwrap()) == ValueResult::Stop
+        {
+            result = GeneratorResult::Stopped;
         }
 
         result
