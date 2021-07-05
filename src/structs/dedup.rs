@@ -17,10 +17,7 @@ where
 {
     #[inline]
     pub(crate) fn new(source: Src) -> Self {
-        Self {
-            source,
-            next: None,
-        }
+        Self { source, next: None }
     }
 }
 
@@ -54,8 +51,7 @@ where
             if x == next_value {
                 *next = Some(x);
                 ValueResult::MoreValues
-            }
-            else {
+            } else {
                 *next = Some(x);
                 output(next_value)
             }
@@ -108,7 +104,6 @@ mod tests {
 
     #[test]
     fn dedup_stopping_source() {
-
         let data = [1, 2, 2, 3, 3, 4];
 
         for x in 0..10 {

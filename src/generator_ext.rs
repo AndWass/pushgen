@@ -1,4 +1,4 @@
-use crate::structs::{Chain, Filter, Skip, Take, Map, Zip, Dedup, Flatten, IteratorAdaptor};
+use crate::structs::{Chain, Dedup, Filter, Flatten, IteratorAdaptor, Map, Skip, Take, Zip};
 use crate::{Generator, GeneratorResult, ValueResult};
 
 pub trait Sealed {}
@@ -129,7 +129,7 @@ pub trait GeneratorExt: Sealed + Generator {
     fn for_each<Func>(&mut self, mut func: Func) -> GeneratorResult
     where
         Self: Sized,
-        Func: FnMut(Self::Output)
+        Func: FnMut(Self::Output),
     {
         self.run(move |value| {
             func(value);
@@ -237,7 +237,7 @@ pub trait GeneratorExt: Sealed + Generator {
     #[inline]
     fn iter(self) -> IteratorAdaptor<Self>
     where
-        Self: Sized
+        Self: Sized,
     {
         IteratorAdaptor::new(self)
     }
@@ -246,16 +246,13 @@ pub trait GeneratorExt: Sealed + Generator {
 impl<T: Generator> GeneratorExt for T {}
 
 #[cfg(test)]
-mod tests
-{
-    use crate::{Generator, ValueResult, GeneratorResult, GeneratorExt};
+mod tests {
+    use crate::{Generator, GeneratorExt, GeneratorResult, ValueResult};
 
     #[test]
-    fn for_each_stopped()
-    {
+    fn for_each_stopped() {
         struct StoppingGen;
-        impl Generator for StoppingGen
-        {
+        impl Generator for StoppingGen {
             type Output = i32;
 
             fn run(&mut self, _output: impl FnMut(Self::Output) -> ValueResult) -> GeneratorResult {

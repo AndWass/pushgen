@@ -1,5 +1,5 @@
 use criterion::{black_box, criterion_group, criterion_main, Criterion};
-use pushgen::{SliceGenerator, GeneratorExt};
+use pushgen::{GeneratorExt, SliceGenerator};
 
 fn run_generator(data: &Vec<i32>) {
     let mut result = 0i32;

@@ -1,10 +1,10 @@
 use criterion::{black_box, criterion_group, criterion_main, Criterion};
 use itertools::Itertools;
 
-fn run_iterator_next(data: &Vec<Vec<i32>>)
-{
+fn run_iterator_next(data: &Vec<Vec<i32>>) {
     let mut result = 0i32;
-    for x in data.iter()
+    for x in data
+        .iter()
         .flatten()
         .dedup()
         .filter(|x| *x % 2 == 0)
@@ -18,7 +18,7 @@ fn run_iterator_next(data: &Vec<Vec<i32>>)
 pub fn make_data() -> Vec<Vec<i32>> {
     let mut data = Vec::new();
     data.reserve(100_000);
-    for x in 0..100_000/4 {
+    for x in 0..100_000 / 4 {
         data.push(x);
         data.push(x);
         data.push(x);

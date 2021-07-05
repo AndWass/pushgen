@@ -2,7 +2,8 @@ use criterion::{black_box, criterion_group, criterion_main, Criterion};
 
 fn function_under_bench(data: &Vec<i32>) {
     let mut result = 0i32;
-    for x in data.iter()
+    for x in data
+        .iter()
         .chain(data.iter())
         .take(3 * data.len() / 2)
         .filter(|x| *x % 2 == 0)

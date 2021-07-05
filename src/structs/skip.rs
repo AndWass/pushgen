@@ -1,26 +1,21 @@
 use crate::{Generator, GeneratorResult, ValueResult};
 
 /// Skip over a set amount of values. See [`.skip()`](crate::GeneratorExt::skip) for more details.
-pub struct Skip<Gen>
-{
+pub struct Skip<Gen> {
     generator: Gen,
     amount: usize,
 }
 
-impl<Gen> Skip<Gen>
-{
+impl<Gen> Skip<Gen> {
     #[inline]
     pub(crate) fn new(generator: Gen, amount: usize) -> Self {
-        Self {
-            generator,
-            amount
-        }
+        Self { generator, amount }
     }
 }
 
 impl<Gen> Generator for Skip<Gen>
 where
-    Gen: Generator
+    Gen: Generator,
 {
     type Output = Gen::Output;
 
@@ -35,8 +30,7 @@ where
 
             if skip_run == GeneratorResult::Complete {
                 return GeneratorResult::Complete;
-            }
-            else if self.amount > 0 {
+            } else if self.amount > 0 {
                 return GeneratorResult::Stopped;
             }
         }

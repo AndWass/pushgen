@@ -1,5 +1,5 @@
 use criterion::{black_box, criterion_group, criterion_main, Criterion};
-use pushgen::{SliceGenerator, GeneratorExt};
+use pushgen::{GeneratorExt, SliceGenerator};
 
 fn run_generator(data: &Vec<Vec<i32>>) {
     let mut result = 0i32;
@@ -15,7 +15,7 @@ fn run_generator(data: &Vec<Vec<i32>>) {
 pub fn make_data() -> Vec<Vec<i32>> {
     let mut data = Vec::new();
     data.reserve(100_000);
-    for x in 0..100_000/4 {
+    for x in 0..100_000 / 4 {
         data.push(x);
         data.push(x);
         data.push(x);

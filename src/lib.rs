@@ -57,13 +57,11 @@ impl From<bool> for ValueResult {
     fn from(value: bool) -> Self {
         if !value {
             Self::Stop
-        }
-        else {
+        } else {
             Self::MoreValues
         }
     }
 }
-
 
 /// The result of generator runs.
 ///
@@ -78,15 +76,14 @@ pub enum GeneratorResult {
     Stopped,
     /// Returned from `Generator::run` when the generator has sent all values to the `output` function.
     /// When this has been returned the generator will never generate more values again.
-    Complete
+    Complete,
 }
 
 impl From<bool> for GeneratorResult {
     fn from(b: bool) -> Self {
         if !b {
             Self::Stopped
-        }
-        else {
+        } else {
             Self::Complete
         }
     }
@@ -155,20 +152,15 @@ pub trait Generator {
 /// SliceGenerator::new(&data).for_each(|x| sum += x);
 /// assert_eq!(sum, 10);
 /// ```
-pub struct SliceGenerator<'a, T>
-{
+pub struct SliceGenerator<'a, T> {
     slice: &'a [T],
-    index: usize
+    index: usize,
 }
 
-impl<'a, T> SliceGenerator<'a, T>
-{
+impl<'a, T> SliceGenerator<'a, T> {
     #[inline]
-    pub fn new(slice: &'a[T]) -> Self {
-        Self {
-            slice,
-            index: 0
-        }
+    pub fn new(slice: &'a [T]) -> Self {
+        Self { slice, index: 0 }
     }
 }
 

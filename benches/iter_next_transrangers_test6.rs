@@ -2,7 +2,8 @@ use criterion::{black_box, criterion_group, criterion_main, Criterion};
 
 fn run_iterator_next(data: &Vec<i32>) {
     let mut result = 0i32;
-    for x in data.iter()
+    for x in data
+        .iter()
         .zip(data.iter().map(|x| x * 3))
         .map(|(a, b)| a + b)
         .filter(|x| x % 3 == 0)

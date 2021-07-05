@@ -48,7 +48,7 @@ impl<Src: Generator> Generator for Take<Src> {
 #[cfg(test)]
 mod tests {
     use crate::structs::Take;
-    use crate::{Generator, GeneratorResult, ValueResult, SliceGenerator};
+    use crate::{Generator, GeneratorResult, SliceGenerator, ValueResult};
 
     #[test]
     fn take() {
@@ -83,6 +83,6 @@ mod tests {
             ValueResult::MoreValues
         });
         assert_eq!(result, GeneratorResult::Complete);
-        assert_eq!(output, [1,2,3,4]);
+        assert_eq!(output, [1, 2, 3, 4]);
     }
 }

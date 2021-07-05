@@ -42,7 +42,7 @@ where
 mod tests {
     use crate::structs::chain::Chain;
     use crate::SliceGenerator;
-    use crate::{Generator, ValueResult, GeneratorResult};
+    use crate::{Generator, GeneratorResult, ValueResult};
 
     #[test]
     fn basic_chain() {
@@ -54,6 +54,6 @@ mod tests {
         });
 
         assert_eq!(result, GeneratorResult::Complete);
-        assert_eq!(output, [1,2,3,1,2,3]);
+        assert_eq!(output, [1, 2, 3, 1, 2, 3]);
     }
 }

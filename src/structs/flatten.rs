@@ -88,8 +88,9 @@ mod tests {
         let data = [[1, 2, 3, 4], [5, 6, 7, 8], [9, 10, 11, 12]];
         let expected = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12];
         for x in 0..10 {
-            let mut gen =
-                crate::test::StoppingGen::new(x, &data).map(|x| SliceGenerator::new(x)).flatten();
+            let mut gen = crate::test::StoppingGen::new(x, &data)
+                .map(|x| SliceGenerator::new(x))
+                .flatten();
 
             let mut output = Vec::new();
 

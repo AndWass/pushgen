@@ -1,7 +1,6 @@
 use criterion::{black_box, criterion_group, criterion_main, Criterion};
 use itertools::Itertools;
 
-
 fn run_iterator_try_for_each(data: &Vec<i32>) {
     let mut result = 0i32;
     data.iter()
@@ -17,7 +16,7 @@ fn run_iterator_try_for_each(data: &Vec<i32>) {
 pub fn make_data() -> Vec<i32> {
     let mut retval = Vec::new();
     retval.reserve(100_000);
-    for x in 0..100_000/4 {
+    for x in 0..100_000 / 4 {
         retval.push(x);
         retval.push(x);
         retval.push(x);

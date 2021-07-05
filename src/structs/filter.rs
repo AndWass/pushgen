@@ -1,8 +1,7 @@
-use crate::{Generator, ValueResult, GeneratorResult};
+use crate::{Generator, GeneratorResult, ValueResult};
 
 /// Implements a filtered generator. See [`.filter()`](crate::GeneratorExt::filter) for more details.
-pub struct Filter<Gen, Pred>
-{
+pub struct Filter<Gen, Pred> {
     generator: Gen,
     predicate: Pred,
 }
@@ -10,13 +9,13 @@ pub struct Filter<Gen, Pred>
 impl<Gen, Pred> Filter<Gen, Pred>
 where
     Gen: Generator,
-    Pred: FnMut(&Gen::Output) -> bool
+    Pred: FnMut(&Gen::Output) -> bool,
 {
     #[inline]
     pub(crate) fn new(generator: Gen, predicate: Pred) -> Self {
         Self {
             generator,
-            predicate
+            predicate,
         }
     }
 }
@@ -24,7 +23,7 @@ where
 impl<Gen, Pred> Generator for Filter<Gen, Pred>
 where
     Gen: Generator,
-    Pred: FnMut(&Gen::Output) -> bool
+    Pred: FnMut(&Gen::Output) -> bool,
 {
     type Output = Gen::Output;
 
@@ -34,8 +33,7 @@ where
         generator.run(move |x| {
             if predicate(&x) {
                 output(x)
-            }
-            else {
+            } else {
                 ValueResult::MoreValues
             }
         })
