@@ -1,4 +1,4 @@
-use crate::structs::{Chain, Filter, Skip, Take, Map, Zip, Dedup, Flatten};
+use crate::structs::{Chain, Filter, Skip, Take, Map, Zip, Dedup, Flatten, IteratorAdaptor};
 use crate::{Generator, GeneratorResult, ValueResult};
 
 pub trait Sealed {}
@@ -218,6 +218,28 @@ pub trait GeneratorExt: Sealed + Generator {
         Self::Output: PartialEq,
     {
         Dedup::new(self)
+    }
+
+    /// Create an iterator from a generator.
+    ///
+    /// This allows generators to be used in basic for-loops.
+    ///
+    /// ## Example
+    /// ```
+    /// use pushgen::{SliceGenerator, GeneratorExt};
+    /// let data = [1, 2, 3, 4, 5, 6];
+    /// let mut sum = 0;
+    /// for x in SliceGenerator::new(&data).iter() {
+    ///     sum += x;
+    /// }
+    /// assert_eq!(sum, data.iter().sum());
+    /// ```
+    #[inline]
+    fn iter(self) -> IteratorAdaptor<Self>
+    where
+        Self: Sized
+    {
+        IteratorAdaptor::new(self)
     }
 }
 

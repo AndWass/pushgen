@@ -53,6 +53,10 @@ name = "pushgen_chain_take_filter_map"
 harness = false
 
 [[bench]]
+name = "pushgen_iter_chain_take_filter_map"
+harness = false
+
+[[bench]]
 name = "for_each_dedup_filter"
 harness = false
 
@@ -114,4 +118,12 @@ harness = false
 
 [[bench]]
 name = "pushgen_transrangers_test6"
+harness = false
+
+[[bench]]
+name = "iter_next_basic_loop"
+harness = false
+
+[[bench]]
+name = "pushgen_iter_basic_loop"
 harness = false

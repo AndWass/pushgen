@@ -8,6 +8,7 @@ mod chain;
 mod zip;
 mod dedup;
 mod flatten;
+mod iterator;
 
 pub use map::Map;
 pub use skip::Skip;
@@ -17,3 +18,4 @@ pub use chain::Chain;
 pub use zip::Zip;
 pub use dedup::Dedup;
 pub use flatten::Flatten;
+pub use iterator::IteratorAdaptor;
