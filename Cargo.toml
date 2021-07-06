@@ -15,6 +15,7 @@ documentation = "https://docs.rs/pushgen"
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
 [dependencies]
+either = { version = "1.0", default-features = false }
 
 [dev-dependencies]
 criterion = "0.3"
