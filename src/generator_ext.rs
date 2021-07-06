@@ -159,6 +159,49 @@ pub trait GeneratorExt: Sealed + Generator {
         Take::new(self, n)
     }
 
+    /// Creates a generator that works like map, but flattens nested structure.
+    ///
+    /// The [`map`] adapter is very useful, but only when the closure
+    /// argument produces values. If it produces a generator instead, there's
+    /// an extra layer of indirection. `flat_map()` will remove this extra layer
+    /// on its own.
+    ///
+    /// You can think of `flat_map(f)` as the semantic equivalent
+    /// of [`map`]ping, and then [`flatten`]ing as in `map(f).flatten()`.
+    ///
+    /// Another way of thinking about `flat_map()`: [`map`]'s closure returns
+    /// one item for each element, and `flat_map()`'s closure returns an
+    /// iterator for each element.
+    ///
+    /// [`map`]: GeneratorExt::map
+    /// [`flatten`]: GeneratorExt::flatten
+    ///
+    /// # Examples
+    ///
+    /// Basic usage:
+    ///
+    /// ```
+    /// use pushgen::IntoGenerator;
+    /// use crate::pushgen::GeneratorExt;
+    ///
+    /// let words = ["alpha", "beta", "gamma"];
+    ///
+    /// let mut merged = String::new();
+    /// words.into_gen()
+    ///      .flat_map(|s| pushgen::from_iter(s.chars()))
+    ///      .for_each(|x| merged.push(x));
+    /// assert_eq!(merged, "alphabetagamma");
+    /// ```
+    #[inline]
+    fn flat_map<U, F>(self, f: F) -> Flatten<Map<Self, F>>
+    where
+        Self: Sized,
+        U: crate::IntoGenerator,
+        F: FnMut(Self::Output) -> U,
+    {
+        self.map(f).flatten()
+    }
+
     /// Creates a generator that flattens nested structure.
     ///
     /// This is useful when you have a generator of generators or a generator of
