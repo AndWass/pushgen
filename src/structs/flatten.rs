@@ -1,19 +1,19 @@
-use crate::{Generator, GeneratorResult, ValueResult};
+use crate::{Generator, GeneratorResult, IntoGenerator, ValueResult};
 
 /// Flatten generator implementation. See [`.flatten()`](crate::GeneratorExt::flatten) for details.
 pub struct Flatten<Src>
 where
     Src: Generator,
-    Src::Output: Generator,
+    Src::Output: IntoGenerator,
 {
     source: Src,
-    current_generator: Option<Src::Output>,
+    current_generator: Option<<Src::Output as IntoGenerator>::IntoGen>,
 }
 
 impl<Src> Flatten<Src>
 where
     Src: Generator,
-    Src::Output: Generator,
+    Src::Output: IntoGenerator,
 {
     pub(crate) fn new(source: Src) -> Self {
         Self {
@@ -26,9 +26,9 @@ where
 impl<Src> Generator for Flatten<Src>
 where
     Src: Generator,
-    Src::Output: Generator,
+    Src::Output: IntoGenerator,
 {
-    type Output = <<Src as Generator>::Output as Generator>::Output;
+    type Output = <<Src as Generator>::Output as IntoGenerator>::Output;
 
     #[inline]
     fn run(&mut self, mut output: impl FnMut(Self::Output) -> ValueResult) -> GeneratorResult {
@@ -40,7 +40,7 @@ where
 
         let current_generator = &mut self.current_generator;
         self.source.run(|x| {
-            *current_generator = Some(x);
+            *current_generator = Some(x.into_gen());
             match current_generator
                 .as_mut()
                 .unwrap()
