@@ -115,7 +115,7 @@ pub trait GeneratorExt: Sealed + Generator {
     /// SliceGenerator::new(&data).map(|x| x.to_string()).for_each(|x| output.push(x));
     /// assert_eq!(output, ["1", "2", "3"]);
     /// ```
-    fn map<Trans, Out>(self, transform_fn: Trans) -> Map<Self, Trans, Out>
+    fn map<Trans, Out>(self, transform_fn: Trans) -> Map<Self, Trans>
     where
         Self: Sized,
         Trans: FnMut(Self::Output) -> Out,
