@@ -39,6 +39,7 @@ pub mod structs;
 pub mod test;
 
 pub use crate::generator_ext::GeneratorExt;
+pub use either::Either;
 pub use structs::from_fn::from_fn;
 
 /// Value-consumption result.
@@ -182,5 +183,20 @@ impl<'a, T> Generator for SliceGenerator<'a, T> {
             self.index += 1;
         }
         GeneratorResult::Complete
+    }
+}
+
+impl<L, R> Generator for Either<L, R>
+where
+    L: Generator,
+    R: Generator<Output = L::Output>,
+{
+    type Output = L::Output;
+
+    fn run(&mut self, output: impl FnMut(Self::Output) -> ValueResult) -> GeneratorResult {
+        match self {
+            Either::Left(left) => left.run(output),
+            Either::Right(right) => right.run(output),
+        }
     }
 }
