@@ -29,7 +29,7 @@
 //! I make no performance-claims, however there are some benchmarked cases where the push-based approach
 //! wins over the iterator approach, but I have made no attempts to analyze this in any depth.
 
-#![cfg_attr(not(test), no_std)]
+#![cfg_attr(not(any(test, feature = "std")), no_std)]
 
 mod generator_ext;
 
