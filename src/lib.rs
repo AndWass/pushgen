@@ -39,6 +39,7 @@ pub mod structs;
 pub mod test;
 
 pub use crate::generator_ext::GeneratorExt;
+pub use structs::from_fn::from_fn;
 
 /// Value-consumption result.
 ///
