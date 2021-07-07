@@ -115,7 +115,7 @@ pub trait GeneratorExt: Sealed + Generator {
     /// SliceGenerator::new(&data).map(|x| x.to_string()).for_each(|x| output.push(x));
     /// assert_eq!(output, ["1", "2", "3"]);
     /// ```
-    fn map<Trans, Out>(self, transform_fn: Trans) -> Map<Self, Trans, Out>
+    fn map<Trans, Out>(self, transform_fn: Trans) -> Map<Self, Trans>
     where
         Self: Sized,
         Trans: FnMut(Self::Output) -> Out,
@@ -159,6 +159,93 @@ pub trait GeneratorExt: Sealed + Generator {
         Take::new(self, n)
     }
 
+    /// Creates a generator that works like map, but flattens nested structure.
+    ///
+    /// The [`map`] adapter is very useful, but only when the closure
+    /// argument produces values. If it produces a generator instead, there's
+    /// an extra layer of indirection. `flat_map()` will remove this extra layer
+    /// on its own.
+    ///
+    /// You can think of `flat_map(f)` as the semantic equivalent
+    /// of [`map`]ping, and then [`flatten`]ing as in `map(f).flatten()`.
+    ///
+    /// Another way of thinking about `flat_map()`: [`map`]'s closure returns
+    /// one item for each element, and `flat_map()`'s closure returns an
+    /// iterator for each element.
+    ///
+    /// [`map`]: GeneratorExt::map
+    /// [`flatten`]: GeneratorExt::flatten
+    ///
+    /// # Examples
+    ///
+    /// Basic usage:
+    ///
+    /// ```
+    /// use pushgen::IntoGenerator;
+    /// use crate::pushgen::GeneratorExt;
+    ///
+    /// let words = ["alpha", "beta", "gamma"];
+    ///
+    /// let mut merged = String::new();
+    /// words.into_gen()
+    ///      .flat_map(|s| pushgen::from_iter(s.chars()))
+    ///      .for_each(|x| merged.push(x));
+    /// assert_eq!(merged, "alphabetagamma");
+    /// ```
+    #[inline]
+    fn flat_map<U, F>(self, f: F) -> Flatten<Map<Self, F>>
+    where
+        Self: Sized,
+        U: crate::IntoGenerator,
+        F: FnMut(Self::Output) -> U,
+    {
+        self.map(f).flatten()
+    }
+
+    /// Creates a generator that flattens nested structure.
+    ///
+    /// This is useful when you have a generator of generators or a generator of
+    /// things that can be turned into generators and you want to remove one
+    /// level of indirection.
+    ///
+    /// # Examples
+    ///
+    /// Basic usage:
+    ///
+    /// ```
+    /// use pushgen::IntoGenerator;
+    /// use crate::pushgen::GeneratorExt;
+    ///
+    /// let data = vec![vec![1, 2, 3, 4], vec![5, 6]];
+    /// let mut output: Vec<i32> = Vec::new();
+    /// let flattened = data.into_gen().flatten().for_each(|x| output.push(x));
+    /// assert_eq!(output, [1, 2, 3, 4, 5, 6]);
+    /// ```
+    ///
+    /// Mapping and then flattening:
+    ///
+    /// ```
+    /// use pushgen::IntoGenerator;
+    /// use crate::pushgen::GeneratorExt;
+    ///
+    /// let words = &["alpha", "beta", "gamma"];
+    ///
+    /// let mut merged = String::new();
+    /// words.into_gen()
+    ///      .map(|s| pushgen::from_iter(s.chars()))
+    ///      .flatten()
+    ///      .for_each(|x| merged.push(x));
+    /// assert_eq!(merged, "alphabetagamma");
+    /// ```
+    #[inline]
+    fn flatten(self) -> Flatten<Self>
+    where
+        Self: Sized,
+        Self::Output: crate::IntoGenerator,
+    {
+        Flatten::new(self)
+    }
+
     /// Run a generator to completion, or until it is stopped, and call a closure for each value
     /// produced by the generator.
     ///
@@ -183,29 +270,6 @@ pub trait GeneratorExt: Sealed + Generator {
             func(value);
             ValueResult::MoreValues
         })
-    }
-
-    /// Creates a generator that removes a level generators.
-    ///
-    /// A generator that outputs generators can be flattened to "remove" middle-layer generator.
-    ///
-    /// ## Example
-    /// ```
-    /// use pushgen::{SliceGenerator, GeneratorExt};
-    /// let data = vec![vec![1, 2, 3, 4], vec![5, 6]];
-    /// let mut flatted = Vec::new();
-    /// SliceGenerator::new(data.as_slice())
-    ///     .map(|x| SliceGenerator::new(x.as_slice()))
-    ///     .flatten()
-    ///     .for_each(|x| flatted.push(*x));
-    /// assert_eq!(flatted, [1, 2, 3, 4, 5, 6]);
-    /// ```
-    fn flatten(self) -> Flatten<Self>
-    where
-        Self: Sized,
-        Self::Output: Generator,
-    {
-        Flatten::new(self)
     }
 
     /// A generator method that applies a fallible function to each item
@@ -255,6 +319,7 @@ pub trait GeneratorExt: Sealed + Generator {
         });
         res
     }
+
     /// Zips the output of two generators into a single generator of pairs.
     ///
     /// `zip()` returns a new generator that will use values from two generators, outputting

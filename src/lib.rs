@@ -29,9 +29,10 @@
 //! I make no performance-claims, however there are some benchmarked cases where the push-based approach
 //! wins over the iterator approach, but I have made no attempts to analyze this in any depth.
 
-#![cfg_attr(not(test), no_std)]
+#![cfg_attr(not(any(test, feature = "std")), no_std)]
 
 mod generator_ext;
+mod into_gen;
 
 pub mod structs;
 
@@ -40,7 +41,9 @@ pub mod test;
 
 pub use crate::generator_ext::GeneratorExt;
 pub use either::Either;
+pub use into_gen::IntoGenerator;
 pub use structs::from_fn::from_fn;
+pub use structs::from_iter::from_iter;
 
 /// Value-consumption result.
 ///
