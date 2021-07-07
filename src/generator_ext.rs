@@ -1,5 +1,5 @@
 use crate::structs::{
-    Chain, Dedup, Filter, FilterMap, Flatten, IteratorAdaptor, Map, Skip, Take, Zip,
+    Chain, Cloned, Dedup, Filter, FilterMap, Flatten, IteratorAdaptor, Map, Skip, Take, Zip,
 };
 use crate::{Generator, GeneratorResult, ValueResult};
 
@@ -52,6 +52,31 @@ pub trait GeneratorExt: Sealed + Generator {
             ValueResult::MoreValues
         });
         res
+    }
+
+    /// Creates a generator that clones all of its elements.
+    ///
+    /// This is useful when you have a generator that generates `&T` but you need a generate
+    /// that generates `T`.
+    ///
+    /// ## Examples
+    ///
+    /// Basic usage
+    ///
+    /// ```rust
+    /// use pushgen::{SliceGenerator, GeneratorExt};
+    /// let data = [1, 2, 3];
+    /// let mut output: Vec<i32> = Vec::new();
+    /// SliceGenerator::new(&data).cloned().for_each(|x| output.push(x));
+    /// assert_eq!(output, [1, 2, 3])
+    /// ```
+    #[inline]
+    fn cloned<'a, T>(self) -> Cloned<Self>
+    where
+        Self: Generator<Output = &'a T> + Sized,
+        T: 'a + Clone,
+    {
+        Cloned::new(self)
     }
 
     /// Creates a generator by chaining two generators, running them one after the other.
