@@ -33,6 +33,7 @@ use crate::{Generator, GeneratorResult, ValueResult};
 /// counter.for_each(|x| output.push(x));
 /// assert_eq!(output, [1, 2, 3, 4, 5]);
 /// ```
+#[inline]
 pub fn from_fn<T, F>(f: F) -> FromFn<F>
 where
     F: FnMut() -> Option<T>,
@@ -55,6 +56,7 @@ where
 {
     type Output = T;
 
+    #[inline]
     fn run(&mut self, mut output: impl FnMut(Self::Output) -> ValueResult) -> GeneratorResult {
         while let Some(v) = self.0() {
             if output(v) == ValueResult::Stop {

@@ -31,6 +31,7 @@ pub trait IntoGenerator {
 impl<G: crate::Generator> IntoGenerator for G {
     type Output = G::Output;
     type IntoGen = G;
+    #[inline]
     fn into_gen(self) -> Self::IntoGen {
         self
     }
@@ -39,6 +40,7 @@ impl<G: crate::Generator> IntoGenerator for G {
 impl<'a, T> IntoGenerator for &'a [T] {
     type Output = &'a T;
     type IntoGen = crate::SliceGenerator<'a, T>;
+    #[inline]
     fn into_gen(self) -> Self::IntoGen {
         crate::SliceGenerator::new(self)
     }
@@ -47,6 +49,7 @@ impl<'a, T> IntoGenerator for &'a [T] {
 impl<'a, T, const N: usize> IntoGenerator for &'a [T; N] {
     type Output = &'a T;
     type IntoGen = crate::SliceGenerator<'a, T>;
+    #[inline]
     fn into_gen(self) -> Self::IntoGen {
         crate::SliceGenerator::new(self)
     }
@@ -56,6 +59,7 @@ impl<'a, T, const N: usize> IntoGenerator for &'a [T; N] {
 impl<'a, T> IntoGenerator for &'a Vec<T> {
     type Output = &'a T;
     type IntoGen = crate::SliceGenerator<'a, T>;
+    #[inline]
     fn into_gen(self) -> Self::IntoGen {
         crate::SliceGenerator::new(self.as_slice())
     }
@@ -65,6 +69,7 @@ impl<'a, T> IntoGenerator for &'a Vec<T> {
 impl<T> IntoGenerator for Vec<T> {
     type Output = T;
     type IntoGen = crate::structs::FromIter<std::vec::IntoIter<T>>;
+    #[inline]
     fn into_gen(self) -> Self::IntoGen {
         crate::from_iter(self)
     }
