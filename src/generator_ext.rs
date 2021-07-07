@@ -440,6 +440,31 @@ pub trait GeneratorExt: Sealed + Generator {
     {
         IteratorAdaptor::new(self)
     }
+
+    /// Box a generator, making it possible to use as return value in for instance traits.
+    ///
+    /// ## Performance
+    /// This causes at least one layer of redirection, which is very likely to impact performance.
+    /// One should always prefer to use `impl Generator<Output=X>` instead.
+    ///
+    /// ## Example
+    /// ```rust
+    /// use pushgen::{BoxedGenerator, IntoGenerator, GeneratorExt};
+    /// fn make_generator() -> BoxedGenerator<i32> {
+    ///     vec![1, 2, 3, 4].into_gen().map(|x| x*2).boxed()
+    /// }
+    /// let mut output = Vec::new();
+    /// make_generator().for_each(|x| output.push(x));
+    /// assert_eq!(output, [2, 4, 6, 8]);
+    /// ```
+    #[cfg(feature = "std")]
+    #[inline]
+    fn boxed(self) -> crate::BoxedGenerator<Self::Output>
+    where
+        Self: Sized + 'static,
+    {
+        crate::BoxedGenerator::new(self)
+    }
 }
 
 impl<T: Generator> GeneratorExt for T {}

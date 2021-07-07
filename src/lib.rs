@@ -31,6 +31,7 @@
 
 #![cfg_attr(not(any(test, feature = "std")), no_std)]
 
+mod dyn_generator;
 mod generator_ext;
 mod into_gen;
 
@@ -40,8 +41,11 @@ pub mod structs;
 pub mod test;
 
 pub use crate::generator_ext::GeneratorExt;
+pub use dyn_generator::DynGenerator;
 pub use either::Either;
 pub use into_gen::IntoGenerator;
+#[cfg(feature = "std")]
+pub use structs::boxed::BoxedGenerator;
 pub use structs::from_fn::from_fn;
 pub use structs::from_iter::from_iter;
 

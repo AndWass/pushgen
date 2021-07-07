@@ -1,5 +1,8 @@
 //! Generator adaptor implementations. See [`GeneratorExt`](crate::GeneratorExt) for more info.
 
+#[cfg(feature = "std")]
+pub(crate) mod boxed;
+
 mod chain;
 mod dedup;
 mod filter;
