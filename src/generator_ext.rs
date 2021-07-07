@@ -30,6 +30,7 @@ pub trait GeneratorExt: Sealed + Generator {
     /// SliceGenerator::new(&data).chain(SliceGenerator::new(&data)).for_each(|x| output.push(*x));
     /// assert_eq!(output, [1, 2, 3, 1, 2, 3]);
     /// ```
+    #[inline]
     fn chain<Gen>(self, other: Gen) -> Chain<Self, Gen>
     where
         Self: Sized,
@@ -51,6 +52,7 @@ pub trait GeneratorExt: Sealed + Generator {
     /// assert_eq!(run_result, GeneratorResult::Complete);
     /// assert_eq!(output, [2,4]);
     /// ```
+    #[inline]
     fn filter<Pred>(self, predicate: Pred) -> Filter<Self, Pred>
     where
         Self: Sized,
@@ -115,6 +117,7 @@ pub trait GeneratorExt: Sealed + Generator {
     /// SliceGenerator::new(&data).map(|x| x.to_string()).for_each(|x| output.push(x));
     /// assert_eq!(output, ["1", "2", "3"]);
     /// ```
+    #[inline]
     fn map<Trans, Out>(self, transform_fn: Trans) -> Map<Self, Trans>
     where
         Self: Sized,
@@ -135,6 +138,7 @@ pub trait GeneratorExt: Sealed + Generator {
     /// skipped_generator.for_each(|x| output.push(*x));
     /// assert_eq!(output, [3,4]);
     /// ```
+    #[inline]
     fn skip(self, n: usize) -> Skip<Self>
     where
         Self: Sized,
@@ -152,6 +156,7 @@ pub trait GeneratorExt: Sealed + Generator {
     /// SliceGenerator::new(&data).take(2).for_each(|x| output.push(*x));
     /// assert_eq!(output, [1, 2]);
     /// ```
+    #[inline]
     fn take(self, n: usize) -> Take<Self>
     where
         Self: Sized,

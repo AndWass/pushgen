@@ -59,6 +59,7 @@ pub enum ValueResult {
 }
 
 impl From<bool> for ValueResult {
+    #[inline]
     fn from(value: bool) -> Self {
         if !value {
             Self::Stop
@@ -85,6 +86,7 @@ pub enum GeneratorResult {
 }
 
 impl From<bool> for GeneratorResult {
+    #[inline]
     fn from(b: bool) -> Self {
         if !b {
             Self::Stopped
@@ -196,6 +198,7 @@ where
 {
     type Output = L::Output;
 
+    #[inline]
     fn run(&mut self, output: impl FnMut(Self::Output) -> ValueResult) -> GeneratorResult {
         match self {
             Either::Left(left) => left.run(output),

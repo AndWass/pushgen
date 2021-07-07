@@ -13,6 +13,7 @@ impl<Src> IteratorAdaptor<Src>
 where
     Src: Generator,
 {
+    #[inline]
     pub fn new(source: Src) -> Self {
         Self { source }
     }
