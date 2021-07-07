@@ -160,6 +160,53 @@ pub trait GeneratorExt: Sealed + Generator {
         Flatten::new(self)
     }
 
+    /// A generator method that applies a fallible function to each item
+    /// produced, stopping at the first error and returning that error.
+    ///
+    /// This can also be thought of as the fallible form of [`for_each()`]
+    /// or as the stateless version of [`try_fold()`].
+    ///
+    /// [`for_each()`]: Generator::for_each
+    /// [`try_fold()`]: Generator::try_fold
+    ///
+    /// # Examples
+    ///
+    /// ```
+    /// use std::fs::rename;
+    /// use std::io::{stdout, Write};
+    /// use std::path::Path;
+    /// use pushgen::{SliceGenerator, GeneratorExt};
+    ///
+    /// let data = ["no_tea.txt", "stale_bread.json", "torrential_rain.png"];
+    ///
+    /// let res = SliceGenerator::new(&data).try_for_each(|x| writeln!(stdout(), "{}", x));
+    /// assert!(res.is_ok());
+    ///
+    /// let mut gen = SliceGenerator::new(&data);
+    /// let res = gen.try_for_each(|x| rename(x, Path::new(x).with_extension("old")));
+    /// assert!(res.is_err());
+    /// // It short-circuited, so the remaining items are still in the iterator:
+    /// let mut output: Vec<&'static str> = Vec::new();
+    /// gen.for_each(|x| output.push(*x));
+    /// assert_eq!(output, ["stale_bread.json", "torrential_rain.png"]);
+    /// ```
+    #[inline]
+    fn try_for_each<F, E>(&mut self, mut f: F) -> Result<(), E>
+    where
+        Self: Sized,
+        F: FnMut(Self::Output) -> Result<(), E>,
+    {
+        let mut res = Ok(());
+        let res_mut = &mut res;
+        self.run(move |value| match f(value) {
+            Ok(()) => ValueResult::MoreValues,
+            Err(e) => {
+                *res_mut = Err(e);
+                ValueResult::Stop
+            }
+        });
+        res
+    }
     /// Zips the output of two generators into a single generator of pairs.
     ///
     /// `zip()` returns a new generator that will use values from two generators, outputting
