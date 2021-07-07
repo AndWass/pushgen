@@ -20,6 +20,40 @@ impl<T> Sealed for T where T: Generator {}
 /// assert_eq!(output, [3,6,9,12]);
 /// ```
 pub trait GeneratorExt: Sealed + Generator {
+    /// Exhausts the generator, returning the last element.
+    ///
+    /// This method will evaluate the generator until it completes. While
+    /// doing so, it keeps track of the current element. After it completes
+    /// `last()` will then return the last element it saw.
+    ///
+    /// # Examples
+    ///
+    /// Basic usage:
+    ///
+    /// ```
+    /// use pushgen::IntoGenerator;
+    /// use pushgen::GeneratorExt;
+    ///
+    /// let a = [1, 2, 3];
+    /// assert_eq!(a.into_gen().last(), Some(&3));
+    ///
+    /// let a = [1, 2, 3, 4, 5];
+    /// assert_eq!(a.into_gen().last(), Some(&5));
+    /// ```
+    #[inline]
+    fn last(mut self) -> Option<Self::Output>
+    where
+        Self: Sized,
+    {
+        let mut res = None;
+        let res_mut = &mut res;
+        self.run(move |value| {
+            *res_mut = Some(value);
+            ValueResult::MoreValues
+        });
+        res
+    }
+
     /// Creates a generator by chaining two generators, running them one after the other.
     ///
     /// ## Example
