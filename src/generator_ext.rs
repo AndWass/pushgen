@@ -1,4 +1,6 @@
-use crate::structs::{Chain, Dedup, Filter, Flatten, IteratorAdaptor, Map, Skip, Take, Zip};
+use crate::structs::{
+    Chain, Dedup, Filter, FilterMap, Flatten, IteratorAdaptor, Map, Skip, Take, Zip,
+};
 use crate::{Generator, GeneratorResult, ValueResult};
 
 pub trait Sealed {}
@@ -55,6 +57,52 @@ pub trait GeneratorExt: Sealed + Generator {
         Pred: FnMut(&Self::Output) -> bool,
     {
         Filter::new(self, predicate)
+    }
+
+    /// Creates a generator that both filters and maps.
+    ///
+    /// The returned generator produces only the `value`s for which the supplied
+    /// closure returns `Some(value)`.
+    ///
+    /// `filter_map` can be used to make chains of [`filter`] and [`map`] more
+    /// concise. The example below shows how a `map().filter().map()` can be
+    /// shortened to a single call to `filter_map`.
+    ///
+    /// [`filter`]: Generator::filter
+    /// [`map`]: Generator::map
+    ///
+    /// # Examples
+    ///
+    /// Basic usage:
+    ///
+    /// ```
+    /// use pushgen::{SliceGenerator, GeneratorExt};
+    ///
+    /// let a = ["1", "two", "NaN", "four", "5"];
+    ///
+    /// let mut output: Vec<i32> = Vec::new();
+    /// SliceGenerator::new(&a).filter_map(|s| s.parse().ok()).for_each(|x: i32| output.push(x));
+    /// assert_eq!(output, [1, 5]);
+    /// ```
+    ///
+    /// Here's the same example, but with [`filter`] and [`map`]:
+    ///
+    /// ```
+    /// use pushgen::{SliceGenerator, GeneratorExt};
+    ///
+    /// let a = ["1", "two", "NaN", "four", "5"];
+    ///
+    /// let mut output: Vec<i32> = Vec::new();
+    /// SliceGenerator::new(&a).map(|s| s.parse()).filter(|s| s.is_ok()).map(|s| s.unwrap()).for_each(|x: i32| output.push(x));
+    /// assert_eq!(output, [1, 5]);
+    /// ```
+    #[inline]
+    fn filter_map<B, F>(self, f: F) -> FilterMap<Self, F>
+    where
+        Self: Sized,
+        F: FnMut(Self::Output) -> Option<B>,
+    {
+        FilterMap::new(self, f)
     }
 
     /// Takes a closure and creates a generator which  calls the closure on each value.
