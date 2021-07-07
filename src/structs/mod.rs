@@ -4,6 +4,7 @@
 pub(crate) mod boxed;
 
 mod chain;
+mod cloned;
 mod dedup;
 mod filter;
 mod filter_map;
@@ -18,6 +19,7 @@ mod take;
 mod zip;
 
 pub use chain::Chain;
+pub use cloned::Cloned;
 pub use dedup::Dedup;
 pub use filter::Filter;
 pub use filter_map::FilterMap;
