@@ -1,4 +1,5 @@
 use crate::{Generator, GeneratorResult, ValueResult};
+use core::mem;
 
 /// Deduplication of duplicate consecutive values. See [`.dedup()`](crate::GeneratorExt::dedup) for details.
 pub struct Dedup<Src>
@@ -30,40 +31,42 @@ where
 
     #[inline]
     fn run(&mut self, mut output: impl FnMut(Self::Output) -> ValueResult) -> GeneratorResult {
-        if self.next.is_none() {
-            let next = &mut self.next;
-            // Try to get the initial value
-            let take_one_res = self.source.run(|x| {
-                *next = Some(x);
-                ValueResult::Stop
-            });
+        let mut prev = match self.next.take() {
+            Some(value) => value,
+            None => {
+                let next = &mut self.next;
+                // Try to get the initial value
+                let take_one_res = self.source.run(|x| {
+                    *next = Some(x);
+                    ValueResult::Stop
+                });
 
-            if !next.is_some() {
-                return take_one_res;
+                match self.next.take() {
+                    Some(value) => value,
+                    None => return take_one_res,
+                }
             }
-        }
-
-        // self.next.is_some() == true always.
-        let next = &mut self.next;
+        };
 
         let mut result = self.source.run(|x| {
-            let next_value = next.take().unwrap();
-            let is_equal = x == next_value;
-            *next = Some(x);
-            if is_equal {
+            if x == prev {
+                prev = x;
                 ValueResult::MoreValues
             } else {
-                output(next_value)
+                output(mem::replace(&mut prev, x))
             }
         });
 
-        // If the source generator was stopped we might have more values coming later runs,
-        // but if it was complete we assume no more values will be generated and
+        // if it was complete we assume no more values will be generated and
         // we need to output the last held value.
-        if result == GeneratorResult::Complete
-            && output(self.next.take().unwrap()) == ValueResult::Stop
-        {
-            result = GeneratorResult::Stopped;
+        if result == GeneratorResult::Complete {
+            if output(prev) == ValueResult::Stop {
+                result = GeneratorResult::Stopped;
+            }
+        } else {
+            // If the source generator was stopped we might have more values
+            // coming later runs,
+            self.next = Some(prev);
         }
 
         result
