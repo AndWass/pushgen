@@ -1,4 +1,4 @@
-use std::hint;
+use core::hint;
 
 #[allow(dead_code)]
 pub unsafe fn unwrap_unchecked<T>(option: Option<T>) -> T {
