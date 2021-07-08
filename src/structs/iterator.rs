@@ -1,4 +1,4 @@
-use crate::{Generator, ValueResult};
+use crate::{structs::utility::InplaceUpdatable, Generator, ValueResult};
 use core::option::Option::Some;
 
 /// Adapt a generator into an iterator. See [`.iter()`](crate::GeneratorExt::iter) for more info.
@@ -41,12 +41,12 @@ where
         Self: Sized,
         F: FnMut(B, Self::Item) -> B,
     {
-        let mut result = Some(init);
+        let mut result = InplaceUpdatable::new(init);
         self.source.run(|x| {
-            result = Some(f(result.take().unwrap(), x));
+            result.update(|val| f(val, x));
             ValueResult::MoreValues
         });
-        result.unwrap()
+        result.get_inner()
     }
 }
 
