@@ -1,6 +1,7 @@
 use core::hint;
 
 #[allow(dead_code)]
+#[inline(always)]
 pub unsafe fn unwrap_unchecked<T>(option: Option<T>) -> T {
     match option {
         Some(val) => val,
