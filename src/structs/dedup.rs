@@ -1,5 +1,5 @@
-use core::mem;
 use crate::{Generator, GeneratorResult, ValueResult};
+use core::mem;
 
 /// Deduplication of duplicate consecutive values. See [`.dedup()`](crate::GeneratorExt::dedup) for details.
 pub struct Dedup<Src>
@@ -64,7 +64,7 @@ where
                 result = GeneratorResult::Stopped;
             }
         } else {
-            // If the source generator was stopped we might have more values 
+            // If the source generator was stopped we might have more values
             // coming later runs,
             self.next = Some(prev);
         }
