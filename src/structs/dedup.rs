@@ -1,4 +1,4 @@
-use crate::{Generator, GeneratorResult, ValueResult};
+use crate::{Generator, GeneratorResult, ValueResult, structs::utility::unwrap_unchecked};
 
 /// Deduplication of duplicate consecutive values. See [`.dedup()`](crate::GeneratorExt::dedup) for details.
 pub struct Dedup<Src>
@@ -60,7 +60,7 @@ where
         // but if it was complete we assume no more values will be generated and
         // we need to output the last held value.
         if result == GeneratorResult::Complete
-            && output(self.next.take().unwrap()) == ValueResult::Stop
+            && output(unsafe { unwrap_unchecked(self.next.take()) }) == ValueResult::Stop
         {
             result = GeneratorResult::Stopped;
         }
