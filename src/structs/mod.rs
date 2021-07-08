@@ -3,6 +3,7 @@
 #[cfg(feature = "std")]
 pub(crate) mod boxed;
 
+mod utility;
 mod chain;
 mod cloned;
 mod dedup;
