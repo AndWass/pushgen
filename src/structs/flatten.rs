@@ -1,4 +1,4 @@
-use crate::{Generator, GeneratorResult, IntoGenerator, ValueResult, structs::utility::set_some};
+use crate::{structs::utility::set_some, Generator, GeneratorResult, IntoGenerator, ValueResult};
 
 /// Flatten generator implementation. See [`.flatten()`](crate::GeneratorExt::flatten) for details.
 pub struct Flatten<Src>
