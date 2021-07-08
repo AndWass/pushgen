@@ -34,6 +34,7 @@ impl<T> InplaceUpdatable<T> {
         self.inner = Some(new_val);
     }
 
+    #[inline(always)]
     pub fn get_inner(self) -> T {
         unsafe { unwrap_unchecked(self.inner) }
     }
