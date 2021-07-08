@@ -39,3 +39,9 @@ impl<T> InplaceUpdatable<T> {
         unsafe { unwrap_unchecked(self.inner) }
     }
 }
+
+#[inline(always)]
+pub fn set_some<T>(option: &mut Option<T>, value: T) -> &mut T {
+    *option = Some(value);
+    unsafe { unwrap_unchecked(option.as_mut()) }
+}

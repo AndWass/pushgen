@@ -1,4 +1,4 @@
-use crate::{Generator, GeneratorResult, IntoGenerator, ValueResult};
+use crate::{Generator, GeneratorResult, IntoGenerator, ValueResult, structs::utility::set_some};
 
 /// Flatten generator implementation. See [`.flatten()`](crate::GeneratorExt::flatten) for details.
 pub struct Flatten<Src>
@@ -41,12 +41,7 @@ where
 
         let current_generator = &mut self.current_generator;
         self.source.run(|x| {
-            *current_generator = Some(x.into_gen());
-            match current_generator
-                .as_mut()
-                .unwrap()
-                .run(|value| output(value))
-            {
+            match set_some(current_generator, x.into_gen()).run(|value| output(value)) {
                 GeneratorResult::Stopped => ValueResult::Stop,
                 GeneratorResult::Complete => ValueResult::MoreValues,
             }
