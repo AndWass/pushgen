@@ -30,30 +30,29 @@ where
 
     #[inline]
     fn run(&mut self, mut output: impl FnMut(Self::Output) -> ValueResult) -> GeneratorResult {
-        if self.next.is_none() {
-            let next = &mut self.next;
-            // Try to get the initial value
-            let take_one_res = self.source.run(|x| {
-                *next = Some(x);
-                ValueResult::Stop
-            });
+        let prev = match &mut self.next {
+            Some(value) => value,
+            None => {
+                let next = &mut self.next;
+                // Try to get the initial value
+                let take_one_res = self.source.run(|x| {
+                    *next = Some(x);
+                    ValueResult::Stop
+                });
 
-            if !next.is_some() {
-                return take_one_res;
+                match &mut self.next {
+                    Some(value) => value,
+                    None => return take_one_res
+                }
             }
-        }
-
-        // self.next.is_some() == true always.
-        let next = &mut self.next;
+        };
 
         let mut result = self.source.run(|x| {
-            let next_value = next.take().unwrap();
-            let is_equal = x == next_value;
-            *next = Some(x);
-            if is_equal {
+            if x == *prev {
+                *prev = x;
                 ValueResult::MoreValues
             } else {
-                output(next_value)
+                output(std::mem::replace(prev, x))
             }
         });
 
