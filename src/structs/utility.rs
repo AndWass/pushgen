@@ -5,6 +5,6 @@ use std::hint::unreachable_unchecked;
 pub unsafe fn unwrap_unchecked<T>(option: Option<T>) -> T {
     match option {
         Some(val) => val,
-        None => unreachable_unchecked()
+        None => unreachable_unchecked(),
     }
 }
