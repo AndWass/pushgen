@@ -129,8 +129,8 @@ pub trait GeneratorExt: Sealed + Generator {
     /// concise. The example below shows how a `map().filter().map()` can be
     /// shortened to a single call to `filter_map`.
     ///
-    /// [`filter`]: Generator::filter
-    /// [`map`]: Generator::map
+    /// [`filter`]: GeneratorExt::filter
+    /// [`map`]: GeneratorExt::map
     ///
     /// # Examples
     ///
