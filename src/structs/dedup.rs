@@ -1,4 +1,4 @@
-use crate::{Generator, GeneratorResult, ValueResult, structs::utility::unwrap_unchecked};
+use crate::{Generator, GeneratorResult, ValueResult};
 
 /// Deduplication of duplicate consecutive values. See [`.dedup()`](crate::GeneratorExt::dedup) for details.
 pub struct Dedup<Src>
@@ -30,7 +30,7 @@ where
 
     #[inline]
     fn run(&mut self, mut output: impl FnMut(Self::Output) -> ValueResult) -> GeneratorResult {
-        let prev = match &mut self.next {
+        let mut prev = match self.next.take() {
             Some(value) => value,
             None => {
                 let next = &mut self.next;
@@ -40,7 +40,7 @@ where
                     ValueResult::Stop
                 });
 
-                match &mut self.next {
+                match self.next.take() {
                     Some(value) => value,
                     None => return take_one_res
                 }
@@ -48,21 +48,24 @@ where
         };
 
         let mut result = self.source.run(|x| {
-            if x == *prev {
-                *prev = x;
+            if x == prev {
+                prev = x;
                 ValueResult::MoreValues
             } else {
-                output(std::mem::replace(prev, x))
+                output(std::mem::replace(&mut prev, x))
             }
         });
 
-        // If the source generator was stopped we might have more values coming later runs,
-        // but if it was complete we assume no more values will be generated and
+        // if it was complete we assume no more values will be generated and
         // we need to output the last held value.
-        if result == GeneratorResult::Complete
-            && output(unsafe { unwrap_unchecked(self.next.take()) }) == ValueResult::Stop
-        {
-            result = GeneratorResult::Stopped;
+        if result == GeneratorResult::Complete {
+            if output(prev) == ValueResult::Stop {
+                result = GeneratorResult::Stopped;
+            }
+        } else {
+            // If the source generator was stopped we might have more values 
+            // coming later runs,
+            self.next = Some(prev);
         }
 
         result
