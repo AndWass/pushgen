@@ -1,4 +1,4 @@
-use std::mem;
+use core::mem;
 use crate::{Generator, GeneratorResult, ValueResult};
 
 /// Deduplication of duplicate consecutive values. See [`.dedup()`](crate::GeneratorExt::dedup) for details.
