@@ -43,7 +43,7 @@ where
 
                 match self.next.take() {
                     Some(value) => value,
-                    None => return take_one_res
+                    None => return take_one_res,
                 }
             }
         };
