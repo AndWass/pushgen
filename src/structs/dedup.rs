@@ -50,6 +50,8 @@ where
 
         let mut result = self.source.run(|x| {
             if x == prev {
+                // Removing this line causes the regression of the performance of
+                // bench pushgen_dedup_flatten_filter_map
                 prev = x;
                 ValueResult::MoreValues
             } else {
