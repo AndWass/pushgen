@@ -32,6 +32,7 @@ where
     Src::Output: IntoGenerator,
     <Src::Output as IntoGenerator>::IntoGen: Clone,
 {
+    #[allow(clippy::missing_inline_in_public_items)]
     fn clone(&self) -> Self {
         Self {
             source: self.source.clone(),

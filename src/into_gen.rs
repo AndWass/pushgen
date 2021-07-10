@@ -78,6 +78,7 @@ impl<T> IntoGenerator for Vec<T> {
 impl<T> IntoGenerator for Option<T> {
     type Output = T;
     type IntoGen = crate::structs::OptionGen<T>;
+    #[inline]
     fn into_gen(self) -> Self::IntoGen {
         crate::structs::OptionGen::new(self)
     }
@@ -86,6 +87,7 @@ impl<T> IntoGenerator for Option<T> {
 impl<'t, T> IntoGenerator for &'t Option<T> {
     type Output = &'t T;
     type IntoGen = crate::structs::OptionGen<&'t T>;
+    #[inline]
     fn into_gen(self) -> Self::IntoGen {
         crate::structs::OptionGen::new(self.as_ref())
     }
