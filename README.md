@@ -8,6 +8,8 @@
 [crates-badge]: https://img.shields.io/crates/v/pushgen.svg
 [crates-url]: https://crates.io/crates/pushgen
 
+[API of `main` branch](https://andwass.github.io/pushgen/pushgen/index.html)
+
 Push-style design pattern for processing of ranges and data-streams.
 
 This is a Rust-based approach to the design pattern described by [transrangers](https://github.com/joaquintides/transrangers).
