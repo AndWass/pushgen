@@ -45,8 +45,63 @@ impl<Src: Generator> Generator for Take<Src> {
     }
 }
 
+/// A generator that only forwards values while the predicate returns `true`. See [`.take_while()`](crate::GeneratorExt::take_while) for details.
+pub struct TakeWhile<Src, P> {
+    source: Src,
+    predicate: P,
+    is_complete: bool,
+}
+
+impl<Src, P> TakeWhile<Src, P>
+where
+    Src: Generator,
+    P: FnMut(&Src::Output) -> bool,
+{
+    #[inline]
+    pub(crate) fn new(source: Src, predicate: P) -> Self {
+        Self {
+            source,
+            predicate,
+            is_complete: false,
+        }
+    }
+}
+
+impl<Src, P> Generator for TakeWhile<Src, P>
+where
+    Src: Generator,
+    P: FnMut(&Src::Output) -> bool,
+{
+    type Output = Src::Output;
+
+    #[inline]
+    fn run(&mut self, mut output: impl FnMut(Self::Output) -> ValueResult) -> GeneratorResult {
+        let is_complete = &mut self.is_complete;
+        if *is_complete {
+            return GeneratorResult::Complete;
+        }
+
+        let predicate = &mut self.predicate;
+        let result = self.source.run(|x| {
+            if predicate(&x) {
+                output(x)
+            } else {
+                *is_complete = true;
+                ValueResult::Stop
+            }
+        });
+
+        if *is_complete {
+            GeneratorResult::Complete
+        } else {
+            result
+        }
+    }
+}
+
 #[cfg(test)]
 mod tests {
+    use crate::structs::take::TakeWhile;
     use crate::structs::Take;
     use crate::{Generator, GeneratorResult, SliceGenerator, ValueResult};
 
@@ -84,5 +139,48 @@ mod tests {
         });
         assert_eq!(result, GeneratorResult::Complete);
         assert_eq!(output, [1, 2, 3, 4]);
+
+        let result = generator.run(|x| {
+            output.push(*x);
+            ValueResult::MoreValues
+        });
+
+        assert_eq!(result, GeneratorResult::Complete);
+        assert_eq!(output, [1, 2, 3, 4]);
+    }
+
+    #[test]
+    fn take_while() {
+        let data = [1, 2, 3, 4, 5];
+        let mut output: Vec<i32> = Vec::new();
+
+        let result = TakeWhile::new(SliceGenerator::new(&data), |x| **x <= 2).run(|x| {
+            output.push(*x);
+            ValueResult::MoreValues
+        });
+        assert_eq!(result, GeneratorResult::Complete);
+        assert_eq!(output, [1, 2]);
+    }
+
+    #[test]
+    fn take_while_with_restart() {
+        let data = [1, 2, 3, 2, 2];
+        let mut output: Vec<i32> = Vec::new();
+
+        let mut gen = TakeWhile::new(SliceGenerator::new(&data), |x| **x <= 2);
+
+        let result = gen.run(|x| {
+            output.push(*x);
+            ValueResult::MoreValues
+        });
+        assert_eq!(result, GeneratorResult::Complete);
+        assert_eq!(output, [1, 2]);
+
+        let result = gen.run(|x| {
+            output.push(*x);
+            ValueResult::MoreValues
+        });
+        assert_eq!(result, GeneratorResult::Complete);
+        assert_eq!(output, [1, 2]);
     }
 }
