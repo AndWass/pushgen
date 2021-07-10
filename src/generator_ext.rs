@@ -1,5 +1,6 @@
 use crate::structs::{
-    Chain, Cloned, Copied, Dedup, Filter, FilterMap, Flatten, IteratorAdaptor, Map, Skip, Take, TakeWhile, Zip,
+    Chain, Cloned, Copied, Dedup, Filter, FilterMap, Flatten, IteratorAdaptor, Map, Skip, Take,
+    TakeWhile, Zip,
 };
 use crate::{Generator, GeneratorResult, ValueResult};
 
@@ -271,7 +272,7 @@ pub trait GeneratorExt: Sealed + Generator {
     fn take_while<P>(self, predicate: P) -> TakeWhile<Self, P>
     where
         Self: Sized,
-        P: FnMut(&Self::Output) -> bool
+        P: FnMut(&Self::Output) -> bool,
     {
         TakeWhile::new(self, predicate)
     }
