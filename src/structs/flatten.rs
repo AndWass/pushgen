@@ -24,6 +24,22 @@ where
     }
 }
 
+// #[derive(Clone)] caused compilation error, probably due to current_generator not being
+// one of the generic arguments. So we do it by hand instead.
+impl<Src> Clone for Flatten<Src>
+where
+    Src: Generator + Clone,
+    Src::Output: IntoGenerator,
+    <Src::Output as IntoGenerator>::IntoGen: Clone,
+{
+    fn clone(&self) -> Self {
+        Self {
+            source: self.source.clone(),
+            current_generator: self.current_generator.clone(),
+        }
+    }
+}
+
 impl<Src> Generator for Flatten<Src>
 where
     Src: Generator,

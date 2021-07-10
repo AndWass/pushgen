@@ -2,6 +2,7 @@ use crate::{structs::utility::InplaceUpdatable, Generator, ValueResult};
 use core::option::Option::Some;
 
 /// Adapt a generator into an iterator. See [`.iter()`](crate::GeneratorExt::iter) for more info.
+#[derive(Clone)]
 pub struct IteratorAdaptor<Src>
 where
     Src: Generator,

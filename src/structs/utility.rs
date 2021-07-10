@@ -13,6 +13,7 @@ pub unsafe fn unwrap_unchecked<T>(option: Option<T>) -> T {
 /// Implements this functionality as a struct instead of a function taking Option<T>
 /// to make sure that we won't accidentally treats a None as a Some and avoids the
 /// unsafe fn altogether.
+#[derive(Clone)]
 pub struct InplaceUpdatable<T> {
     // Using Option here is necessary for integrity during unwind,
     // which is the only moment where inner is set to None.

@@ -1,6 +1,7 @@
 use crate::{Generator, GeneratorResult, ValueResult};
 
 /// Implements a filtered generator. See [`.filter()`](crate::GeneratorExt::filter) for more details.
+#[derive(Clone)]
 pub struct Filter<Gen, Pred> {
     generator: Gen,
     predicate: Pred,

@@ -1,6 +1,7 @@
 use crate::{Generator, GeneratorResult, ValueResult};
 
 /// Skip over a set amount of values. See [`.skip()`](crate::GeneratorExt::skip) for more details.
+#[derive(Clone)]
 pub struct Skip<Gen> {
     generator: Gen,
     amount: usize,
@@ -39,6 +40,7 @@ where
     }
 }
 
+#[derive(Clone)]
 pub struct SkipWhile<Src, P> {
     source: Src,
     predicate: P,

@@ -1,6 +1,7 @@
 use crate::{Generator, GeneratorResult, ValueResult};
 
 /// A generator that copies the elements of an underlying generator. See [`.copied()`](crate::GeneratorExt::copied) for details.
+#[derive(Clone)]
 pub struct Copied<Src> {
     source: Src,
 }

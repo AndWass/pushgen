@@ -2,6 +2,7 @@ use crate::{Generator, GeneratorResult, ValueResult};
 
 /// A generator that clones the elements of an underlying generator. See `[.cloned()](crate::GeneratorExt::cloned)
 /// for details
+#[derive(Clone)]
 pub struct Cloned<Src> {
     source: Src,
 }

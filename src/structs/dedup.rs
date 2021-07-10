@@ -2,6 +2,7 @@ use crate::{Generator, GeneratorResult, ValueResult};
 use core::mem;
 
 /// Deduplication of duplicate consecutive values. See [`.dedup()`](crate::GeneratorExt::dedup) for details.
+#[derive(Clone)]
 pub struct Dedup<Src>
 where
     Src: Generator,

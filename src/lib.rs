@@ -163,6 +163,7 @@ pub trait Generator {
 /// SliceGenerator::new(&data).for_each(|x| sum += x);
 /// assert_eq!(sum, 10);
 /// ```
+#[derive(Clone)]
 pub struct SliceGenerator<'a, T> {
     slice: &'a [T],
     index: usize,

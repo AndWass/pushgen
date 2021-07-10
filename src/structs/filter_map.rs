@@ -1,6 +1,7 @@
 use crate::{Generator, GeneratorResult, ValueResult};
 
 /// Implements a mapped generator. See [`.map()`](crate::GeneratorExt::map) for details.
+#[derive(Clone)]
 pub struct FilterMap<Gen, Func> {
     source: Gen,
     transform: Func,
