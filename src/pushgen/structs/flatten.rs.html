@@ -115,6 +115,7 @@
 <span id="112">112</span>
 <span id="113">113</span>
 <span id="114">114</span>
+<span id="115">115</span>
 </pre><div class="example-wrap"><pre class="rust ">
 <span class="kw">use</span> <span class="kw">crate</span>::{<span class="ident">structs::utility::set_some</span>, <span class="ident">Generator</span>, <span class="ident">GeneratorResult</span>, <span class="ident">IntoGenerator</span>, <span class="ident">ValueResult</span>};
 
@@ -150,6 +151,7 @@
     <span class="ident">Src::Output</span>: <span class="ident">IntoGenerator</span>,
     <span class="op">&lt;</span><span class="ident">Src::Output</span> <span class="kw">as</span> <span class="ident">IntoGenerator</span><span class="op">&gt;</span><span class="ident">::IntoGen</span>: <span class="ident">Clone</span>,
 {
+    <span class="attribute">#[<span class="ident">allow</span>(<span class="ident">clippy::missing_inline_in_public_items</span>)]</span>
     <span class="kw">fn</span> <span class="ident">clone</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {
         <span class="self">Self</span> {
             <span class="ident">source</span>: <span class="self">self</span>.<span class="ident">source</span>.<span class="ident">clone</span>(),
