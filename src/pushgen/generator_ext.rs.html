@@ -541,9 +541,39 @@
 <span id="538">538</span>
 <span id="539">539</span>
 <span id="540">540</span>
+<span id="541">541</span>
+<span id="542">542</span>
+<span id="543">543</span>
+<span id="544">544</span>
+<span id="545">545</span>
+<span id="546">546</span>
+<span id="547">547</span>
+<span id="548">548</span>
+<span id="549">549</span>
+<span id="550">550</span>
+<span id="551">551</span>
+<span id="552">552</span>
+<span id="553">553</span>
+<span id="554">554</span>
+<span id="555">555</span>
+<span id="556">556</span>
+<span id="557">557</span>
+<span id="558">558</span>
+<span id="559">559</span>
+<span id="560">560</span>
+<span id="561">561</span>
+<span id="562">562</span>
+<span id="563">563</span>
+<span id="564">564</span>
+<span id="565">565</span>
+<span id="566">566</span>
+<span id="567">567</span>
+<span id="568">568</span>
+<span id="569">569</span>
 </pre><div class="example-wrap"><pre class="rust ">
 <span class="kw">use</span> <span class="kw">crate</span><span class="ident">::structs</span>::{
-    <span class="ident">Chain</span>, <span class="ident">Cloned</span>, <span class="ident">Copied</span>, <span class="ident">Dedup</span>, <span class="ident">Filter</span>, <span class="ident">FilterMap</span>, <span class="ident">Flatten</span>, <span class="ident">IteratorAdaptor</span>, <span class="ident">Map</span>, <span class="ident">Skip</span>, <span class="ident">Take</span>, <span class="ident">Zip</span>,
+    <span class="ident">Chain</span>, <span class="ident">Cloned</span>, <span class="ident">Copied</span>, <span class="ident">Dedup</span>, <span class="ident">Filter</span>, <span class="ident">FilterMap</span>, <span class="ident">Flatten</span>, <span class="ident">IteratorAdaptor</span>, <span class="ident">Map</span>, <span class="ident">Skip</span>, <span class="ident">Take</span>,
+    <span class="ident">TakeWhile</span>, <span class="ident">Zip</span>,
 };
 <span class="kw">use</span> <span class="kw">crate</span>::{<span class="ident">Generator</span>, <span class="ident">GeneratorResult</span>, <span class="ident">ValueResult</span>};
 
@@ -790,6 +820,34 @@
         <span class="self">Self</span>: <span class="ident">Sized</span>,
     {
         <span class="ident">Take::new</span>(<span class="self">self</span>, <span class="ident">n</span>)
+    }
+
+    <span class="doccomment">/// Creates a generator that pushes values based on a predicate.</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// `take_while()` takes a closure as an argument. It will call this closure on each value</span>
+    <span class="doccomment">/// received from the source generator, and push values while it returns true. After `false` is</span>
+    <span class="doccomment">/// returned, `take_while()`&#39;s job is over and it will always report `Complete`.</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// ## Examples</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// Basic usage:</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// ```rust</span>
+    <span class="doccomment">/// use pushgen::{IntoGenerator, GeneratorExt};</span>
+    <span class="doccomment">/// let a = [-1i32, 0, 1];</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// let mut gen_as_iter = a.into_gen().take_while(|x| x.is_negative()).iter();</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// assert_eq!(gen_as_iter.next(), Some(&amp;-1));</span>
+    <span class="doccomment">/// assert_eq!(gen_as_iter.next(), None);</span>
+    <span class="doccomment">/// ```</span>
+    <span class="attribute">#[<span class="ident">inline</span>]</span>
+    <span class="kw">fn</span> <span class="ident">take_while</span><span class="op">&lt;</span><span class="ident">P</span><span class="op">&gt;</span>(<span class="self">self</span>, <span class="ident">predicate</span>: <span class="ident">P</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">TakeWhile</span><span class="op">&lt;</span><span class="self">Self</span>, <span class="ident">P</span><span class="op">&gt;</span>
+    <span class="kw">where</span>
+        <span class="self">Self</span>: <span class="ident">Sized</span>,
+        <span class="ident">P</span>: <span class="ident">FnMut</span>(<span class="kw-2">&amp;</span><span class="self">Self</span><span class="ident">::Output</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">bool</span>,
+    {
+        <span class="ident">TakeWhile::new</span>(<span class="self">self</span>, <span class="ident">predicate</span>)
     }
 
     <span class="doccomment">/// Creates a generator that works like map, but flattens nested structure.</span>
