@@ -1,5 +1,6 @@
 use crate::structs::{
-    Chain, Cloned, Copied, Dedup, Filter, FilterMap, Flatten, IteratorAdaptor, Map, Skip, Take, Zip,
+    Chain, Cloned, Copied, Dedup, Filter, FilterMap, Flatten, IteratorAdaptor, Map, Skip, Take,
+    TakeWhile, Zip,
 };
 use crate::{Generator, GeneratorResult, ValueResult};
 
@@ -246,6 +247,34 @@ pub trait GeneratorExt: Sealed + Generator {
         Self: Sized,
     {
         Take::new(self, n)
+    }
+
+    /// Creates a generator that pushes values based on a predicate.
+    ///
+    /// `take_while()` takes a closure as an argument. It will call this closure on each value
+    /// received from the source generator, and push values while it returns true. After `false` is
+    /// returned, `take_while()`'s job is over and it will always report `Complete`.
+    ///
+    /// ## Examples
+    ///
+    /// Basic usage:
+    ///
+    /// ```rust
+    /// use pushgen::{IntoGenerator, GeneratorExt};
+    /// let a = [-1i32, 0, 1];
+    ///
+    /// let mut gen_as_iter = a.into_gen().take_while(|x| x.is_negative()).iter();
+    ///
+    /// assert_eq!(gen_as_iter.next(), Some(&-1));
+    /// assert_eq!(gen_as_iter.next(), None);
+    /// ```
+    #[inline]
+    fn take_while<P>(self, predicate: P) -> TakeWhile<Self, P>
+    where
+        Self: Sized,
+        P: FnMut(&Self::Output) -> bool,
+    {
+        TakeWhile::new(self, predicate)
     }
 
     /// Creates a generator that works like map, but flattens nested structure.

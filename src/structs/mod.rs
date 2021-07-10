@@ -33,5 +33,5 @@ pub use iterator::IteratorAdaptor;
 pub use map::Map;
 pub use option::OptionGen;
 pub use skip::Skip;
-pub use take::Take;
+pub use take::{Take, TakeWhile};
 pub use zip::Zip;
