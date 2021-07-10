@@ -570,10 +570,37 @@
 <span id="567">567</span>
 <span id="568">568</span>
 <span id="569">569</span>
+<span id="570">570</span>
+<span id="571">571</span>
+<span id="572">572</span>
+<span id="573">573</span>
+<span id="574">574</span>
+<span id="575">575</span>
+<span id="576">576</span>
+<span id="577">577</span>
+<span id="578">578</span>
+<span id="579">579</span>
+<span id="580">580</span>
+<span id="581">581</span>
+<span id="582">582</span>
+<span id="583">583</span>
+<span id="584">584</span>
+<span id="585">585</span>
+<span id="586">586</span>
+<span id="587">587</span>
+<span id="588">588</span>
+<span id="589">589</span>
+<span id="590">590</span>
+<span id="591">591</span>
+<span id="592">592</span>
+<span id="593">593</span>
+<span id="594">594</span>
+<span id="595">595</span>
+<span id="596">596</span>
 </pre><div class="example-wrap"><pre class="rust ">
 <span class="kw">use</span> <span class="kw">crate</span><span class="ident">::structs</span>::{
-    <span class="ident">Chain</span>, <span class="ident">Cloned</span>, <span class="ident">Copied</span>, <span class="ident">Dedup</span>, <span class="ident">Filter</span>, <span class="ident">FilterMap</span>, <span class="ident">Flatten</span>, <span class="ident">IteratorAdaptor</span>, <span class="ident">Map</span>, <span class="ident">Skip</span>, <span class="ident">Take</span>,
-    <span class="ident">TakeWhile</span>, <span class="ident">Zip</span>,
+    <span class="ident">Chain</span>, <span class="ident">Cloned</span>, <span class="ident">Copied</span>, <span class="ident">Dedup</span>, <span class="ident">Filter</span>, <span class="ident">FilterMap</span>, <span class="ident">Flatten</span>, <span class="ident">IteratorAdaptor</span>, <span class="ident">Map</span>, <span class="ident">Skip</span>,
+    <span class="ident">SkipWhile</span>, <span class="ident">Take</span>, <span class="ident">TakeWhile</span>, <span class="ident">Zip</span>,
 };
 <span class="kw">use</span> <span class="kw">crate</span>::{<span class="ident">Generator</span>, <span class="ident">GeneratorResult</span>, <span class="ident">ValueResult</span>};
 
@@ -802,6 +829,33 @@
         <span class="self">Self</span>: <span class="ident">Sized</span>,
     {
         <span class="ident">Skip::new</span>(<span class="self">self</span>, <span class="ident">n</span>)
+    }
+
+    <span class="doccomment">/// Creates a generator that skips values based on a predicate.</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// `skip_while()` takes a closure as argument. It will call this closure on each value,</span>
+    <span class="doccomment">/// and ignore values until the closure returns `false`.</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// After `false` is returned, `skip_while()` will push the rest of the values.</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// ## Examples</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// Basic usage</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// ```rust</span>
+    <span class="doccomment">/// use pushgen::{IntoGenerator, GeneratorExt};</span>
+    <span class="doccomment">/// let a = [-1i32, 0, 1];</span>
+    <span class="doccomment">/// let mut output = Vec::new();</span>
+    <span class="doccomment">/// a.into_gen().skip_while(|x| x.is_negative()).for_each(|x| output.push(x));</span>
+    <span class="doccomment">/// assert_eq!(output, [&amp;0, &amp;1]);</span>
+    <span class="doccomment">/// ```</span>
+    <span class="attribute">#[<span class="ident">inline</span>]</span>
+    <span class="kw">fn</span> <span class="ident">skip_while</span><span class="op">&lt;</span><span class="ident">P</span><span class="op">&gt;</span>(<span class="self">self</span>, <span class="ident">predicate</span>: <span class="ident">P</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">SkipWhile</span><span class="op">&lt;</span><span class="self">Self</span>, <span class="ident">P</span><span class="op">&gt;</span>
+    <span class="kw">where</span>
+        <span class="self">Self</span>: <span class="ident">Sized</span>,
+        <span class="ident">P</span>: <span class="ident">FnMut</span>(<span class="kw-2">&amp;</span><span class="self">Self</span><span class="ident">::Output</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">bool</span>,
+    {
+        <span class="ident">SkipWhile::new</span>(<span class="self">self</span>, <span class="ident">predicate</span>)
     }
 
     <span class="doccomment">/// Takes `n` values and then completes the generator.</span>
