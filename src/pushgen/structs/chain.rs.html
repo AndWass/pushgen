@@ -60,10 +60,12 @@
 <span id="57">57</span>
 <span id="58">58</span>
 <span id="59">59</span>
+<span id="60">60</span>
 </pre><div class="example-wrap"><pre class="rust ">
 <span class="kw">use</span> <span class="kw">crate</span>::{<span class="ident">Generator</span>, <span class="ident">GeneratorResult</span>, <span class="ident">ValueResult</span>};
 
 <span class="doccomment">/// Implements a chained generator. See [`.chain()`](crate::GeneratorExt::chain) for details.</span>
+<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>)]</span>
 <span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">Chain</span><span class="op">&lt;</span><span class="ident">First</span>, <span class="ident">Second</span><span class="op">&gt;</span> {
     <span class="ident">first</span>: <span class="ident">First</span>,
     <span class="ident">second</span>: <span class="ident">Second</span>,

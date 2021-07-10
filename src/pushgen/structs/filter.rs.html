@@ -42,10 +42,12 @@
 <span id="39">39</span>
 <span id="40">40</span>
 <span id="41">41</span>
+<span id="42">42</span>
 </pre><div class="example-wrap"><pre class="rust ">
 <span class="kw">use</span> <span class="kw">crate</span>::{<span class="ident">Generator</span>, <span class="ident">GeneratorResult</span>, <span class="ident">ValueResult</span>};
 
 <span class="doccomment">/// Implements a filtered generator. See [`.filter()`](crate::GeneratorExt::filter) for more details.</span>
+<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>)]</span>
 <span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">Filter</span><span class="op">&lt;</span><span class="ident">Gen</span>, <span class="ident">Pred</span><span class="op">&gt;</span> {
     <span class="ident">generator</span>: <span class="ident">Gen</span>,
     <span class="ident">predicate</span>: <span class="ident">Pred</span>,

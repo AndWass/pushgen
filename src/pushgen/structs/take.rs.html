@@ -187,10 +187,13 @@
 <span id="184">184</span>
 <span id="185">185</span>
 <span id="186">186</span>
+<span id="187">187</span>
+<span id="188">188</span>
 </pre><div class="example-wrap"><pre class="rust ">
 <span class="kw">use</span> <span class="kw">crate</span>::{<span class="ident">Generator</span>, <span class="ident">GeneratorResult</span>, <span class="ident">ValueResult</span>};
 
 <span class="doccomment">/// Take `n` values from a generator. See [`.take()`](crate::GeneratorExt::take) for details.</span>
+<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>)]</span>
 <span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">Take</span><span class="op">&lt;</span><span class="ident">Src</span><span class="op">&gt;</span> {
     <span class="ident">source</span>: <span class="ident">Src</span>,
     <span class="ident">amount_left</span>: <span class="ident">usize</span>,
@@ -236,6 +239,7 @@
 }
 
 <span class="doccomment">/// A generator that only forwards values while the predicate returns `true`. See [`.take_while()`](crate::GeneratorExt::take_while) for details.</span>
+<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>)]</span>
 <span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">TakeWhile</span><span class="op">&lt;</span><span class="ident">Src</span>, <span class="ident">P</span><span class="op">&gt;</span> {
     <span class="ident">source</span>: <span class="ident">Src</span>,
     <span class="ident">predicate</span>: <span class="ident">P</span>,

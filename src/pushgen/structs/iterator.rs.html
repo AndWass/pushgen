@@ -80,11 +80,13 @@
 <span id="77">77</span>
 <span id="78">78</span>
 <span id="79">79</span>
+<span id="80">80</span>
 </pre><div class="example-wrap"><pre class="rust ">
 <span class="kw">use</span> <span class="kw">crate</span>::{<span class="ident">structs::utility::InplaceUpdatable</span>, <span class="ident">Generator</span>, <span class="ident">ValueResult</span>};
 <span class="kw">use</span> <span class="ident">core::option::Option::Some</span>;
 
 <span class="doccomment">/// Adapt a generator into an iterator. See [`.iter()`](crate::GeneratorExt::iter) for more info.</span>
+<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>)]</span>
 <span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">IteratorAdaptor</span><span class="op">&lt;</span><span class="ident">Src</span><span class="op">&gt;</span>
 <span class="kw">where</span>
     <span class="ident">Src</span>: <span class="ident">Generator</span>,

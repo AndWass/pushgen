@@ -125,11 +125,13 @@
 <span id="122">122</span>
 <span id="123">123</span>
 <span id="124">124</span>
+<span id="125">125</span>
 </pre><div class="example-wrap"><pre class="rust ">
 <span class="kw">use</span> <span class="kw">crate</span>::{<span class="ident">Generator</span>, <span class="ident">GeneratorResult</span>, <span class="ident">ValueResult</span>};
 <span class="kw">use</span> <span class="ident">core::mem</span>;
 
 <span class="doccomment">/// Deduplication of duplicate consecutive values. See [`.dedup()`](crate::GeneratorExt::dedup) for details.</span>
+<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>)]</span>
 <span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">Dedup</span><span class="op">&lt;</span><span class="ident">Src</span><span class="op">&gt;</span>
 <span class="kw">where</span>
     <span class="ident">Src</span>: <span class="ident">Generator</span>,

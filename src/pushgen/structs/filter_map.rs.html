@@ -39,10 +39,12 @@
 <span id="36">36</span>
 <span id="37">37</span>
 <span id="38">38</span>
+<span id="39">39</span>
 </pre><div class="example-wrap"><pre class="rust ">
 <span class="kw">use</span> <span class="kw">crate</span>::{<span class="ident">Generator</span>, <span class="ident">GeneratorResult</span>, <span class="ident">ValueResult</span>};
 
 <span class="doccomment">/// Implements a mapped generator. See [`.map()`](crate::GeneratorExt::map) for details.</span>
+<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>)]</span>
 <span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">FilterMap</span><span class="op">&lt;</span><span class="ident">Gen</span>, <span class="ident">Func</span><span class="op">&gt;</span> {
     <span class="ident">source</span>: <span class="ident">Gen</span>,
     <span class="ident">transform</span>: <span class="ident">Func</span>,

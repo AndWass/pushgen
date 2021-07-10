@@ -26,10 +26,12 @@
 <span id="23">23</span>
 <span id="24">24</span>
 <span id="25">25</span>
+<span id="26">26</span>
 </pre><div class="example-wrap"><pre class="rust ">
 <span class="kw">use</span> <span class="kw">crate</span>::{<span class="ident">Generator</span>, <span class="ident">GeneratorResult</span>, <span class="ident">ValueResult</span>};
 
 <span class="doccomment">/// A generator that copies the elements of an underlying generator. See [`.copied()`](crate::GeneratorExt::copied) for details.</span>
+<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>)]</span>
 <span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">Copied</span><span class="op">&lt;</span><span class="ident">Src</span><span class="op">&gt;</span> {
     <span class="ident">source</span>: <span class="ident">Src</span>,
 }

@@ -213,6 +213,7 @@
 <span id="210">210</span>
 <span id="211">211</span>
 <span id="212">212</span>
+<span id="213">213</span>
 </pre><div class="example-wrap"><pre class="rust ">
 <span class="doccomment">//! Push-style design pattern for processing of ranges and data-streams.</span>
 <span class="doccomment">//!</span>
@@ -379,6 +380,7 @@
 <span class="doccomment">/// SliceGenerator::new(&amp;data).for_each(|x| sum += x);</span>
 <span class="doccomment">/// assert_eq!(sum, 10);</span>
 <span class="doccomment">/// ```</span>
+<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>)]</span>
 <span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">SliceGenerator</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">T</span><span class="op">&gt;</span> {
     <span class="ident">slice</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> [<span class="ident">T</span>],
     <span class="ident">index</span>: <span class="ident">usize</span>,

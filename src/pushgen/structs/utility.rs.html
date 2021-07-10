@@ -48,6 +48,7 @@
 <span id="45">45</span>
 <span id="46">46</span>
 <span id="47">47</span>
+<span id="48">48</span>
 </pre><div class="example-wrap"><pre class="rust ">
 <span class="kw">use</span> <span class="ident">core::hint</span>;
 
@@ -64,6 +65,7 @@
 <span class="doccomment">/// Implements this functionality as a struct instead of a function taking Option&lt;T&gt;</span>
 <span class="doccomment">/// to make sure that we won&#39;t accidentally treats a None as a Some and avoids the</span>
 <span class="doccomment">/// unsafe fn altogether.</span>
+<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>)]</span>
 <span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">InplaceUpdatable</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span> {
     <span class="comment">// Using Option here is necessary for integrity during unwind,</span>
     <span class="comment">// which is the only moment where inner is set to None.</span>

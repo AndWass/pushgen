@@ -101,10 +101,12 @@
 <span id="98"> 98</span>
 <span id="99"> 99</span>
 <span id="100">100</span>
+<span id="101">101</span>
 </pre><div class="example-wrap"><pre class="rust ">
 <span class="kw">use</span> <span class="kw">crate</span>::{<span class="ident">Generator</span>, <span class="ident">GeneratorResult</span>, <span class="ident">ValueResult</span>};
 
 <span class="doccomment">/// Zip two generators. See [`.zip()`](crate::GeneratorExt::zip) for details.</span>
+<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>)]</span>
 <span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">Zip</span><span class="op">&lt;</span><span class="ident">Left</span>, <span class="ident">Right</span><span class="op">&gt;</span> {
     <span class="ident">left</span>: <span class="ident">Left</span>,
     <span class="ident">right</span>: <span class="ident">Right</span>,
