@@ -35,7 +35,7 @@ where
     fn clone(&self) -> Self {
         Self {
             source: self.source.clone(),
-            current_generator: self.current_generator.clone()
+            current_generator: self.current_generator.clone(),
         }
     }
 }
