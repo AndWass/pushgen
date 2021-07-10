@@ -516,9 +516,34 @@
 <span id="513">513</span>
 <span id="514">514</span>
 <span id="515">515</span>
+<span id="516">516</span>
+<span id="517">517</span>
+<span id="518">518</span>
+<span id="519">519</span>
+<span id="520">520</span>
+<span id="521">521</span>
+<span id="522">522</span>
+<span id="523">523</span>
+<span id="524">524</span>
+<span id="525">525</span>
+<span id="526">526</span>
+<span id="527">527</span>
+<span id="528">528</span>
+<span id="529">529</span>
+<span id="530">530</span>
+<span id="531">531</span>
+<span id="532">532</span>
+<span id="533">533</span>
+<span id="534">534</span>
+<span id="535">535</span>
+<span id="536">536</span>
+<span id="537">537</span>
+<span id="538">538</span>
+<span id="539">539</span>
+<span id="540">540</span>
 </pre><div class="example-wrap"><pre class="rust ">
 <span class="kw">use</span> <span class="kw">crate</span><span class="ident">::structs</span>::{
-    <span class="ident">Chain</span>, <span class="ident">Cloned</span>, <span class="ident">Dedup</span>, <span class="ident">Filter</span>, <span class="ident">FilterMap</span>, <span class="ident">Flatten</span>, <span class="ident">IteratorAdaptor</span>, <span class="ident">Map</span>, <span class="ident">Skip</span>, <span class="ident">Take</span>, <span class="ident">Zip</span>,
+    <span class="ident">Chain</span>, <span class="ident">Cloned</span>, <span class="ident">Copied</span>, <span class="ident">Dedup</span>, <span class="ident">Filter</span>, <span class="ident">FilterMap</span>, <span class="ident">Flatten</span>, <span class="ident">IteratorAdaptor</span>, <span class="ident">Map</span>, <span class="ident">Skip</span>, <span class="ident">Take</span>, <span class="ident">Zip</span>,
 };
 <span class="kw">use</span> <span class="kw">crate</span>::{<span class="ident">Generator</span>, <span class="ident">GeneratorResult</span>, <span class="ident">ValueResult</span>};
 
@@ -596,6 +621,31 @@
         <span class="ident">T</span>: <span class="lifetime">&#39;a</span> <span class="op">+</span> <span class="ident">Clone</span>,
     {
         <span class="ident">Cloned::new</span>(<span class="self">self</span>)
+    }
+
+    <span class="doccomment">/// Creates a generator that copies all of its elements.</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// This is useful when you have a generator of `&amp;T` but need a generator of `T`.</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// ## Examples</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// Basic usage:</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// ```rust</span>
+    <span class="doccomment">/// use pushgen::{SliceGenerator, GeneratorExt};</span>
+    <span class="doccomment">/// let data = [1, 2, 3];</span>
+    <span class="doccomment">/// let mut v_copied: Vec&lt;_&gt; = Vec::new();</span>
+    <span class="doccomment">/// SliceGenerator::new(&amp;data).copied().for_each(|x| v_copied.push(x));</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// assert_eq!(v_copied, [1, 2, 3]);</span>
+    <span class="doccomment">/// ```</span>
+    <span class="attribute">#[<span class="ident">inline</span>]</span>
+    <span class="kw">fn</span> <span class="ident">copied</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">T</span><span class="op">&gt;</span>(<span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Copied</span><span class="op">&lt;</span><span class="self">Self</span><span class="op">&gt;</span>
+    <span class="kw">where</span>
+        <span class="ident">T</span>: <span class="lifetime">&#39;a</span> <span class="op">+</span> <span class="ident">Copy</span>,
+        <span class="self">Self</span>: <span class="ident">Generator</span><span class="op">&lt;</span><span class="ident">Output</span> <span class="op">=</span> <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">T</span><span class="op">&gt;</span> <span class="op">+</span> <span class="ident">Sized</span>,
+    {
+        <span class="ident">Copied::new</span>(<span class="self">self</span>)
     }
 
     <span class="doccomment">/// Creates a generator by chaining two generators, running them one after the other.</span>
