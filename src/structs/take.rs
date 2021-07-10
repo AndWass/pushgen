@@ -1,6 +1,7 @@
 use crate::{Generator, GeneratorResult, ValueResult};
 
 /// Take `n` values from a generator. See [`.take()`](crate::GeneratorExt::take) for details.
+#[derive(Clone)]
 pub struct Take<Src> {
     source: Src,
     amount_left: usize,
@@ -46,6 +47,7 @@ impl<Src: Generator> Generator for Take<Src> {
 }
 
 /// A generator that only forwards values while the predicate returns `true`. See [`.take_while()`](crate::GeneratorExt::take_while) for details.
+#[derive(Clone)]
 pub struct TakeWhile<Src, P> {
     source: Src,
     predicate: P,

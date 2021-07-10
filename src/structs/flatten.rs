@@ -1,6 +1,7 @@
 use crate::{structs::utility::set_some, Generator, GeneratorResult, IntoGenerator, ValueResult};
 
 /// Flatten generator implementation. See [`.flatten()`](crate::GeneratorExt::flatten) for details.
+#[derive(Clone)]
 pub struct Flatten<Src>
 where
     Src: Generator,
