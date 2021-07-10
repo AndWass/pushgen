@@ -32,6 +32,6 @@ pub use from_iter::FromIter;
 pub use iterator::IteratorAdaptor;
 pub use map::Map;
 pub use option::OptionGen;
-pub use skip::Skip;
+pub use skip::{Skip, SkipWhile};
 pub use take::{Take, TakeWhile};
 pub use zip::Zip;

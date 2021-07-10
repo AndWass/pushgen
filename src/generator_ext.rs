@@ -1,6 +1,6 @@
 use crate::structs::{
-    Chain, Cloned, Copied, Dedup, Filter, FilterMap, Flatten, IteratorAdaptor, Map, Skip, Take,
-    TakeWhile, Zip,
+    Chain, Cloned, Copied, Dedup, Filter, FilterMap, Flatten, IteratorAdaptor, Map, Skip,
+    SkipWhile, Take, TakeWhile, Zip,
 };
 use crate::{Generator, GeneratorResult, ValueResult};
 
@@ -229,6 +229,33 @@ pub trait GeneratorExt: Sealed + Generator {
         Self: Sized,
     {
         Skip::new(self, n)
+    }
+
+    /// Creates a generator that skips values based on a predicate.
+    ///
+    /// `skip_while()` takes a closure as argument. It will call this closure on each value,
+    /// and ignore values until the closure returns `false`.
+    ///
+    /// After `false` is returned, `skip_while()` will push the rest of the values.
+    ///
+    /// ## Examples
+    ///
+    /// Basic usage
+    ///
+    /// ```rust
+    /// use pushgen::{IntoGenerator, GeneratorExt};
+    /// let a = [-1i32, 0, 1];
+    /// let mut output = Vec::new();
+    /// a.into_gen().skip_while(|x| x.is_negative()).for_each(|x| output.push(x));
+    /// assert_eq!(output, [&0, &1]);
+    /// ```
+    #[inline]
+    fn skip_while<P>(self, predicate: P) -> SkipWhile<Self, P>
+    where
+        Self: Sized,
+        P: FnMut(&Self::Output) -> bool,
+    {
+        SkipWhile::new(self, predicate)
     }
 
     /// Takes `n` values and then completes the generator.
