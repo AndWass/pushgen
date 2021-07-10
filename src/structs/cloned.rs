@@ -21,6 +21,7 @@ where
 {
     type Output = T;
 
+    #[inline]
     fn run(&mut self, mut output: impl FnMut(Self::Output) -> ValueResult) -> GeneratorResult {
         self.source.run(|x| output(x.clone()))
     }
