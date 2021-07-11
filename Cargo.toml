@@ -132,3 +132,11 @@ harness = false
 [[bench]]
 name = "pushgen_iter_basic_loop"
 harness = false
+
+[[bench]]
+name = "for_each_step_by"
+harness = false
+
+[[bench]]
+name = "pushgen_step_by"
+harness = false

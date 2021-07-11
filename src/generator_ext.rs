@@ -1,6 +1,6 @@
 use crate::structs::{
     Chain, Cloned, Copied, Dedup, Filter, FilterMap, Flatten, IteratorAdaptor, Map, Skip,
-    SkipWhile, Take, TakeWhile, Zip,
+    SkipWhile, StepBy, Take, TakeWhile, Zip,
 };
 use crate::{Generator, GeneratorResult, ValueResult};
 
@@ -256,6 +256,60 @@ pub trait GeneratorExt: Sealed + Generator {
         P: FnMut(&Self::Output) -> bool,
     {
         SkipWhile::new(self, predicate)
+    }
+
+    /// Creates a generator starting at the same point, but stepping by the given amount.
+    ///
+    /// **⚠️ This adaptor has known performance problems.** See [performance](#performance)
+    ///
+    /// ## Performance
+    ///
+    /// The "naive" usage like
+    /// ```ignore
+    /// SliceGenerator::new(&data).step_by(step).for_each(process);
+    /// ```
+    ///
+    /// will almost certainly be less performant than
+    /// ```ignore
+    /// data.iter().step_by(step).for_each(process);
+    /// ```
+    ///
+    /// This is because the iterator produced by a slice can step in effectively `O(1)` instead of
+    /// `O(n)` that is done by `pushgen`.
+    ///
+    /// There are cases when `step_by` can provide much better performance, but it is advised to
+    /// benchmark properly before assuming that.
+    ///
+    /// See [issue #52](https://github.com/AndWass/pushgen/issues/52).
+    ///
+    /// ## Notes
+    ///
+    /// The first value of the generator will always be pushed, regardless of step.
+    ///
+    /// ## Panics
+    ///
+    /// This method will panic if the given `step` is `0`.
+    ///
+    /// ## Examples
+    ///
+    /// ```rust
+    /// use pushgen::{ IntoGenerator, GeneratorExt, GeneratorResult };
+    /// let data = [0, 1, 2, 3, 4, 5];
+    /// let mut output = Vec::new();
+    ///
+    /// let result = data.into_gen().step_by(2).for_each(|x| {
+    ///     output.push(x);
+    /// });
+    ///
+    /// assert_eq!(result, GeneratorResult::Complete);
+    /// assert_eq!(output, [&0, &2, &4]);
+    /// ```
+    #[inline]
+    fn step_by(self, step: usize) -> StepBy<Self>
+    where
+        Self: Sized,
+    {
+        StepBy::new(self, step)
     }
 
     /// Takes `n` values and then completes the generator.
