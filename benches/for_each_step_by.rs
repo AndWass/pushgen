@@ -2,11 +2,9 @@ use criterion::{black_box, criterion_group, criterion_main, Criterion};
 
 fn run_iterator_for_each(data: &Vec<i32>) {
     let mut result = 0i32;
-    data.iter()
-        .step_by(31)
-        .for_each(|x| {
-            result = result.wrapping_add(*x);
-        });
+    data.iter().step_by(31).for_each(|x| {
+        result = result.wrapping_add(*x);
+    });
     black_box(result);
 }
 

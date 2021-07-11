@@ -51,7 +51,7 @@ where
                 Ok(x) => {
                     self.first_output = false;
                     output(x)
-                },
+                }
                 Err(x) => return x,
             };
 
@@ -67,8 +67,7 @@ where
             if index == step {
                 index = 0;
                 output(x)
-            }
-            else {
+            } else {
                 ValueResult::MoreValues
             }
         });
