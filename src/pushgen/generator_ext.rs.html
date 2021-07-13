@@ -727,11 +727,91 @@
 <span id="724">724</span>
 <span id="725">725</span>
 <span id="726">726</span>
+<span id="727">727</span>
+<span id="728">728</span>
+<span id="729">729</span>
+<span id="730">730</span>
+<span id="731">731</span>
+<span id="732">732</span>
+<span id="733">733</span>
+<span id="734">734</span>
+<span id="735">735</span>
+<span id="736">736</span>
+<span id="737">737</span>
+<span id="738">738</span>
+<span id="739">739</span>
+<span id="740">740</span>
+<span id="741">741</span>
+<span id="742">742</span>
+<span id="743">743</span>
+<span id="744">744</span>
+<span id="745">745</span>
+<span id="746">746</span>
+<span id="747">747</span>
+<span id="748">748</span>
+<span id="749">749</span>
+<span id="750">750</span>
+<span id="751">751</span>
+<span id="752">752</span>
+<span id="753">753</span>
+<span id="754">754</span>
+<span id="755">755</span>
+<span id="756">756</span>
+<span id="757">757</span>
+<span id="758">758</span>
+<span id="759">759</span>
+<span id="760">760</span>
+<span id="761">761</span>
+<span id="762">762</span>
+<span id="763">763</span>
+<span id="764">764</span>
+<span id="765">765</span>
+<span id="766">766</span>
+<span id="767">767</span>
+<span id="768">768</span>
+<span id="769">769</span>
+<span id="770">770</span>
+<span id="771">771</span>
+<span id="772">772</span>
+<span id="773">773</span>
+<span id="774">774</span>
+<span id="775">775</span>
+<span id="776">776</span>
+<span id="777">777</span>
+<span id="778">778</span>
+<span id="779">779</span>
+<span id="780">780</span>
+<span id="781">781</span>
+<span id="782">782</span>
+<span id="783">783</span>
+<span id="784">784</span>
+<span id="785">785</span>
+<span id="786">786</span>
+<span id="787">787</span>
+<span id="788">788</span>
+<span id="789">789</span>
+<span id="790">790</span>
+<span id="791">791</span>
+<span id="792">792</span>
+<span id="793">793</span>
+<span id="794">794</span>
+<span id="795">795</span>
+<span id="796">796</span>
+<span id="797">797</span>
+<span id="798">798</span>
+<span id="799">799</span>
+<span id="800">800</span>
+<span id="801">801</span>
+<span id="802">802</span>
+<span id="803">803</span>
+<span id="804">804</span>
+<span id="805">805</span>
 </pre><div class="example-wrap"><pre class="rust ">
 <span class="kw">use</span> <span class="kw">crate</span><span class="ident">::structs</span>::{
     <span class="ident">Chain</span>, <span class="ident">Cloned</span>, <span class="ident">Copied</span>, <span class="ident">Dedup</span>, <span class="ident">Filter</span>, <span class="ident">FilterMap</span>, <span class="ident">Flatten</span>, <span class="ident">IteratorAdaptor</span>, <span class="ident">Map</span>, <span class="ident">Skip</span>,
     <span class="ident">SkipWhile</span>, <span class="ident">Take</span>, <span class="ident">TakeWhile</span>, <span class="ident">Zip</span>,
 };
+<span class="kw">use</span> <span class="kw">crate</span><span class="ident">::traits</span>::{<span class="ident">Product</span>, <span class="ident">Sum</span>};
 <span class="kw">use</span> <span class="kw">crate</span>::{<span class="ident">Generator</span>, <span class="ident">GeneratorResult</span>, <span class="ident">ValueResult</span>};
 
 <span class="kw">pub</span> <span class="kw">trait</span> <span class="ident">Sealed</span> {}
@@ -1403,6 +1483,84 @@
         <span class="self">Self</span>: <span class="ident">Sized</span> <span class="op">+</span> <span class="lifetime">&#39;static</span>,
     {
         <span class="kw">crate</span><span class="ident">::BoxedGenerator::new</span>(<span class="self">self</span>)
+    }
+
+    <span class="doccomment">/// Sums the values of a generator. Takes each value and adds them together and returns</span>
+    <span class="doccomment">/// the result.</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// An empty generator returns the zero value of the type.</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// ## Stopping source generators</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// `sum()` only sums the values up until the source generator is first stopped. If the source</span>
+    <span class="doccomment">/// generator is not completed, but stops mid-generation for some reason, only the values up</span>
+    <span class="doccomment">/// until the first stop are summed.</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// ## Panics</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// When calling `sum()` and a primitive integer type is being returned,</span>
+    <span class="doccomment">/// this method will panic if the computation overflows and debug assertions are enabled.</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// ## Examples</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// Basic usage:</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// ```</span>
+    <span class="doccomment">/// use pushgen::{IntoGenerator, GeneratorExt};</span>
+    <span class="doccomment">/// let a = [1, 2, 3];</span>
+    <span class="doccomment">/// let sum: i32 = a.into_gen().sum();</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// assert_eq!(sum, 6);</span>
+    <span class="doccomment">/// ```</span>
+    <span class="doccomment">///</span>
+    <span class="attribute">#[<span class="ident">inline</span>]</span>
+    <span class="kw">fn</span> <span class="ident">sum</span><span class="op">&lt;</span><span class="ident">S</span><span class="op">&gt;</span>(<span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">S</span>
+    <span class="kw">where</span>
+        <span class="self">Self</span>: <span class="ident">Sized</span>,
+        <span class="ident">S</span>: <span class="ident">Sum</span><span class="op">&lt;</span><span class="self">Self</span><span class="ident">::Output</span><span class="op">&gt;</span>,
+    {
+        <span class="ident">S::sum</span>(<span class="self">self</span>)
+    }
+
+    <span class="doccomment">/// Multiplies the values of a generator. Takes each value and adds them together and returns</span>
+    <span class="doccomment">/// the result.</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// An empty generator returns the one value of the type.</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// ## Stopping source generators</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// `product()` only multiplies the values up until the source generator is first stopped. If the source</span>
+    <span class="doccomment">/// generator is not completed, but stops mid-generation for some reason, only the values up</span>
+    <span class="doccomment">/// until the first stop are multiplied.</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// ## Panics</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// When calling `product()` and a primitive integer type is being returned,</span>
+    <span class="doccomment">/// this method will panic if the computation overflows and debug assertions are enabled.</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// ## Examples</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// Basic usage:</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// ```</span>
+    <span class="doccomment">/// use pushgen::{GeneratorExt, from_iter};</span>
+    <span class="doccomment">/// fn factorial(n: u32) -&gt; u32 {</span>
+    <span class="doccomment">///     // Create a generator from an iterable</span>
+    <span class="doccomment">///     from_iter((1..=n)).product()</span>
+    <span class="doccomment">/// }</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// assert_eq!(factorial(0), 1);</span>
+    <span class="doccomment">/// assert_eq!(factorial(1), 1);</span>
+    <span class="doccomment">/// assert_eq!(factorial(5), 120);</span>
+    <span class="doccomment">/// ```</span>
+    <span class="doccomment">///</span>
+    <span class="attribute">#[<span class="ident">inline</span>]</span>
+    <span class="kw">fn</span> <span class="ident">product</span><span class="op">&lt;</span><span class="ident">P</span><span class="op">&gt;</span>(<span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">P</span>
+    <span class="kw">where</span>
+        <span class="self">Self</span>: <span class="ident">Sized</span>,
+        <span class="ident">P</span>: <span class="ident">Product</span><span class="op">&lt;</span><span class="self">Self</span><span class="ident">::Output</span><span class="op">&gt;</span>,
+    {
+        <span class="ident">P::product</span>(<span class="self">self</span>)
     }
 }
 

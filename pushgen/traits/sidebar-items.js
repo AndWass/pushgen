@@ -1,0 +1,1 @@
+initSidebarItems({"trait":[["Product","Trait to represent types that can be created by multiplying values from a generator."],["Sum","Trait to represent types that can be created by summing up a generator."]]});
