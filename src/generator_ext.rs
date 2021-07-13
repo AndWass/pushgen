@@ -2,6 +2,7 @@ use crate::structs::{
     Chain, Cloned, Copied, Dedup, Filter, FilterMap, Flatten, IteratorAdaptor, Map, Skip,
     SkipWhile, Take, TakeWhile, Zip,
 };
+use crate::traits::{Product, Sum};
 use crate::{Generator, GeneratorResult, ValueResult};
 
 pub trait Sealed {}
@@ -570,6 +571,84 @@ pub trait GeneratorExt: Sealed + Generator {
         Self: Sized + 'static,
     {
         crate::BoxedGenerator::new(self)
+    }
+
+    /// Sums the values of a generator. Takes each value and adds them together and returns
+    /// the result.
+    ///
+    /// An empty generator returns the zero value of the type.
+    ///
+    /// ## Stopping source generators
+    ///
+    /// `sum()` only sums the values up until the source generator is first stopped. If the source
+    /// generator is not completed, but stops mid-generation for some reason, only the values up
+    /// until the first stop are summed.
+    ///
+    /// ## Panics
+    ///
+    /// When calling `sum()` and a primitive integer type is being returned,
+    /// this method will panic if the computation overflows and debug assertions are enabled.
+    ///
+    /// ## Examples
+    ///
+    /// Basic usage:
+    ///
+    /// ```
+    /// use pushgen::{IntoGenerator, GeneratorExt};
+    /// let a = [1, 2, 3];
+    /// let sum: i32 = a.into_gen().sum();
+    ///
+    /// assert_eq!(sum, 6);
+    /// ```
+    ///
+    #[inline]
+    fn sum<S>(self) -> S
+    where
+        Self: Sized,
+        S: Sum<Self::Output>,
+    {
+        S::sum(self)
+    }
+
+    /// Multiplies the values of a generator. Takes each value and adds them together and returns
+    /// the result.
+    ///
+    /// An empty generator returns the one value of the type.
+    ///
+    /// ## Stopping source generators
+    ///
+    /// `product()` only multiplies the values up until the source generator is first stopped. If the source
+    /// generator is not completed, but stops mid-generation for some reason, only the values up
+    /// until the first stop are multiplied.
+    ///
+    /// ## Panics
+    ///
+    /// When calling `product()` and a primitive integer type is being returned,
+    /// this method will panic if the computation overflows and debug assertions are enabled.
+    ///
+    /// ## Examples
+    ///
+    /// Basic usage:
+    ///
+    /// ```
+    /// use pushgen::{GeneratorExt, from_iter};
+    /// fn factorial(n: u32) -> u32 {
+    ///     // Create a generator from an iterable
+    ///     from_iter((1..=n)).product()
+    /// }
+    ///
+    /// assert_eq!(factorial(0), 1);
+    /// assert_eq!(factorial(1), 1);
+    /// assert_eq!(factorial(5), 120);
+    /// ```
+    ///
+    #[inline]
+    fn product<P>(self) -> P
+    where
+        Self: Sized,
+        P: Product<Self::Output>,
+    {
+        P::product(self)
     }
 }
 
