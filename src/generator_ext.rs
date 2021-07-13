@@ -108,6 +108,7 @@ pub trait GeneratorExt: Sealed + Generator {
     /// // we can still use `gen`, as there are more elements.
     /// assert_eq!(gen.iter().next(), Some(&2));
     /// ```
+    #[inline]
     fn any<F>(&mut self, mut predicate: F) -> bool
     where
         F: FnMut(Self::Output) -> bool,
