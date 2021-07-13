@@ -36,6 +36,7 @@ mod generator_ext;
 mod into_gen;
 
 pub mod structs;
+pub mod traits;
 
 #[cfg(test)]
 pub mod test;
