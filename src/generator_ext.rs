@@ -753,6 +753,65 @@ pub trait GeneratorExt: Sealed + Generator {
     {
         P::product(self)
     }
+
+    /// Reduces the elements to a single one by repeatedly applying a reducing operation.
+    ///
+    /// ## Returns
+    ///
+    /// `None` if the iterator is empty, otherwise the result of the reduction.
+    ///
+    /// ## Stopping generators
+    ///
+    /// Reduce will return the result after the source generator has stopped. It doesn't matter
+    /// if the source generator is stopped or completed.
+    ///
+    /// ## Example
+    ///
+    /// Find the maximum value:
+    ///
+    /// ```
+    /// use pushgen::{Generator, GeneratorExt, IntoGenerator};
+    /// fn find_max<G>(gen: G) -> Option<G::Output>
+    ///     where G: Generator,
+    ///           G::Output: Ord,
+    /// {
+    ///     gen.reduce(|a, b| {
+    ///         if a >= b { a } else { b }
+    ///     })
+    /// }
+    /// let a = [10, 20, 5, -23, 0];
+    /// let b: [u32; 0] = [];
+    ///
+    /// assert_eq!(find_max(a.into_gen()), Some(&20));
+    /// assert_eq!(find_max(b.into_gen()), None);
+    /// ```
+    ///
+    #[inline]
+    fn reduce<F>(mut self, mut reducer: F) -> Option<Self::Output>
+    where
+        Self: Sized,
+        F: FnMut(Self::Output, Self::Output) -> Self::Output,
+    {
+        let mut left_value = {
+            // Grab the first item into an optional
+            let mut first = None;
+            self.run(|x| {
+                first = Some(x);
+                ValueResult::Stop
+            });
+
+            // In the hot loop we use an inplace updatable since we know we will never
+            // have a None option from now on.
+            crate::structs::utility::InplaceUpdatable::new(first?)
+        };
+
+        self.run(|x| {
+            left_value.reduce(x, |a, b| reducer(a, b));
+            ValueResult::MoreValues
+        });
+
+        Some(left_value.get_inner())
+    }
 }
 
 impl<T: Generator> GeneratorExt for T {}

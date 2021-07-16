@@ -17,7 +17,7 @@ mod map;
 mod option;
 mod skip;
 mod take;
-mod utility;
+pub(crate) mod utility;
 mod zip;
 
 pub use chain::Chain;
