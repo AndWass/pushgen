@@ -758,7 +758,7 @@ pub trait GeneratorExt: Sealed + Generator {
     ///
     /// ## Returns
     ///
-    /// `None` if the iterator is empty, otherwise the result of the reduction.
+    /// `None` if the generator is empty, otherwise the result of the reduction.
     ///
     /// ## Stopping generators
     ///
