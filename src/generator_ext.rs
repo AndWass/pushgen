@@ -903,6 +903,7 @@ pub trait GeneratorExt: Sealed + Generator {
     /// }
     /// ```
     ///
+    #[allow(clippy::type_complexity)]
     #[inline]
     fn try_reduce<F>(
         mut self,
