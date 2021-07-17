@@ -681,7 +681,7 @@ pub trait GeneratorExt: Sealed + Generator {
     ///
     /// An empty generator returns the zero value of the type.
     ///
-    /// ## Stopping source generators
+    /// ## Spuriously stopping generators
     ///
     /// `sum()` only sums the values up until the source generator is first stopped. If the source
     /// generator is not completed, but stops mid-generation for some reason, only the values up
@@ -718,7 +718,7 @@ pub trait GeneratorExt: Sealed + Generator {
     ///
     /// An empty generator returns the one value of the type.
     ///
-    /// ## Stopping source generators
+    /// ## Spuriously stopping generators
     ///
     /// `product()` only multiplies the values up until the source generator is first stopped. If the source
     /// generator is not completed, but stops mid-generation for some reason, only the values up
@@ -760,12 +760,12 @@ pub trait GeneratorExt: Sealed + Generator {
     ///
     /// `None` if the generator is empty, otherwise the result of the reduction.
     ///
-    /// ## Stopping generators
+    /// ## Spuriously stopping generators
     ///
     /// Reduce will return the result after the source generator has stopped. It doesn't matter
     /// if the source generator is stopped or completed.
     ///
-    /// Use [`try_reduce`] to reduce stopping generators.
+    /// Use [`try_reduce`] to reduce spuriously stopping generators.
     ///
     /// [`try_reduce`]: GeneratorExt::try_reduce
     ///
@@ -818,6 +818,11 @@ pub trait GeneratorExt: Sealed + Generator {
     }
 
     /// Reduces the values to a single value by repeatedly applying a reducing operation.
+    ///
+    /// Use this reduction if the generator is known to spuriously stop mid-stream. Otherwise
+    /// it is better to use [`reduce()`].
+    ///
+    /// [`reduce()`]: GeneratorExt::reduce
     ///
     /// ## Arguments
     ///
