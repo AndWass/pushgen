@@ -861,4 +861,34 @@ mod tests {
         let data: [i32; 0] = [];
         assert!(!data.into_gen().any(|_| true));
     }
+
+    #[test]
+    fn empty_reduce() {
+        let x: [i32;0] = [];
+        fn reducer(a: i32, b: i32) -> i32 {
+            a+b
+        }
+
+        assert_eq!(x.iter().copied().reduce(reducer), x.into_gen().copied().reduce(reducer));
+    }
+
+    #[test]
+    fn single_element_reduce() {
+        let x = [1i32];
+        fn reducer(a: i32, b: i32) -> i32 {
+            a+b
+        }
+
+        assert_eq!(x.iter().copied().reduce(reducer), x.into_gen().copied().reduce(reducer));
+    }
+
+    #[test]
+    fn two_element_reduce() {
+        let x = [1i32, 2];
+        fn reducer(a: i32, b: i32) -> i32 {
+            a+b
+        }
+
+        assert_eq!(x.iter().copied().reduce(reducer), x.into_gen().copied().reduce(reducer));
+    }
 }
