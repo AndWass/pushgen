@@ -681,7 +681,7 @@ pub trait GeneratorExt: Sealed + Generator {
     ///
     /// An empty generator returns the zero value of the type.
     ///
-    /// ## Stopping source generators
+    /// ## Spuriously stopping generators
     ///
     /// `sum()` only sums the values up until the source generator is first stopped. If the source
     /// generator is not completed, but stops mid-generation for some reason, only the values up
@@ -718,7 +718,7 @@ pub trait GeneratorExt: Sealed + Generator {
     ///
     /// An empty generator returns the one value of the type.
     ///
-    /// ## Stopping source generators
+    /// ## Spuriously stopping generators
     ///
     /// `product()` only multiplies the values up until the source generator is first stopped. If the source
     /// generator is not completed, but stops mid-generation for some reason, only the values up
@@ -753,12 +753,216 @@ pub trait GeneratorExt: Sealed + Generator {
     {
         P::product(self)
     }
+
+    /// Reduces the elements to a single one by repeatedly applying a reducing operation.
+    ///
+    /// ## Returns
+    ///
+    /// `None` if the generator is empty, otherwise the result of the reduction.
+    ///
+    /// ## Spuriously stopping generators
+    ///
+    /// Reduce will return the result after the source generator has stopped. It doesn't matter
+    /// if the source generator is stopped or completed.
+    ///
+    /// Use [`try_reduce`] to reduce spuriously stopping generators.
+    ///
+    /// [`try_reduce`]: GeneratorExt::try_reduce
+    ///
+    /// ## Example
+    ///
+    /// Find the maximum value:
+    ///
+    /// ```
+    /// use pushgen::{Generator, GeneratorExt, IntoGenerator};
+    /// fn find_max<G>(gen: G) -> Option<G::Output>
+    ///     where G: Generator,
+    ///           G::Output: Ord,
+    /// {
+    ///     gen.reduce(|a, b| {
+    ///         if a >= b { a } else { b }
+    ///     })
+    /// }
+    /// let a = [10, 20, 5, -23, 0];
+    /// let b: [u32; 0] = [];
+    ///
+    /// assert_eq!(find_max(a.into_gen()), Some(&20));
+    /// assert_eq!(find_max(b.into_gen()), None);
+    /// ```
+    ///
+    #[inline]
+    fn reduce<F>(mut self, mut reducer: F) -> Option<Self::Output>
+    where
+        Self: Sized,
+        F: FnMut(Self::Output, Self::Output) -> Self::Output,
+    {
+        let mut left_value = {
+            // Grab the first item into an optional
+            let mut first = None;
+            self.run(|x| {
+                first = Some(x);
+                ValueResult::Stop
+            });
+
+            // In the hot loop we use an inplace updatable since we know we will never
+            // have a None option from now on.
+            crate::structs::utility::InplaceUpdatable::new(first?)
+        };
+
+        self.run(|x| {
+            left_value.inplace_reduce(x, &mut reducer);
+            ValueResult::MoreValues
+        });
+
+        Some(left_value.get_inner())
+    }
+
+    /// Reduces the values to a single value by repeatedly applying a reducing operation.
+    ///
+    /// Use this reduction if the generator is known to spuriously stop mid-stream. Otherwise
+    /// it is better to use [`reduce()`].
+    ///
+    /// [`reduce()`]: GeneratorExt::reduce
+    ///
+    /// ## Arguments
+    ///
+    /// `prev_reduction` The result of an earlier partial reduction. Set to `None` if this is the
+    /// first reduction pass.
+    ///
+    /// `reducer` The reducing  closure to use.
+    ///
+    /// ## Returns
+    ///
+    /// `Ok(x)` if the generator was run to completion. `x` is `None` if the generator is empty,
+    /// otherwise it is the result of the reduction.
+    ///
+    /// `Err((Self, Option<Self::Output>))` if the generator was stopped mid-reduction. The second
+    /// tuple element (`.1`) is the value that the
+    /// generator reduced to before it stopped. This value should be used in any subsequent calls to `try_reduce`
+    /// until an `Ok()` value is returned.
+    ///
+    /// ## Example
+    ///
+    /// Find the maximum value:
+    ///
+    /// ```
+    /// use pushgen::{Generator, GeneratorExt, IntoGenerator};
+    /// fn find_max<G>(gen: G) -> Result<Option<G::Output>, (G, Option<G::Output>)>
+    ///     where G: Generator,
+    ///           G::Output: Ord,
+    /// {
+    ///     gen.try_reduce(None, |a, b| {
+    ///         if a >= b { a } else { b }
+    ///     })
+    /// }
+    /// let a = [10, 20, 5, -23, 0];
+    /// let b: [u32; 0] = [];
+    ///
+    /// // SliceGenerator doesn't implement Debug, to use unwrap() we simply map the error
+    /// // to something that does.
+    /// assert_eq!(find_max(a.into_gen()).map_err(|x| x.1).unwrap(), Some(&20));
+    /// assert_eq!(find_max(b.into_gen()).map_err(|x| x.1).unwrap(), None);
+    /// ```
+    ///
+    /// With a stopping generator:
+    ///
+    /// ```
+    /// use pushgen::{Generator, ValueResult, GeneratorResult, GeneratorExt};
+    /// // This is a very very basic stopping generator, only for demonstration purposes!
+    /// struct StoppingGen(i32, usize);
+    /// impl Generator for StoppingGen {
+    ///     type Output = i32;
+    ///
+    ///     fn run(&mut self, mut output: impl FnMut(Self::Output) -> ValueResult) -> GeneratorResult{
+    ///         static DATA: [i32;4] = [1, 2, 3, 4];
+    ///         if self.0 == 0 {
+    ///             self.0 = -1;
+    ///             return GeneratorResult::Stopped;
+    ///         }
+    ///         while self.1 < DATA.len() {
+    ///             if self.0 == 0 {
+    ///                 self.0 = -1;
+    ///                 return GeneratorResult::Stopped;
+    ///             }
+    ///             let res = output(DATA[self.1]);
+    ///             self.0 -= 1;
+    ///             self.1 += 1;
+    ///             if res == ValueResult::Stop {
+    ///                 return GeneratorResult::Stopped;
+    ///             }
+    ///         }
+    ///         GeneratorResult::Complete
+    ///     }
+    /// }
+    /// // Generator will produce `[1, *Stopped*, 2, 3, 4]`.
+    /// if let Err((mut gen, partial)) = StoppingGen(1, 0).try_reduce(None, |a, b| a + b) {
+    ///     assert_eq!(partial, Some(1));
+    ///     let res = gen.try_reduce(partial, |a, b| a + b);
+    ///     assert!(res.is_ok());
+    ///     // StoppingGen doesn't implement debug, map error to enable unwrap
+    ///     assert_eq!(res.map_err(|x| 0).unwrap(), Some(1+2+3+4));
+    /// }
+    /// else {
+    ///     // Untaken branch
+    ///     assert!(false);
+    /// }
+    /// ```
+    ///
+    #[allow(clippy::type_complexity)]
+    #[inline]
+    fn try_reduce<F>(
+        mut self,
+        prev_reduction: Option<Self::Output>,
+        mut reducer: F,
+    ) -> Result<Option<Self::Output>, (Self, Option<Self::Output>)>
+    where
+        Self: Sized,
+        F: FnMut(Self::Output, Self::Output) -> Self::Output,
+    {
+        let left_value = {
+            if let Some(prev) = prev_reduction {
+                prev
+            } else {
+                // Grab the first item into an optional
+                let mut first = None;
+                let run_result = self.run(|x| {
+                    first = Some(x);
+                    ValueResult::Stop
+                });
+
+                // In the hot loop we use an inplace updatable since we know we will never
+                // have a None option from now on.
+                match run_result {
+                    GeneratorResult::Stopped => match first {
+                        None => return Err((self, None)),
+                        Some(first) => first,
+                    },
+                    GeneratorResult::Complete => return Ok(first),
+                }
+            }
+        };
+
+        let mut left_value = crate::structs::utility::InplaceUpdatable::new(left_value);
+
+        let run_result = self.run(|x| {
+            left_value.inplace_reduce(x, &mut reducer);
+            ValueResult::MoreValues
+        });
+
+        let result = Some(left_value.get_inner());
+
+        match run_result {
+            GeneratorResult::Stopped => Err((self, result)),
+            GeneratorResult::Complete => Ok(result),
+        }
+    }
 }
 
 impl<T: Generator> GeneratorExt for T {}
 
 #[cfg(test)]
 mod tests {
+    use crate::test::StoppingGen;
     use crate::{Generator, GeneratorExt, GeneratorResult, IntoGenerator, ValueResult};
 
     #[test]
@@ -801,5 +1005,119 @@ mod tests {
     fn empty_any() {
         let data: [i32; 0] = [];
         assert!(!data.into_gen().any(|_| true));
+    }
+
+    #[test]
+    fn empty_reduce() {
+        let x: [i32; 0] = [];
+        fn reducer(a: i32, b: i32) -> i32 {
+            a + b
+        }
+
+        assert_eq!(
+            x.iter().copied().reduce(reducer),
+            x.into_gen().copied().reduce(reducer)
+        );
+    }
+
+    #[test]
+    fn single_element_reduce() {
+        let x = [1i32];
+        fn reducer(a: i32, b: i32) -> i32 {
+            a + b
+        }
+
+        assert_eq!(
+            x.iter().copied().reduce(reducer),
+            x.into_gen().copied().reduce(reducer)
+        );
+    }
+
+    #[test]
+    fn two_element_reduce() {
+        let x = [1i32, 2];
+        fn reducer(a: i32, b: i32) -> i32 {
+            a + b
+        }
+
+        assert_eq!(
+            x.iter().copied().reduce(reducer),
+            x.into_gen().copied().reduce(reducer)
+        );
+    }
+
+    #[test]
+    fn empty_try_reduce() {
+        let x: [i32; 0] = [];
+        fn reducer(a: i32, b: i32) -> i32 {
+            a + b
+        }
+
+        assert_eq!(
+            x.into_gen()
+                .copied()
+                .try_reduce(None, reducer)
+                .map_err(|x| x.1),
+            Ok(None)
+        );
+    }
+
+    #[test]
+    fn single_element_try_reduce() {
+        let x = [1i32];
+        fn reducer(a: i32, b: i32) -> i32 {
+            a + b
+        }
+
+        assert_eq!(
+            x.into_gen()
+                .copied()
+                .try_reduce(None, reducer)
+                .map_err(|x| x.1),
+            Ok(Some(1))
+        );
+    }
+
+    #[test]
+    fn two_element_try_reduce() {
+        let x = [1i32, 2];
+        fn reducer(a: i32, b: i32) -> i32 {
+            a + b
+        }
+
+        assert_eq!(
+            x.into_gen()
+                .copied()
+                .try_reduce(None, reducer)
+                .map_err(|x| x.1),
+            Ok(Some(3))
+        );
+    }
+
+    #[test]
+    fn stop_at_start_try_reduce() {
+        for i in 0..4 {
+            let x = [1, 2, 3, 4, 5];
+            let gen = StoppingGen::new(i, &x);
+            let res = gen.try_reduce(None, |a, b| match a < b {
+                true => a,
+                false => b,
+            });
+
+            assert!(res.is_err());
+            if let Err((gen, partial)) = res {
+                if i == 0 {
+                    assert_eq!(partial, None);
+                } else {
+                    assert_eq!(partial, Some(&1));
+                }
+                match gen.try_reduce(partial, |a, b| if a < b { a } else { b }) {
+                    Ok(x) => assert_eq!(x, Some(&1)),
+                    Err(_) => {
+                        assert!(false);
+                    }
+                }
+            }
+        }
     }
 }
