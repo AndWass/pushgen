@@ -916,8 +916,7 @@ pub trait GeneratorExt: Sealed + Generator {
         let left_value = {
             if let Some(prev) = prev_reduction {
                 prev
-            }
-            else {
+            } else {
                 // Grab the first item into an optional
                 let mut first = None;
                 let run_result = self.run(|x| {
@@ -1049,7 +1048,10 @@ mod tests {
         }
 
         assert_eq!(
-            x.into_gen().copied().try_reduce(None, reducer).map_err(|x| x.1),
+            x.into_gen()
+                .copied()
+                .try_reduce(None, reducer)
+                .map_err(|x| x.1),
             Ok(None)
         );
     }
@@ -1062,7 +1064,10 @@ mod tests {
         }
 
         assert_eq!(
-            x.into_gen().copied().try_reduce(None, reducer).map_err(|x| x.1),
+            x.into_gen()
+                .copied()
+                .try_reduce(None, reducer)
+                .map_err(|x| x.1),
             Ok(Some(1))
         );
     }
@@ -1075,7 +1080,10 @@ mod tests {
         }
 
         assert_eq!(
-            x.into_gen().copied().try_reduce(None, reducer).map_err(|x| x.1),
+            x.into_gen()
+                .copied()
+                .try_reduce(None, reducer)
+                .map_err(|x| x.1),
             Ok(Some(3))
         );
     }
@@ -1094,8 +1102,7 @@ mod tests {
             if let Err((gen, partial)) = res {
                 if i == 0 {
                     assert_eq!(partial, None);
-                }
-                else {
+                } else {
                     assert_eq!(partial, Some(&1));
                 }
                 match gen.try_reduce(partial, |a, b| if a < b { a } else { b }) {
