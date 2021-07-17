@@ -806,7 +806,7 @@ pub trait GeneratorExt: Sealed + Generator {
         };
 
         self.run(|x| {
-            left_value.reduce(x, |a, b| reducer(a, b));
+            left_value.inplace_reduce(x, &mut reducer);
             ValueResult::MoreValues
         });
 

@@ -36,7 +36,7 @@ impl<T> InplaceUpdatable<T> {
     }
 
     #[inline(always)]
-    pub fn reduce(&mut self, right_value: T, reducer: impl FnOnce(T, T) -> T) {
+    pub fn inplace_reduce(&mut self, right_value: T, reducer: impl FnOnce(T, T) -> T) {
         // take self.inner to ensure nothing will be dropped here during unwind,
         // if reducer ever panic
         let new_val = reducer(unsafe { unwrap_unchecked(self.inner.take()) }, right_value);
