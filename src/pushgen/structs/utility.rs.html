@@ -49,6 +49,14 @@
 <span id="46">46</span>
 <span id="47">47</span>
 <span id="48">48</span>
+<span id="49">49</span>
+<span id="50">50</span>
+<span id="51">51</span>
+<span id="52">52</span>
+<span id="53">53</span>
+<span id="54">54</span>
+<span id="55">55</span>
+<span id="56">56</span>
 </pre><div class="example-wrap"><pre class="rust ">
 <span class="kw">use</span> <span class="ident">core::hint</span>;
 
@@ -84,6 +92,14 @@
         <span class="comment">// take self.inner to ensure nothing will be dropped here during unwind,</span>
         <span class="comment">// if updater ever panic</span>
         <span class="kw">let</span> <span class="ident">new_val</span> <span class="op">=</span> <span class="ident">updater</span>(<span class="kw">unsafe</span> { <span class="ident">unwrap_unchecked</span>(<span class="self">self</span>.<span class="ident">inner</span>.<span class="ident">take</span>()) });
+        <span class="self">self</span>.<span class="ident">inner</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="ident">new_val</span>);
+    }
+
+    <span class="attribute">#[<span class="ident">inline</span>(<span class="ident">always</span>)]</span>
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">inplace_reduce</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">right_value</span>: <span class="ident">T</span>, <span class="ident">reducer</span>: <span class="kw">impl</span> <span class="ident">FnOnce</span>(<span class="ident">T</span>, <span class="ident">T</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">T</span>) {
+        <span class="comment">// take self.inner to ensure nothing will be dropped here during unwind,</span>
+        <span class="comment">// if reducer ever panic</span>
+        <span class="kw">let</span> <span class="ident">new_val</span> <span class="op">=</span> <span class="ident">reducer</span>(<span class="kw">unsafe</span> { <span class="ident">unwrap_unchecked</span>(<span class="self">self</span>.<span class="ident">inner</span>.<span class="ident">take</span>()) }, <span class="ident">right_value</span>);
         <span class="self">self</span>.<span class="ident">inner</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="ident">new_val</span>);
     }
 
