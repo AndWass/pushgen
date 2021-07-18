@@ -40,3 +40,27 @@ where
         })
     }
 }
+
+mod tests
+{
+    use crate::test::StoppingGen;
+    use crate::{GeneratorExt, GeneratorResult};
+
+    #[test]
+    fn spuriously_stopping() {
+        let data = [1, 2, 3];
+        fn is_odd(v: &&i32) -> bool {
+            **v % 2 != 0
+        }
+
+        for x in 0..data.len() {
+            let mut gen = StoppingGen::new(x as i32, &data).filter(is_odd);
+            let mut output= Vec::new();
+            let result = gen.for_each(|x| output.push(x));
+            assert_eq!(result, GeneratorResult::Stopped);
+            let result = gen.for_each(|x| output.push(x));
+            assert_eq!(result, GeneratorResult::Complete);
+            assert_eq!(output, [&1, &3]);
+        }
+    }
+}
