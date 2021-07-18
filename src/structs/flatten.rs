@@ -70,6 +70,7 @@ where
 mod tests {
     use super::*;
     use crate::{GeneratorExt, SliceGenerator};
+    use crate::test::StoppingGen;
 
     #[test]
     fn vector_flatten() {
@@ -100,16 +101,59 @@ mod tests {
     fn stopping_generator() {
         let data = [[1, 2, 3, 4], [5, 6, 7, 8], [9, 10, 11, 12]];
         let expected = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12];
-        for x in 0..10 {
+        for x in 0..3 {
             let mut gen = crate::test::StoppingGen::new(x, &data)
                 .map(|x| SliceGenerator::new(x))
                 .flatten();
 
             let mut output = Vec::new();
-
-            while gen.for_each(|x| output.push(*x)) == GeneratorResult::Stopped {}
-
+            let mut num_stops = 0;
+            while gen.for_each(|x| output.push(*x)) == GeneratorResult::Stopped {
+                num_stops += 1;
+            }
+            assert_eq!(num_stops, 1);
             assert_eq!(output, expected);
+        }
+    }
+
+    #[test]
+    fn stopping_nested_generator() {
+        let data = [[1, 2, 3, 4], [5, 6, 7, 8], [9, 10, 11, 12]];
+        let expected = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12];
+        for i in 0..4 {
+            let mut gen = SliceGenerator::new(&data)
+                .map(|x| StoppingGen::new(i, x))
+                .flatten();
+
+            let mut output = Vec::new();
+            let mut num_stops = 0;
+            while gen.for_each(|x| output.push(*x)) == GeneratorResult::Stopped {
+                num_stops += 1;
+            }
+            assert_eq!(num_stops, 3);
+            assert_eq!(output, expected);
+        }
+    }
+
+    #[test]
+    fn only_stopping_generators() {
+        let data = [[1, 2, 3, 4], [5, 6, 7, 8], [9, 10, 11, 12]];
+        let expected = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12];
+        for outer in 0..3 {
+            for i in 0..4 {
+                let mut gen = StoppingGen::new(outer, &data)
+                    .map(|x| StoppingGen::new(i, x))
+                    .flatten();
+
+                let mut output = Vec::new();
+
+                let mut num_stops = 0;
+                while gen.for_each(|x| output.push(*x)) == GeneratorResult::Stopped {
+                    num_stops += 1;
+                }
+                assert_eq!(num_stops, 4);
+                assert_eq!(output, expected);
+            }
         }
     }
 }
