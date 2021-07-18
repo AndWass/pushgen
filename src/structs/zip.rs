@@ -17,7 +17,11 @@ where
 {
     #[inline]
     pub(crate) fn new(left: Left, right: Right) -> Self {
-        Self { left, right, last_left: None }
+        Self {
+            left,
+            right,
+            last_left: None,
+        }
     }
 }
 
@@ -37,15 +41,11 @@ where
         if last_left.is_some() {
             let mut output_result = ValueResult::Stop;
             match right.run(|rv| {
-                match last_left.take() {
-                    Some(lv) => {
-                        output_result = output((lv, rv));
-                    },
-                    None => {}
+                if let Some(lv) = last_left.take() {
+                    output_result = output((lv, rv));
                 }
                 ValueResult::Stop
-            })
-            {
+            }) {
                 GeneratorResult::Stopped => {
                     if last_left.is_some() || output_result == ValueResult::Stop {
                         return GeneratorResult::Stopped;

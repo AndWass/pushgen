@@ -28,8 +28,7 @@ where
 }
 
 #[cfg(test)]
-mod tests
-{
+mod tests {
     use crate::test::StoppingGen;
     use crate::{GeneratorExt, GeneratorResult};
 

@@ -105,8 +105,8 @@ where
 mod tests {
     use crate::structs::take::TakeWhile;
     use crate::structs::Take;
-    use crate::{Generator, GeneratorResult, SliceGenerator, ValueResult, GeneratorExt};
     use crate::test::StoppingGen;
+    use crate::{Generator, GeneratorExt, GeneratorResult, SliceGenerator, ValueResult};
 
     #[test]
     fn take() {

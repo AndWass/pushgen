@@ -102,8 +102,8 @@ where
 #[cfg(test)]
 mod tests {
     use super::*;
-    use crate::{GeneratorExt, IntoGenerator};
     use crate::test::StoppingGen;
+    use crate::{GeneratorExt, IntoGenerator};
 
     #[test]
     fn skip() {

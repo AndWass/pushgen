@@ -42,9 +42,9 @@ where
 #[cfg(test)]
 mod tests {
     use crate::structs::chain::Chain;
-    use crate::{SliceGenerator, GeneratorExt};
-    use crate::{Generator, GeneratorResult, ValueResult};
     use crate::test::StoppingGen;
+    use crate::{Generator, GeneratorResult, ValueResult};
+    use crate::{GeneratorExt, SliceGenerator};
 
     #[test]
     fn basic_chain() {

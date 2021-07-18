@@ -69,8 +69,8 @@ where
 #[cfg(test)]
 mod tests {
     use super::*;
-    use crate::{GeneratorExt, SliceGenerator};
     use crate::test::StoppingGen;
+    use crate::{GeneratorExt, SliceGenerator};
 
     #[test]
     fn vector_flatten() {

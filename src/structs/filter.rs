@@ -41,8 +41,8 @@ where
     }
 }
 
-mod tests
-{
+#[cfg(test)]
+mod tests {
     use crate::test::StoppingGen;
     use crate::{GeneratorExt, GeneratorResult};
 
@@ -55,7 +55,7 @@ mod tests
 
         for x in 0..data.len() {
             let mut gen = StoppingGen::new(x as i32, &data).filter(is_odd);
-            let mut output= Vec::new();
+            let mut output = Vec::new();
             let result = gen.for_each(|x| output.push(x));
             assert_eq!(result, GeneratorResult::Stopped);
             let result = gen.for_each(|x| output.push(x));
