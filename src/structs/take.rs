@@ -122,6 +122,24 @@ mod tests {
     }
 
     #[test]
+    fn spuriously_stopping_take() {
+        let data = [1, 2, 3, 4, 5];
+        for x in 0..3 {
+            let mut output: Vec<i32> = Vec::new();
+            let mut gen = StoppingGen::new(x, &data).take(3);
+
+            let result = gen.for_each(|x| output.push(*x));
+            assert_eq!(result, GeneratorResult::Stopped);
+            let result = gen.for_each(|x| output.push(*x));
+            assert_eq!(result, GeneratorResult::Complete);
+            assert_eq!(output, [1, 2, 3]);
+            let result = gen.for_each(|x| output.push(*x));
+            assert_eq!(result, GeneratorResult::Complete);
+            assert_eq!(output, [1, 2, 3]);
+        }
+    }
+
+    #[test]
     fn take_restart() {
         let data = [1, 2, 3, 4, 5];
         let mut output: Vec<i32> = Vec::new();
