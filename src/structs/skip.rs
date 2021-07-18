@@ -87,6 +87,7 @@ where
             if skip_run_result == GeneratorResult::Complete {
                 return GeneratorResult::Complete;
             } else if let Some(x) = first_to_push {
+                self.need_skip_run = false;
                 if output(x) == ValueResult::Stop {
                     return GeneratorResult::Stopped;
                 }
@@ -101,6 +102,7 @@ where
 #[cfg(test)]
 mod tests {
     use super::*;
+    use crate::test::StoppingGen;
     use crate::{GeneratorExt, IntoGenerator};
 
     #[test]
@@ -115,6 +117,20 @@ mod tests {
     }
 
     #[test]
+    fn spuriously_stopping_skip() {
+        let data = [1, 2, 3, 4, 5];
+        for x in 0..5 {
+            let mut gen = StoppingGen::new(x, &data).skip(3);
+            let mut output = Vec::new();
+            let result = gen.for_each(|x| output.push(x));
+            assert_eq!(result, GeneratorResult::Stopped);
+            let result = gen.for_each(|x| output.push(x));
+            assert_eq!(result, GeneratorResult::Complete);
+            assert_eq!(output, [&4, &5]);
+        }
+    }
+
+    #[test]
     fn skip_while() {
         let a = [-1i32, 0, 1];
 
@@ -123,5 +139,19 @@ mod tests {
         let result = gen.for_each(|x| output.push(x));
         assert_eq!(output, [&0, &1]);
         assert_eq!(result, GeneratorResult::Complete);
+    }
+
+    #[test]
+    fn spuriously_stopping_skip_while() {
+        let data = [-1i32, -2, 0, -1, 2];
+        for x in 0..5 {
+            let mut gen = StoppingGen::new(x, &data).skip_while(|x| x.is_negative());
+            let mut output = Vec::new();
+            let result = gen.for_each(|x| output.push(x));
+            assert_eq!(result, GeneratorResult::Stopped);
+            let result = gen.for_each(|x| output.push(x));
+            assert_eq!(result, GeneratorResult::Complete);
+            assert_eq!(output, [&0, &-1, &2]);
+        }
     }
 }

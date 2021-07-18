@@ -31,3 +31,24 @@ where
         self.source.run(move |value| output(transform(value)))
     }
 }
+
+#[cfg(test)]
+mod tests {
+    use crate::test::StoppingGen;
+    use crate::{GeneratorExt, GeneratorResult};
+
+    #[test]
+    fn spuriously_stopping() {
+        let data = [1, 2, 3];
+
+        for x in 0..data.len() {
+            let mut gen = StoppingGen::new(x as i32, &data).map(|x| x * 2);
+            let mut output = Vec::new();
+            let result = gen.for_each(|x| output.push(x));
+            assert_eq!(result, GeneratorResult::Stopped);
+            let result = gen.for_each(|x| output.push(x));
+            assert_eq!(result, GeneratorResult::Complete);
+            assert_eq!(output, [2 * 1, 2 * 2, 2 * 3]);
+        }
+    }
+}

@@ -105,7 +105,8 @@ where
 mod tests {
     use crate::structs::take::TakeWhile;
     use crate::structs::Take;
-    use crate::{Generator, GeneratorResult, SliceGenerator, ValueResult};
+    use crate::test::StoppingGen;
+    use crate::{Generator, GeneratorExt, GeneratorResult, SliceGenerator, ValueResult};
 
     #[test]
     fn take() {
@@ -118,6 +119,24 @@ mod tests {
         });
         assert_eq!(result, GeneratorResult::Complete);
         assert_eq!(output, [1, 2]);
+    }
+
+    #[test]
+    fn spuriously_stopping_take() {
+        let data = [1, 2, 3, 4, 5];
+        for x in 0..3 {
+            let mut output: Vec<i32> = Vec::new();
+            let mut gen = StoppingGen::new(x, &data).take(3);
+
+            let result = gen.for_each(|x| output.push(*x));
+            assert_eq!(result, GeneratorResult::Stopped);
+            let result = gen.for_each(|x| output.push(*x));
+            assert_eq!(result, GeneratorResult::Complete);
+            assert_eq!(output, [1, 2, 3]);
+            let result = gen.for_each(|x| output.push(*x));
+            assert_eq!(result, GeneratorResult::Complete);
+            assert_eq!(output, [1, 2, 3]);
+        }
     }
 
     #[test]
@@ -184,5 +203,22 @@ mod tests {
         });
         assert_eq!(result, GeneratorResult::Complete);
         assert_eq!(output, [1, 2]);
+    }
+
+    #[test]
+    fn spuriously_stopping_take_while() {
+        let data = [1i32, 2, 3, 4, -1, 1, 2];
+        for x in 0..5 {
+            let mut gen = StoppingGen::new(x, &data).take_while(|x| x.is_positive());
+            let mut output = Vec::new();
+            let result = gen.for_each(|x| output.push(x));
+            assert_eq!(result, GeneratorResult::Stopped);
+            let result = gen.for_each(|x| output.push(x));
+            assert_eq!(result, GeneratorResult::Complete);
+            assert_eq!(output, [&1, &2, &3, &4]);
+            let result = gen.for_each(|x| output.push(x));
+            assert_eq!(result, GeneratorResult::Complete);
+            assert_eq!(output, [&1, &2, &3, &4]);
+        }
     }
 }
