@@ -4,6 +4,7 @@ use crate::structs::{
 };
 use crate::traits::{Product, Sum};
 use crate::{Generator, GeneratorResult, ValueResult};
+use core::cmp::Ordering;
 
 pub trait Sealed {}
 
@@ -752,6 +753,36 @@ pub trait GeneratorExt: Sealed + Generator {
         P: Product<Self::Output>,
     {
         P::product(self)
+    }
+
+    /// Returns the value that gives the minimum value when compared with the
+    /// specified comparison function.
+    ///
+    /// If several elements are equally minimum, the first element is
+    /// returned. If the iterator is empty, [`None`] is returned.
+    ///
+    /// ## Spuriously stopping generators
+    ///
+    /// `min_by()` will return the result after the source generator has stopped. It doesn't matter
+    /// if the source generator is stopped or completed.
+    ///
+    /// Manually use [`try_reduce`] to handle spuriously stopping generators.
+    ///
+    /// [`try_reduce`]: GeneratorExt::try_reduce
+    ///
+    /// # Examples
+    ///
+    /// ```
+    /// use pushgen::{GeneratorExt, IntoGenerator};
+    /// let a = [-3_i32, 0, 1, 5, -10];
+    /// assert_eq!(*a.into_gen().min_by(|x, y| x.cmp(y)).unwrap(), -10);
+    /// ```
+    #[inline]
+    fn min_by<F>(self, mut compare: F) -> Option<Self::Output>
+    where
+        Self: Sized,
+        F: FnMut(&Self::Output, &Self::Output) -> Ordering {
+        self.reduce(|a, b| core::cmp::min_by(a, b, &mut compare))
     }
 
     /// Reduces the elements to a single one by repeatedly applying a reducing operation.
