@@ -755,6 +755,32 @@ pub trait GeneratorExt: Sealed + Generator {
         P::product(self)
     }
 
+    /// Returns the minimum value of a generator.
+    ///
+    /// If several elements are equally minimum, the first element is
+    /// returned. If the generator is empty, [`None`] is returned.
+    ///
+    /// # Examples
+    ///
+    /// Basic usage:
+    ///
+    /// ```
+    /// use pushgen::{GeneratorExt, IntoGenerator};
+    /// let a = [1, 2, 3];
+    /// let b: Vec<u32> = Vec::new();
+    ///
+    /// assert_eq!(a.into_gen().min(), Some(&1));
+    /// assert_eq!(b.into_gen().min(), None);
+    /// ```
+    #[inline]
+    fn min(self) -> Option<Self::Output>
+    where
+        Self: Sized,
+        Self::Output: Ord,
+    {
+        self.min_by(Ord::cmp)
+    }
+
     /// Returns the value that gives the minimum value when compared with the
     /// specified comparison function.
     ///
