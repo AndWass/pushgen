@@ -760,6 +760,15 @@ pub trait GeneratorExt: Sealed + Generator {
     /// If several elements are equally minimum, the first element is
     /// returned. If the generator is empty, [`None`] is returned.
     ///
+    /// ## Spuriously stopping generators
+    ///
+    /// `min()` will return the result after the source generator has stopped. It doesn't matter
+    /// if the source generator is stopped or completed.
+    ///
+    /// Use [`try_min_by()`] to handle spuriously stopping generators.
+    ///
+    /// [`try_min_by()`]: GeneratorExt::try_min_by
+    ///
     /// # Examples
     ///
     /// Basic usage:
@@ -792,9 +801,9 @@ pub trait GeneratorExt: Sealed + Generator {
     /// `min_by()` will return the result after the source generator has stopped. It doesn't matter
     /// if the source generator is stopped or completed.
     ///
-    /// Manually use [`try_reduce`] to handle spuriously stopping generators.
+    /// Use [`try_min_by()`] to handle spuriously stopping generators.
     ///
-    /// [`try_reduce`]: GeneratorExt::try_reduce
+    /// [`try_min_by()`]: GeneratorExt::try_min_by
     ///
     /// # Examples
     ///
