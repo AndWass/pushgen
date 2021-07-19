@@ -38,7 +38,7 @@ mod into_gen;
 pub mod structs;
 pub mod traits;
 
-#[cfg(test)]
+#[cfg(any(test, feature = "test"))]
 pub mod test;
 
 pub use crate::generator_ext::GeneratorExt;
