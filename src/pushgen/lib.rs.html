@@ -256,7 +256,7 @@
 <span class="kw">pub</span> <span class="kw">mod</span> <span class="ident">structs</span>;
 <span class="kw">pub</span> <span class="kw">mod</span> <span class="ident">traits</span>;
 
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">test</span>)]</span>
+<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">any</span>(<span class="ident">test</span>, <span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;test&quot;</span>))]</span>
 <span class="kw">pub</span> <span class="kw">mod</span> <span class="ident">test</span>;
 
 <span class="kw">pub</span> <span class="kw">use</span> <span class="kw">crate</span><span class="ident">::generator_ext::GeneratorExt</span>;
