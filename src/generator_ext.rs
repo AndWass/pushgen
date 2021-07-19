@@ -1018,9 +1018,9 @@ pub trait GeneratorExt: Sealed + Generator {
         partial: Option<Self::Output>,
         mut compare: F,
     ) -> Result<Option<Self::Output>, Option<Self::Output>>
-        where
-            Self: Sized,
-            F: FnMut(&Self::Output, &Self::Output) -> Ordering,
+    where
+        Self: Sized,
+        F: FnMut(&Self::Output, &Self::Output) -> Ordering,
     {
         self.try_reduce(partial, |a, b| core::cmp::max_by(a, b, &mut compare))
     }
@@ -1393,8 +1393,11 @@ mod tests {
         impl Generator for Gen {
             type Output = i32;
 
-            fn run(&mut self, mut output: impl FnMut(Self::Output) -> ValueResult) -> GeneratorResult {
-                static DATA: [i32;4] = [0, 1, 2, 3];
+            fn run(
+                &mut self,
+                mut output: impl FnMut(Self::Output) -> ValueResult,
+            ) -> GeneratorResult {
+                static DATA: [i32; 4] = [0, 1, 2, 3];
                 while self.index < DATA.len() {
                     if self.index == 2 {
                         if self.num_stops < 2 {
@@ -1415,17 +1418,20 @@ mod tests {
             }
         }
 
-        let mut gen = Gen{index: 0, num_stops: 0};
+        let mut gen = Gen {
+            index: 0,
+            num_stops: 0,
+        };
         let result = gen.try_reduce(None, |a, b| a + b);
         assert!(result.is_err());
         let partial = result.unwrap_err();
-        assert_eq!(partial, Some(0+1));
-        let result = gen.try_reduce(partial, |a, b| a+b);
+        assert_eq!(partial, Some(0 + 1));
+        let result = gen.try_reduce(partial, |a, b| a + b);
         assert!(result.is_err());
         let partial = result.unwrap_err();
-        assert_eq!(partial, Some(0+1));
-        let result = gen.try_reduce(partial, |a, b| a+b);
+        assert_eq!(partial, Some(0 + 1));
+        let result = gen.try_reduce(partial, |a, b| a + b);
         assert!(result.is_ok());
-        assert_eq!(result.unwrap(), Some(0+1+2+3));
+        assert_eq!(result.unwrap(), Some(0 + 1 + 2 + 3));
     }
 }
