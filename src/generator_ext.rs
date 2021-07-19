@@ -812,6 +812,54 @@ pub trait GeneratorExt: Sealed + Generator {
         self.reduce(|a, b| core::cmp::min_by(a, b, &mut compare))
     }
 
+    /// Returns the value that gives the minimum value when compared with the
+    /// specified comparison function.
+    ///
+    /// If several elements are equally minimum, the first element is
+    /// returned. If the iterator is empty, [`None`] is returned.
+    ///
+    /// This method can be used with spuriously stopping generators by feeding.
+    ///
+    /// # Examples
+    ///
+    /// Basic usage
+    ///
+    /// ```
+    /// use pushgen::{GeneratorExt, IntoGenerator};
+    /// let a = [-3_i32, 0, 1, 5, -10];
+    /// assert_eq!(a.into_gen().try_min_by(None, |x, y| x.cmp(y)).unwrap(), Some(&-10));
+    /// ```
+    ///
+    /// Stopping generator (See [`try_reduce()`](crate::GeneratorExt::try_reduce) for generator implementation):
+    ///
+    /// ```
+    /// use pushgen::{Generator, ValueResult, GeneratorResult, GeneratorExt};
+    /// use pushgen::test::StoppingGen;
+    /// let data = [1, 2, 0, 4];
+    /// let mut gen = StoppingGen::new(1, &data);
+    /// let partial = gen.try_min_by(None, Ord::cmp);
+    /// // generator was stopped - indicated by an Err result
+    /// assert!(partial.is_err());
+    /// let partial = partial.unwrap_err();
+    /// assert_eq!(partial, Some(&1));
+    /// // Feed partial value to continue reduction from the partial value
+    /// let res = gen.try_min_by(partial, Ord::cmp);
+    /// assert!(res.is_ok());
+    /// assert_eq!(res.unwrap(), Some(&0));
+    /// ```
+    #[inline]
+    fn try_min_by<F>(
+        &mut self,
+        partial: Option<Self::Output>,
+        mut compare: F,
+    ) -> Result<Option<Self::Output>, Option<Self::Output>>
+    where
+        Self: Sized,
+        F: FnMut(&Self::Output, &Self::Output) -> Ordering,
+    {
+        self.try_reduce(partial, |a, b| core::cmp::min_by(a, b, &mut compare))
+    }
+
     /// Returns the value that gives the minimum value from the specified function.
     ///
     /// If several elements are equally minimum, the first element is
