@@ -547,7 +547,7 @@ pub trait GeneratorExt: Sealed + Generator {
     /// let mut gen = SliceGenerator::new(&data);
     /// let res = gen.try_for_each(|x| rename(x, Path::new(x).with_extension("old")));
     /// assert!(res.is_err());
-    /// // It short-circuited, so the remaining items are still in the iterator:
+    /// // It short-circuited, so the remaining items are still in the generator:
     /// let mut output: Vec<&'static str> = Vec::new();
     /// gen.for_each(|x| output.push(*x));
     /// assert_eq!(output, ["stale_bread.json", "torrential_rain.png"]);
@@ -794,7 +794,7 @@ pub trait GeneratorExt: Sealed + Generator {
     /// specified comparison function.
     ///
     /// If several elements are equally minimum, the first element is
-    /// returned. If the iterator is empty, [`None`] is returned.
+    /// returned. If the generator is empty, [`None`] is returned.
     ///
     /// ## Spuriously stopping generators
     ///
@@ -825,9 +825,9 @@ pub trait GeneratorExt: Sealed + Generator {
     /// specified comparison function.
     ///
     /// If several elements are equally minimum, the first element is
-    /// returned. If the iterator is empty, [`None`] is returned.
+    /// returned. If the generator is empty, `None` is returned.
     ///
-    /// This method can be used with spuriously stopping generators by feeding.
+    /// This method can be used with spuriously stopping generators.
     ///
     /// # Examples
     ///
@@ -839,7 +839,7 @@ pub trait GeneratorExt: Sealed + Generator {
     /// assert_eq!(a.into_gen().try_min_by(None, |x, y| x.cmp(y)).unwrap(), Some(&-10));
     /// ```
     ///
-    /// Stopping generator (See [`try_reduce()`](crate::GeneratorExt::try_reduce) for generator implementation):
+    /// Stopping generator:
     ///
     /// ```
     /// use pushgen::{Generator, ValueResult, GeneratorResult, GeneratorExt};
@@ -872,16 +872,16 @@ pub trait GeneratorExt: Sealed + Generator {
     /// Returns the value that gives the minimum value from the specified function.
     ///
     /// If several elements are equally minimum, the first element is
-    /// returned. If the iterator is empty, [`None`] is returned.
+    /// returned. If the generator is empty, `None` is returned.
     ///
     /// ## Spuriously stopping generators
     ///
     /// `min_by_key()` will return the result after the source generator has stopped. It doesn't matter
     /// if the source generator is stopped or completed.
     ///
-    /// Manually use [`try_reduce`] to handle spuriously stopping generators.
+    /// Manually use [`try_min_by()`] to handle spuriously stopping generators.
     ///
-    /// [`try_reduce`]: GeneratorExt::try_reduce
+    /// [`try_min_by()`]: GeneratorExt::try_min_by
     ///
     /// # Examples
     ///
@@ -916,6 +916,15 @@ pub trait GeneratorExt: Sealed + Generator {
     /// If several elements are equally maximum, the last element is
     /// returned. If the generator is empty, [`None`] is returned.
     ///
+    /// ## Spuriously stopping generators
+    ///
+    /// `max()` will return the result after the source generator has stopped. It doesn't matter
+    /// if the source generator is stopped or completed.
+    ///
+    /// Use [`try_max_by()`] to handle spuriously stopping generators.
+    ///
+    /// [`try_max_by()`]: GeneratorExt::try_max_by
+    ///
     /// # Examples
     ///
     /// Basic usage:
@@ -941,16 +950,16 @@ pub trait GeneratorExt: Sealed + Generator {
     /// specified comparison function.
     ///
     /// If several elements are equally maximum, the last element is
-    /// returned. If the iterator is empty, [`None`] is returned.
+    /// returned. If the generator is empty, `None` is returned.
     ///
     /// ## Spuriously stopping generators
     ///
     /// `max_by()` will return the result after the source generator has stopped. It doesn't matter
     /// if the source generator is stopped or completed.
     ///
-    /// Manually use [`try_reduce`] to handle spuriously stopping generators.
+    /// Manually use [`try_max_by()`] to handle spuriously stopping generators.
     ///
-    /// [`try_reduce`]: GeneratorExt::try_reduce
+    /// [`try_max_by()`]: GeneratorExt::try_max_by
     ///
     /// # Examples
     ///
@@ -971,16 +980,16 @@ pub trait GeneratorExt: Sealed + Generator {
     /// Returns the value that gives the maximum value from the specified function.
     ///
     /// If several elements are equally maximum, the last element is
-    /// returned. If the iterator is empty, [`None`] is returned.
+    /// returned. If the generator is empty, [`None`] is returned.
     ///
     /// ## Spuriously stopping generators
     ///
     /// `max_by_key()` will return the result after the source generator has stopped. It doesn't matter
     /// if the source generator is stopped or completed.
     ///
-    /// Manually use [`try_reduce`] to handle spuriously stopping generators.
+    /// Manually use [`try_max_by()`] to handle spuriously stopping generators.
     ///
-    /// [`try_reduce`]: GeneratorExt::try_reduce
+    /// [`try_max_by()`]: GeneratorExt::try_max_by()
     ///
     /// # Examples
     ///
@@ -1121,41 +1130,16 @@ pub trait GeneratorExt: Sealed + Generator {
     ///
     /// ```
     /// use pushgen::{Generator, ValueResult, GeneratorResult, GeneratorExt};
-    /// // This is a very very basic stopping generator, only for demonstration purposes!
-    /// struct StoppingGen(i32, usize);
-    /// impl Generator for StoppingGen {
-    ///     type Output = i32;
-    ///
-    ///     fn run(&mut self, mut output: impl FnMut(Self::Output) -> ValueResult) -> GeneratorResult{
-    ///         static DATA: [i32;4] = [1, 2, 3, 4];
-    ///         if self.0 == 0 {
-    ///             self.0 = -1;
-    ///             return GeneratorResult::Stopped;
-    ///         }
-    ///         while self.1 < DATA.len() {
-    ///             if self.0 == 0 {
-    ///                 self.0 = -1;
-    ///                 return GeneratorResult::Stopped;
-    ///             }
-    ///             let res = output(DATA[self.1]);
-    ///             self.0 -= 1;
-    ///             self.1 += 1;
-    ///             if res == ValueResult::Stop {
-    ///                 return GeneratorResult::Stopped;
-    ///             }
-    ///         }
-    ///         GeneratorResult::Complete
-    ///     }
-    /// }
-    /// // Generator will produce `[1, *Stopped*, 2, 3, 4]`.
-    /// let mut gen = StoppingGen(1, 0);
+    /// use pushgen::test::StoppingGen; // Available with feature `test`
+    /// let data = [1, 2, 3, 0, 4, 5];
+    /// let mut gen = StoppingGen::new(1, &data).copied();
     /// let partial = gen.try_reduce(None, |a, b| a + b);
     /// assert!(partial.is_err());
     /// let partial = partial.unwrap_err();
     /// assert_eq!(partial, Some(1));
     /// let res = gen.try_reduce(partial, |a, b| a + b);
     /// assert!(res.is_ok());
-    /// assert_eq!(res.unwrap(), Some(1+2+3+4));
+    /// assert_eq!(res.unwrap(), Some(1+2+3+4+5));
     /// ```
     ///
     #[inline]
