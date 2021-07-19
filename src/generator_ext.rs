@@ -4,6 +4,7 @@ use crate::structs::{
 };
 use crate::traits::{Product, Sum};
 use crate::{Generator, GeneratorResult, ValueResult};
+use core::cmp::Ordering;
 
 pub trait Sealed {}
 
@@ -752,6 +753,204 @@ pub trait GeneratorExt: Sealed + Generator {
         P: Product<Self::Output>,
     {
         P::product(self)
+    }
+
+    /// Returns the minimum value of a generator.
+    ///
+    /// If several elements are equally minimum, the first element is
+    /// returned. If the generator is empty, [`None`] is returned.
+    ///
+    /// # Examples
+    ///
+    /// Basic usage:
+    ///
+    /// ```
+    /// use pushgen::{GeneratorExt, IntoGenerator};
+    /// let a = [1, 2, 3];
+    /// let b: Vec<u32> = Vec::new();
+    ///
+    /// assert_eq!(a.into_gen().min(), Some(&1));
+    /// assert_eq!(b.into_gen().min(), None);
+    /// ```
+    #[inline]
+    fn min(self) -> Option<Self::Output>
+    where
+        Self: Sized,
+        Self::Output: Ord,
+    {
+        self.min_by(Ord::cmp)
+    }
+
+    /// Returns the value that gives the minimum value when compared with the
+    /// specified comparison function.
+    ///
+    /// If several elements are equally minimum, the first element is
+    /// returned. If the iterator is empty, [`None`] is returned.
+    ///
+    /// ## Spuriously stopping generators
+    ///
+    /// `min_by()` will return the result after the source generator has stopped. It doesn't matter
+    /// if the source generator is stopped or completed.
+    ///
+    /// Manually use [`try_reduce`] to handle spuriously stopping generators.
+    ///
+    /// [`try_reduce`]: GeneratorExt::try_reduce
+    ///
+    /// # Examples
+    ///
+    /// ```
+    /// use pushgen::{GeneratorExt, IntoGenerator};
+    /// let a = [-3_i32, 0, 1, 5, -10];
+    /// assert_eq!(*a.into_gen().min_by(|x, y| x.cmp(y)).unwrap(), -10);
+    /// ```
+    #[inline]
+    fn min_by<F>(self, mut compare: F) -> Option<Self::Output>
+    where
+        Self: Sized,
+        F: FnMut(&Self::Output, &Self::Output) -> Ordering,
+    {
+        self.reduce(|a, b| core::cmp::min_by(a, b, &mut compare))
+    }
+
+    /// Returns the value that gives the minimum value from the specified function.
+    ///
+    /// If several elements are equally minimum, the first element is
+    /// returned. If the iterator is empty, [`None`] is returned.
+    ///
+    /// ## Spuriously stopping generators
+    ///
+    /// `min_by_key()` will return the result after the source generator has stopped. It doesn't matter
+    /// if the source generator is stopped or completed.
+    ///
+    /// Manually use [`try_reduce`] to handle spuriously stopping generators.
+    ///
+    /// [`try_reduce`]: GeneratorExt::try_reduce
+    ///
+    /// # Examples
+    ///
+    /// ```
+    /// use pushgen::{GeneratorExt, IntoGenerator};
+    /// let a = [-3_i32, 0, 1, 5, -10];
+    /// assert_eq!(*a.into_gen().min_by_key(|x| x.abs()).unwrap(), 0);
+    /// ```
+    #[inline]
+    fn min_by_key<F, B>(self, f: F) -> Option<Self::Output>
+    where
+        Self: Sized,
+        F: FnMut(&Self::Output) -> B,
+        B: Ord,
+    {
+        #[inline]
+        fn key<T, B>(mut f: impl FnMut(&T) -> B) -> impl FnMut(T) -> (B, T) {
+            move |x| (f(&x), x)
+        }
+
+        #[inline]
+        fn compare<T, B: Ord>((x_p, _): &(B, T), (y_p, _): &(B, T)) -> Ordering {
+            x_p.cmp(y_p)
+        }
+
+        let (_, x) = self.map(key(f)).min_by(compare)?;
+        Some(x)
+    }
+
+    /// Returns the maximum value of a generator.
+    ///
+    /// If several elements are equally maximum, the last element is
+    /// returned. If the generator is empty, [`None`] is returned.
+    ///
+    /// # Examples
+    ///
+    /// Basic usage:
+    ///
+    /// ```
+    /// use pushgen::{GeneratorExt, IntoGenerator};
+    /// let a = [1, 2, 3];
+    /// let b: Vec<u32> = Vec::new();
+    ///
+    /// assert_eq!(a.into_gen().max(), Some(&3));
+    /// assert_eq!(b.into_gen().max(), None);
+    /// ```
+    #[inline]
+    fn max(self) -> Option<Self::Output>
+    where
+        Self: Sized,
+        Self::Output: Ord,
+    {
+        self.max_by(Ord::cmp)
+    }
+
+    /// Returns the value that gives the maximum value when compared with the
+    /// specified comparison function.
+    ///
+    /// If several elements are equally maximum, the last element is
+    /// returned. If the iterator is empty, [`None`] is returned.
+    ///
+    /// ## Spuriously stopping generators
+    ///
+    /// `max_by()` will return the result after the source generator has stopped. It doesn't matter
+    /// if the source generator is stopped or completed.
+    ///
+    /// Manually use [`try_reduce`] to handle spuriously stopping generators.
+    ///
+    /// [`try_reduce`]: GeneratorExt::try_reduce
+    ///
+    /// # Examples
+    ///
+    /// ```
+    /// use pushgen::{GeneratorExt, IntoGenerator};
+    /// let a = [-3_i32, 0, 1, 5, -10];
+    /// assert_eq!(*a.into_gen().max_by(|x, y| x.cmp(y)).unwrap(), 5);
+    /// ```
+    #[inline]
+    fn max_by<F>(self, mut compare: F) -> Option<Self::Output>
+    where
+        Self: Sized,
+        F: FnMut(&Self::Output, &Self::Output) -> Ordering,
+    {
+        self.reduce(|a, b| core::cmp::max_by(a, b, &mut compare))
+    }
+
+    /// Returns the value that gives the maximum value from the specified function.
+    ///
+    /// If several elements are equally maximum, the last element is
+    /// returned. If the iterator is empty, [`None`] is returned.
+    ///
+    /// ## Spuriously stopping generators
+    ///
+    /// `max_by_key()` will return the result after the source generator has stopped. It doesn't matter
+    /// if the source generator is stopped or completed.
+    ///
+    /// Manually use [`try_reduce`] to handle spuriously stopping generators.
+    ///
+    /// [`try_reduce`]: GeneratorExt::try_reduce
+    ///
+    /// # Examples
+    ///
+    /// ```
+    /// use pushgen::{GeneratorExt, IntoGenerator};
+    /// let a = [-3_i32, 0, 1, 5, -10];
+    /// assert_eq!(*a.into_gen().max_by_key(|x| x.abs()).unwrap(), -10);
+    /// ```
+    #[inline]
+    fn max_by_key<F, B>(self, f: F) -> Option<Self::Output>
+    where
+        Self: Sized,
+        F: FnMut(&Self::Output) -> B,
+        B: Ord,
+    {
+        #[inline]
+        fn key<T, B>(mut f: impl FnMut(&T) -> B) -> impl FnMut(T) -> (B, T) {
+            move |x| (f(&x), x)
+        }
+
+        #[inline]
+        fn compare<T, B: Ord>((x_p, _): &(B, T), (y_p, _): &(B, T)) -> Ordering {
+            x_p.cmp(y_p)
+        }
+
+        let (_, x) = self.map(key(f)).max_by(compare)?;
+        Some(x)
     }
 
     /// Reduces the elements to a single one by repeatedly applying a reducing operation.
