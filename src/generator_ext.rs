@@ -835,10 +835,10 @@ pub trait GeneratorExt: Sealed + Generator {
     /// ```
     #[inline]
     fn min_by_key<F, B>(self, f: F) -> Option<Self::Output>
-        where
-            Self: Sized,
-            F: FnMut(&Self::Output) -> B,
-            B: Ord,
+    where
+        Self: Sized,
+        F: FnMut(&Self::Output) -> B,
+        B: Ord,
     {
         #[inline]
         fn key<T, B>(mut f: impl FnMut(&T) -> B) -> impl FnMut(T) -> (B, T) {
@@ -873,9 +873,9 @@ pub trait GeneratorExt: Sealed + Generator {
     /// ```
     #[inline]
     fn max(self) -> Option<Self::Output>
-        where
-            Self: Sized,
-            Self::Output: Ord,
+    where
+        Self: Sized,
+        Self::Output: Ord,
     {
         self.max_by(Ord::cmp)
     }
