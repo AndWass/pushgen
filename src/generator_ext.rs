@@ -1382,4 +1382,50 @@ mod tests {
             }
         }
     }
+
+    #[test]
+    fn double_stop_try_reduce() {
+        struct Gen {
+            index: usize,
+            num_stops: u32,
+        }
+
+        impl Generator for Gen {
+            type Output = i32;
+
+            fn run(&mut self, mut output: impl FnMut(Self::Output) -> ValueResult) -> GeneratorResult {
+                static DATA: [i32;4] = [0, 1, 2, 3];
+                while self.index < DATA.len() {
+                    if self.index == 2 {
+                        if self.num_stops < 2 {
+                            self.num_stops += 1;
+                            return GeneratorResult::Stopped;
+                        }
+                    }
+
+                    let old = self.index;
+                    self.index += 1;
+
+                    if output(DATA[old]) == ValueResult::Stop {
+                        return GeneratorResult::Stopped;
+                    }
+                }
+
+                GeneratorResult::Complete
+            }
+        }
+
+        let mut gen = Gen{index: 0, num_stops: 0};
+        let result = gen.try_reduce(None, |a, b| a + b);
+        assert!(result.is_err());
+        let partial = result.unwrap_err();
+        assert_eq!(partial, Some(0+1));
+        let result = gen.try_reduce(partial, |a, b| a+b);
+        assert!(result.is_err());
+        let partial = result.unwrap_err();
+        assert_eq!(partial, Some(0+1));
+        let result = gen.try_reduce(partial, |a, b| a+b);
+        assert!(result.is_ok());
+        assert_eq!(result.unwrap(), Some(0+1+2+3));
+    }
 }
