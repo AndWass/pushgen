@@ -826,7 +826,7 @@ pub trait GeneratorExt: Sealed + Generator {
     ///
     /// ## Arguments
     ///
-    /// `prev_reduction` The result of an earlier partial reduction. Set to `None` if this is the
+    /// `prev_reduction` The result of an earlier incomplete reduction. Set to `None` if this is the
     /// first reduction pass.
     ///
     /// `reducer` The reducing  closure to use.
@@ -834,11 +834,10 @@ pub trait GeneratorExt: Sealed + Generator {
     /// ## Returns
     ///
     /// `Ok(x)` if the generator was run to completion. `x` is `None` if the generator is empty,
-    /// otherwise it is the result of the reduction.
+    /// otherwise it is the result of the complete reduction.
     ///
-    /// `Err((Self, Option<Self::Output>))` if the generator was stopped mid-reduction. The second
-    /// tuple element (`.1`) is the value that the
-    /// generator reduced to before it stopped. This value should be used in any subsequent calls to `try_reduce`
+    /// `Err(y)` if the generator was stopped mid-reduction. `y` is the value that the generator was
+    /// reduced to when it stopped. This value should be used in any subsequent calls to `try_reduce`
     /// until an `Ok()` value is returned.
     ///
     /// ## Example
@@ -847,7 +846,7 @@ pub trait GeneratorExt: Sealed + Generator {
     ///
     /// ```
     /// use pushgen::{Generator, GeneratorExt, IntoGenerator};
-    /// fn find_max<G>(gen: G) -> Result<Option<G::Output>, (G, Option<G::Output>)>
+    /// fn find_max<G>(gen: &mut G) -> Result<Option<G::Output>, Option<G::Output>>
     ///     where G: Generator,
     ///           G::Output: Ord,
     /// {
@@ -858,10 +857,8 @@ pub trait GeneratorExt: Sealed + Generator {
     /// let a = [10, 20, 5, -23, 0];
     /// let b: [u32; 0] = [];
     ///
-    /// // SliceGenerator doesn't implement Debug, to use unwrap() we simply map the error
-    /// // to something that does.
-    /// assert_eq!(find_max(a.into_gen()).map_err(|x| x.1).unwrap(), Some(&20));
-    /// assert_eq!(find_max(b.into_gen()).map_err(|x| x.1).unwrap(), None);
+    /// assert_eq!(find_max(&mut a.into_gen()).unwrap(), Some(&20));
+    /// assert_eq!(find_max(&mut b.into_gen()).unwrap(), None);
     /// ```
     ///
     /// With a stopping generator:
@@ -895,26 +892,22 @@ pub trait GeneratorExt: Sealed + Generator {
     ///     }
     /// }
     /// // Generator will produce `[1, *Stopped*, 2, 3, 4]`.
-    /// if let Err((mut gen, partial)) = StoppingGen(1, 0).try_reduce(None, |a, b| a + b) {
-    ///     assert_eq!(partial, Some(1));
-    ///     let res = gen.try_reduce(partial, |a, b| a + b);
-    ///     assert!(res.is_ok());
-    ///     // StoppingGen doesn't implement debug, map error to enable unwrap
-    ///     assert_eq!(res.map_err(|x| 0).unwrap(), Some(1+2+3+4));
-    /// }
-    /// else {
-    ///     // Untaken branch
-    ///     assert!(false);
-    /// }
+    /// let mut gen = StoppingGen(1, 0);
+    /// let partial = gen.try_reduce(None, |a, b| a + b);
+    /// assert!(partial.is_err());
+    /// let partial = partial.unwrap_err();
+    /// assert_eq!(partial, Some(1));
+    /// let res = gen.try_reduce(partial, |a, b| a + b);
+    /// assert!(res.is_ok());
+    /// assert_eq!(res.unwrap(), Some(1+2+3+4));
     /// ```
     ///
-    #[allow(clippy::type_complexity)]
     #[inline]
     fn try_reduce<F>(
-        mut self,
+        &mut self,
         prev_reduction: Option<Self::Output>,
         mut reducer: F,
-    ) -> Result<Option<Self::Output>, (Self, Option<Self::Output>)>
+    ) -> Result<Option<Self::Output>, Option<Self::Output>>
     where
         Self: Sized,
         F: FnMut(Self::Output, Self::Output) -> Self::Output,
@@ -934,7 +927,7 @@ pub trait GeneratorExt: Sealed + Generator {
                 // have a None option from now on.
                 match run_result {
                     GeneratorResult::Stopped => match first {
-                        None => return Err((self, None)),
+                        None => return Err(None),
                         Some(first) => first,
                     },
                     GeneratorResult::Complete => return Ok(first),
@@ -952,7 +945,7 @@ pub trait GeneratorExt: Sealed + Generator {
         let result = Some(left_value.get_inner());
 
         match run_result {
-            GeneratorResult::Stopped => Err((self, result)),
+            GeneratorResult::Stopped => Err(result),
             GeneratorResult::Complete => Ok(result),
         }
     }
@@ -1053,13 +1046,7 @@ mod tests {
             a + b
         }
 
-        assert_eq!(
-            x.into_gen()
-                .copied()
-                .try_reduce(None, reducer)
-                .map_err(|x| x.1),
-            Ok(None)
-        );
+        assert_eq!(x.into_gen().copied().try_reduce(None, reducer), Ok(None));
     }
 
     #[test]
@@ -1069,13 +1056,7 @@ mod tests {
             a + b
         }
 
-        assert_eq!(
-            x.into_gen()
-                .copied()
-                .try_reduce(None, reducer)
-                .map_err(|x| x.1),
-            Ok(Some(1))
-        );
+        assert_eq!(x.into_gen().copied().try_reduce(None, reducer), Ok(Some(1)));
     }
 
     #[test]
@@ -1085,37 +1066,30 @@ mod tests {
             a + b
         }
 
-        assert_eq!(
-            x.into_gen()
-                .copied()
-                .try_reduce(None, reducer)
-                .map_err(|x| x.1),
-            Ok(Some(3))
-        );
+        assert_eq!(x.into_gen().copied().try_reduce(None, reducer), Ok(Some(3)));
     }
 
     #[test]
     fn stop_at_start_try_reduce() {
         for i in 0..4 {
             let x = [1, 2, 3, 4, 5];
-            let gen = StoppingGen::new(i, &x);
+            let mut gen = StoppingGen::new(i, &x);
             let res = gen.try_reduce(None, |a, b| match a < b {
                 true => a,
                 false => b,
             });
 
             assert!(res.is_err());
-            if let Err((gen, partial)) = res {
-                if i == 0 {
-                    assert_eq!(partial, None);
-                } else {
-                    assert_eq!(partial, Some(&1));
-                }
-                match gen.try_reduce(partial, |a, b| if a < b { a } else { b }) {
-                    Ok(x) => assert_eq!(x, Some(&1)),
-                    Err(_) => {
-                        assert!(false);
-                    }
+            let partial = res.unwrap_err();
+            if i == 0 {
+                assert_eq!(partial, None);
+            } else {
+                assert_eq!(partial, Some(&1));
+            }
+            match gen.try_reduce(partial, |a, b| if a < b { a } else { b }) {
+                Ok(x) => assert_eq!(x, Some(&1)),
+                Err(_) => {
+                    assert!(false);
                 }
             }
         }
