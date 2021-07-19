@@ -786,6 +786,48 @@ pub trait GeneratorExt: Sealed + Generator {
         self.reduce(|a, b| core::cmp::min_by(a, b, &mut compare))
     }
 
+    /// Returns the value that gives the minimum value from the specified function.
+    ///
+    /// If several elements are equally minimum, the first element is
+    /// returned. If the iterator is empty, [`None`] is returned.
+    ///
+    /// ## Spuriously stopping generators
+    ///
+    /// `min_by_key()` will return the result after the source generator has stopped. It doesn't matter
+    /// if the source generator is stopped or completed.
+    ///
+    /// Manually use [`try_reduce`] to handle spuriously stopping generators.
+    ///
+    /// [`try_reduce`]: GeneratorExt::try_reduce
+    ///
+    /// # Examples
+    ///
+    /// ```
+    /// use pushgen::{GeneratorExt, IntoGenerator};
+    /// let a = [-3_i32, 0, 1, 5, -10];
+    /// assert_eq!(*a.into_gen().min_by_key(|x| x.abs()).unwrap(), 0);
+    /// ```
+    #[inline]
+    fn min_by_key<F, B>(self, f: F) -> Option<Self::Output>
+        where
+            Self: Sized,
+            F: FnMut(&Self::Output) -> B,
+            B: Ord,
+    {
+        #[inline]
+        fn key<T, B>(mut f: impl FnMut(&T) -> B) -> impl FnMut(T) -> (B, T) {
+            move |x| (f(&x), x)
+        }
+
+        #[inline]
+        fn compare<T, B: Ord>((x_p, _): &(B, T), (y_p, _): &(B, T)) -> Ordering {
+            x_p.cmp(y_p)
+        }
+
+        let (_, x) = self.map(key(f)).min_by(compare)?;
+        Some(x)
+    }
+
     /// Returns the value that gives the maximum value when compared with the
     /// specified comparison function.
     ///
