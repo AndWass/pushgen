@@ -854,6 +854,32 @@ pub trait GeneratorExt: Sealed + Generator {
         Some(x)
     }
 
+    /// Returns the maximum value of a generator.
+    ///
+    /// If several elements are equally maximum, the last element is
+    /// returned. If the generator is empty, [`None`] is returned.
+    ///
+    /// # Examples
+    ///
+    /// Basic usage:
+    ///
+    /// ```
+    /// use pushgen::{GeneratorExt, IntoGenerator};
+    /// let a = [1, 2, 3];
+    /// let b: Vec<u32> = Vec::new();
+    ///
+    /// assert_eq!(a.into_gen().max(), Some(&3));
+    /// assert_eq!(b.into_gen().max(), None);
+    /// ```
+    #[inline]
+    fn max(self) -> Option<Self::Output>
+        where
+            Self: Sized,
+            Self::Output: Ord,
+    {
+        self.max_by(Ord::cmp)
+    }
+
     /// Returns the value that gives the maximum value when compared with the
     /// specified comparison function.
     ///
