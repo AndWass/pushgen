@@ -781,7 +781,8 @@ pub trait GeneratorExt: Sealed + Generator {
     fn min_by<F>(self, mut compare: F) -> Option<Self::Output>
     where
         Self: Sized,
-        F: FnMut(&Self::Output, &Self::Output) -> Ordering {
+        F: FnMut(&Self::Output, &Self::Output) -> Ordering,
+    {
         self.reduce(|a, b| core::cmp::min_by(a, b, &mut compare))
     }
 
@@ -809,10 +810,53 @@ pub trait GeneratorExt: Sealed + Generator {
     /// ```
     #[inline]
     fn max_by<F>(self, mut compare: F) -> Option<Self::Output>
-        where
-            Self: Sized,
-            F: FnMut(&Self::Output, &Self::Output) -> Ordering {
+    where
+        Self: Sized,
+        F: FnMut(&Self::Output, &Self::Output) -> Ordering,
+    {
         self.reduce(|a, b| core::cmp::max_by(a, b, &mut compare))
+    }
+
+    /// Returns the value that gives the maximum value from the specified function.
+    ///
+    /// If several elements are equally maximum, the last element is
+    /// returned. If the iterator is empty, [`None`] is returned.
+    ///
+    /// ## Spuriously stopping generators
+    ///
+    /// `max_by_key()` will return the result after the source generator has stopped. It doesn't matter
+    /// if the source generator is stopped or completed.
+    ///
+    /// Manually use [`try_reduce`] to handle spuriously stopping generators.
+    ///
+    /// [`try_reduce`]: GeneratorExt::try_reduce
+    ///
+    /// # Examples
+    ///
+    /// ```
+    /// use pushgen::{GeneratorExt, IntoGenerator};
+    /// let a = [-3_i32, 0, 1, 5, -10];
+    /// assert_eq!(*a.into_gen().max_by_key(|x| x.abs()).unwrap(), -10);
+    /// ```
+    #[inline]
+    fn max_by_key<F, B>(self, f: F) -> Option<Self::Output>
+    where
+        Self: Sized,
+        F: FnMut(&Self::Output) -> B,
+        B: Ord,
+    {
+        #[inline]
+        fn key<T, B>(mut f: impl FnMut(&T) -> B) -> impl FnMut(T) -> (B, T) {
+            move |x| (f(&x), x)
+        }
+
+        #[inline]
+        fn compare<T, B: Ord>((x_p, _): &(B, T), (y_p, _): &(B, T)) -> Ordering {
+            x_p.cmp(y_p)
+        }
+
+        let (_, x) = self.map(key(f)).max_by(compare)?;
+        Some(x)
     }
 
     /// Reduces the elements to a single one by repeatedly applying a reducing operation.
