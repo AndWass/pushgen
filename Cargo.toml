@@ -17,6 +17,7 @@ documentation = "https://docs.rs/pushgen"
 [features]
 default = ["std"]
 std = []
+test = ["std"]
 
 [dependencies]
 either = { version = "1.0", default-features = false }

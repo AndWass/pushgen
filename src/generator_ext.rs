@@ -547,7 +547,7 @@ pub trait GeneratorExt: Sealed + Generator {
     /// let mut gen = SliceGenerator::new(&data);
     /// let res = gen.try_for_each(|x| rename(x, Path::new(x).with_extension("old")));
     /// assert!(res.is_err());
-    /// // It short-circuited, so the remaining items are still in the iterator:
+    /// // It short-circuited, so the remaining items are still in the generator:
     /// let mut output: Vec<&'static str> = Vec::new();
     /// gen.for_each(|x| output.push(*x));
     /// assert_eq!(output, ["stale_bread.json", "torrential_rain.png"]);
@@ -760,6 +760,15 @@ pub trait GeneratorExt: Sealed + Generator {
     /// If several elements are equally minimum, the first element is
     /// returned. If the generator is empty, [`None`] is returned.
     ///
+    /// ## Spuriously stopping generators
+    ///
+    /// `min()` will return the result after the source generator has stopped. It doesn't matter
+    /// if the source generator is stopped or completed.
+    ///
+    /// Use [`try_min_by()`] to handle spuriously stopping generators.
+    ///
+    /// [`try_min_by()`]: GeneratorExt::try_min_by
+    ///
     /// # Examples
     ///
     /// Basic usage:
@@ -785,16 +794,16 @@ pub trait GeneratorExt: Sealed + Generator {
     /// specified comparison function.
     ///
     /// If several elements are equally minimum, the first element is
-    /// returned. If the iterator is empty, [`None`] is returned.
+    /// returned. If the generator is empty, [`None`] is returned.
     ///
     /// ## Spuriously stopping generators
     ///
     /// `min_by()` will return the result after the source generator has stopped. It doesn't matter
     /// if the source generator is stopped or completed.
     ///
-    /// Manually use [`try_reduce`] to handle spuriously stopping generators.
+    /// Use [`try_min_by()`] to handle spuriously stopping generators.
     ///
-    /// [`try_reduce`]: GeneratorExt::try_reduce
+    /// [`try_min_by()`]: GeneratorExt::try_min_by
     ///
     /// # Examples
     ///
@@ -812,19 +821,67 @@ pub trait GeneratorExt: Sealed + Generator {
         self.reduce(|a, b| core::cmp::min_by(a, b, &mut compare))
     }
 
+    /// Returns the value that gives the minimum value when compared with the
+    /// specified comparison function.
+    ///
+    /// If several elements are equally minimum, the first element is
+    /// returned. If the generator is empty, `None` is returned.
+    ///
+    /// This method can be used with spuriously stopping generators.
+    ///
+    /// # Examples
+    ///
+    /// Basic usage
+    ///
+    /// ```
+    /// use pushgen::{GeneratorExt, IntoGenerator};
+    /// let a = [-3_i32, 0, 1, 5, -10];
+    /// assert_eq!(a.into_gen().try_min_by(None, |x, y| x.cmp(y)).unwrap(), Some(&-10));
+    /// ```
+    ///
+    /// Stopping generator:
+    ///
+    /// ```
+    /// use pushgen::{Generator, ValueResult, GeneratorResult, GeneratorExt};
+    /// use pushgen::test::StoppingGen;
+    /// let data = [1, 2, 0, 4];
+    /// let mut gen = StoppingGen::new(1, &data);
+    /// let partial = gen.try_min_by(None, Ord::cmp);
+    /// // generator was stopped - indicated by an Err result
+    /// assert!(partial.is_err());
+    /// let partial = partial.unwrap_err();
+    /// assert_eq!(partial, Some(&1));
+    /// // Feed partial value to continue reduction from the partial value
+    /// let res = gen.try_min_by(partial, Ord::cmp);
+    /// assert!(res.is_ok());
+    /// assert_eq!(res.unwrap(), Some(&0));
+    /// ```
+    #[inline]
+    fn try_min_by<F>(
+        &mut self,
+        partial: Option<Self::Output>,
+        mut compare: F,
+    ) -> Result<Option<Self::Output>, Option<Self::Output>>
+    where
+        Self: Sized,
+        F: FnMut(&Self::Output, &Self::Output) -> Ordering,
+    {
+        self.try_reduce(partial, |a, b| core::cmp::min_by(a, b, &mut compare))
+    }
+
     /// Returns the value that gives the minimum value from the specified function.
     ///
     /// If several elements are equally minimum, the first element is
-    /// returned. If the iterator is empty, [`None`] is returned.
+    /// returned. If the generator is empty, `None` is returned.
     ///
     /// ## Spuriously stopping generators
     ///
     /// `min_by_key()` will return the result after the source generator has stopped. It doesn't matter
     /// if the source generator is stopped or completed.
     ///
-    /// Manually use [`try_reduce`] to handle spuriously stopping generators.
+    /// Manually use [`try_min_by()`] to handle spuriously stopping generators.
     ///
-    /// [`try_reduce`]: GeneratorExt::try_reduce
+    /// [`try_min_by()`]: GeneratorExt::try_min_by
     ///
     /// # Examples
     ///
@@ -859,6 +916,15 @@ pub trait GeneratorExt: Sealed + Generator {
     /// If several elements are equally maximum, the last element is
     /// returned. If the generator is empty, [`None`] is returned.
     ///
+    /// ## Spuriously stopping generators
+    ///
+    /// `max()` will return the result after the source generator has stopped. It doesn't matter
+    /// if the source generator is stopped or completed.
+    ///
+    /// Use [`try_max_by()`] to handle spuriously stopping generators.
+    ///
+    /// [`try_max_by()`]: GeneratorExt::try_max_by
+    ///
     /// # Examples
     ///
     /// Basic usage:
@@ -884,16 +950,16 @@ pub trait GeneratorExt: Sealed + Generator {
     /// specified comparison function.
     ///
     /// If several elements are equally maximum, the last element is
-    /// returned. If the iterator is empty, [`None`] is returned.
+    /// returned. If the generator is empty, `None` is returned.
     ///
     /// ## Spuriously stopping generators
     ///
     /// `max_by()` will return the result after the source generator has stopped. It doesn't matter
     /// if the source generator is stopped or completed.
     ///
-    /// Manually use [`try_reduce`] to handle spuriously stopping generators.
+    /// Manually use [`try_max_by()`] to handle spuriously stopping generators.
     ///
-    /// [`try_reduce`]: GeneratorExt::try_reduce
+    /// [`try_max_by()`]: GeneratorExt::try_max_by
     ///
     /// # Examples
     ///
@@ -911,19 +977,67 @@ pub trait GeneratorExt: Sealed + Generator {
         self.reduce(|a, b| core::cmp::max_by(a, b, &mut compare))
     }
 
+    /// Returns the value that gives the maximum value when compared with the
+    /// specified comparison function.
+    ///
+    /// If several elements are equally maximum, the last element is
+    /// returned. If the generator is empty, [`None`] is returned.
+    ///
+    /// This method can be used with spuriously stopping generators.
+    ///
+    /// # Examples
+    ///
+    /// Basic usage
+    ///
+    /// ```
+    /// use pushgen::{GeneratorExt, IntoGenerator};
+    /// let a = [-3_i32, 0, 1, 5, -10];
+    /// assert_eq!(a.into_gen().try_min_by(None, |x, y| x.cmp(y)).unwrap(), Some(&-10));
+    /// ```
+    ///
+    /// Stopping generator:
+    ///
+    /// ```
+    /// use pushgen::{Generator, ValueResult, GeneratorResult, GeneratorExt};
+    /// use pushgen::test::StoppingGen;
+    /// let data = [1, 2, 0, 4];
+    /// let mut gen = StoppingGen::new(1, &data);
+    /// let partial = gen.try_max_by(None, Ord::cmp);
+    /// // generator was stopped - indicated by an Err result
+    /// assert!(partial.is_err());
+    /// let partial = partial.unwrap_err();
+    /// assert_eq!(partial, Some(&1));
+    /// // Feed partial value to continue from the partial value
+    /// let res = gen.try_max_by(partial, Ord::cmp);
+    /// assert!(res.is_ok());
+    /// assert_eq!(res.unwrap(), Some(&4));
+    /// ```
+    #[inline]
+    fn try_max_by<F>(
+        &mut self,
+        partial: Option<Self::Output>,
+        mut compare: F,
+    ) -> Result<Option<Self::Output>, Option<Self::Output>>
+    where
+        Self: Sized,
+        F: FnMut(&Self::Output, &Self::Output) -> Ordering,
+    {
+        self.try_reduce(partial, |a, b| core::cmp::max_by(a, b, &mut compare))
+    }
+
     /// Returns the value that gives the maximum value from the specified function.
     ///
     /// If several elements are equally maximum, the last element is
-    /// returned. If the iterator is empty, [`None`] is returned.
+    /// returned. If the generator is empty, [`None`] is returned.
     ///
     /// ## Spuriously stopping generators
     ///
     /// `max_by_key()` will return the result after the source generator has stopped. It doesn't matter
     /// if the source generator is stopped or completed.
     ///
-    /// Manually use [`try_reduce`] to handle spuriously stopping generators.
+    /// Manually use [`try_max_by()`] to handle spuriously stopping generators.
     ///
-    /// [`try_reduce`]: GeneratorExt::try_reduce
+    /// [`try_max_by()`]: GeneratorExt::try_max_by()
     ///
     /// # Examples
     ///
@@ -1064,41 +1178,16 @@ pub trait GeneratorExt: Sealed + Generator {
     ///
     /// ```
     /// use pushgen::{Generator, ValueResult, GeneratorResult, GeneratorExt};
-    /// // This is a very very basic stopping generator, only for demonstration purposes!
-    /// struct StoppingGen(i32, usize);
-    /// impl Generator for StoppingGen {
-    ///     type Output = i32;
-    ///
-    ///     fn run(&mut self, mut output: impl FnMut(Self::Output) -> ValueResult) -> GeneratorResult{
-    ///         static DATA: [i32;4] = [1, 2, 3, 4];
-    ///         if self.0 == 0 {
-    ///             self.0 = -1;
-    ///             return GeneratorResult::Stopped;
-    ///         }
-    ///         while self.1 < DATA.len() {
-    ///             if self.0 == 0 {
-    ///                 self.0 = -1;
-    ///                 return GeneratorResult::Stopped;
-    ///             }
-    ///             let res = output(DATA[self.1]);
-    ///             self.0 -= 1;
-    ///             self.1 += 1;
-    ///             if res == ValueResult::Stop {
-    ///                 return GeneratorResult::Stopped;
-    ///             }
-    ///         }
-    ///         GeneratorResult::Complete
-    ///     }
-    /// }
-    /// // Generator will produce `[1, *Stopped*, 2, 3, 4]`.
-    /// let mut gen = StoppingGen(1, 0);
+    /// use pushgen::test::StoppingGen; // Available with feature `test`
+    /// let data = [1, 2, 3, 0, 4, 5];
+    /// let mut gen = StoppingGen::new(1, &data).copied();
     /// let partial = gen.try_reduce(None, |a, b| a + b);
     /// assert!(partial.is_err());
     /// let partial = partial.unwrap_err();
     /// assert_eq!(partial, Some(1));
     /// let res = gen.try_reduce(partial, |a, b| a + b);
     /// assert!(res.is_ok());
-    /// assert_eq!(res.unwrap(), Some(1+2+3+4));
+    /// assert_eq!(res.unwrap(), Some(1+2+3+4+5));
     /// ```
     ///
     #[inline]
@@ -1292,5 +1381,57 @@ mod tests {
                 }
             }
         }
+    }
+
+    #[test]
+    fn double_stop_try_reduce() {
+        struct Gen {
+            index: usize,
+            num_stops: u32,
+        }
+
+        impl Generator for Gen {
+            type Output = i32;
+
+            fn run(
+                &mut self,
+                mut output: impl FnMut(Self::Output) -> ValueResult,
+            ) -> GeneratorResult {
+                static DATA: [i32; 4] = [0, 1, 2, 3];
+                while self.index < DATA.len() {
+                    if self.index == 2 {
+                        if self.num_stops < 2 {
+                            self.num_stops += 1;
+                            return GeneratorResult::Stopped;
+                        }
+                    }
+
+                    let old = self.index;
+                    self.index += 1;
+
+                    if output(DATA[old]) == ValueResult::Stop {
+                        return GeneratorResult::Stopped;
+                    }
+                }
+
+                GeneratorResult::Complete
+            }
+        }
+
+        let mut gen = Gen {
+            index: 0,
+            num_stops: 0,
+        };
+        let result = gen.try_reduce(None, |a, b| a + b);
+        assert!(result.is_err());
+        let partial = result.unwrap_err();
+        assert_eq!(partial, Some(0 + 1));
+        let result = gen.try_reduce(partial, |a, b| a + b);
+        assert!(result.is_err());
+        let partial = result.unwrap_err();
+        assert_eq!(partial, Some(0 + 1));
+        let result = gen.try_reduce(partial, |a, b| a + b);
+        assert!(result.is_ok());
+        assert_eq!(result.unwrap(), Some(0 + 1 + 2 + 3));
     }
 }
