@@ -1,3 +1,4 @@
+use crate::structs::utility::InplaceUpdatable;
 use crate::structs::{
     Chain, Cloned, Copied, Dedup, Filter, FilterMap, Flatten, IteratorAdaptor, Map, Skip,
     SkipWhile, Take, TakeWhile, Zip,
@@ -1094,6 +1095,54 @@ pub trait GeneratorExt: Sealed + Generator {
 
         let (_, x) = self.map(key(f)).max_by(compare)?;
         Some(x)
+    }
+
+    /// Folds every element into an accumulator by applying an operation, returning the final result.
+    ///
+    /// Folding is useful whenever you have a collection of something, and want to produce a single
+    /// value from it.
+    ///
+    /// Note: [`reduce()`] can be used to use the first value as the initial value, if the accumulator
+    /// type and the output type is the same.
+    ///
+    /// [`reduce()`]: GeneratorExt::reduce
+    ///
+    /// ## Spuriously stopping generators
+    ///
+    /// `fold()` will stop and return the result after the first stop of the generator. It doesn't
+    /// matter if the generator stopped or completed.
+    ///
+    /// ## Arguments
+    ///
+    /// `init` The initial accumulator value
+    ///
+    /// `folder` A closure that takes an accumulator value and a generated value and returns a new
+    /// accumulator value.
+    ///
+    /// ## Examples
+    ///
+    /// Basic usage:
+    ///
+    /// ```
+    /// use pushgen::{IntoGenerator, GeneratorExt};
+    /// let a = [1, 2, 3];
+    ///
+    /// // the sum of all of the elements of the array
+    /// let sum = a.into_gen().fold(0, |acc, x| acc + x);
+    ///
+    /// assert_eq!(sum, 6);
+    /// ```
+    #[inline]
+    fn fold<B, F>(mut self, init: B, mut folder: F) -> B
+    where
+        Self: Sized,
+        F: FnMut(B, Self::Output) -> B,
+    {
+        let mut value = InplaceUpdatable::new(init);
+        self.for_each(|x| {
+            value.update(|acc| folder(acc, x));
+        });
+        value.get_inner()
     }
 
     /// Reduces the elements to a single one by repeatedly applying a reducing operation.
