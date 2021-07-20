@@ -557,8 +557,8 @@ pub trait GeneratorExt: Sealed + Generator {
     /// This can also be thought of as the fallible form of [`for_each()`]
     /// or as the stateless version of [`try_fold()`].
     ///
-    /// [`for_each()`]: Generator::for_each
-    /// [`try_fold()`]: Generator::try_fold
+    /// [`for_each()`]: GeneratorExt::for_each
+    /// [`try_fold()`]: GeneratorExt::try_fold
     ///
     /// # Examples
     ///

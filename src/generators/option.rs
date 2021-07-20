@@ -5,6 +5,8 @@ use crate::{Generator, GeneratorResult, ValueResult};
 /// The generator produces one value if the [`Option`] is a [`Some`], otherwise none.
 ///
 /// This `struct` is created by the [`Option::into_gen`] function.
+///
+/// [`Option::into_gen`]: crate::IntoGenerator::into_gen
 #[derive(Clone)]
 pub struct OptionGen<T> {
     inner: Option<T>,
