@@ -1,4 +1,4 @@
-use crate::{Generator, ValueResult, GeneratorResult};
+use crate::{Generator, GeneratorResult, ValueResult};
 
 /// A generator that generates values from a slice.
 ///

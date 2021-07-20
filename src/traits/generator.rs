@@ -54,9 +54,9 @@ pub trait Generator {
 }
 
 impl<L, R> Generator for Either<L, R>
-    where
-        L: Generator,
-        R: Generator<Output = L::Output>,
+where
+    L: Generator,
+    R: Generator<Output = L::Output>,
 {
     type Output = L::Output;
 

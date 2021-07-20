@@ -45,9 +45,9 @@ pub use generators::SliceGenerator;
 
 mod result;
 
+pub mod generators;
 pub mod structs;
 pub mod traits;
-pub mod generators;
 
 #[cfg(any(test, feature = "test"))]
 pub mod test;
