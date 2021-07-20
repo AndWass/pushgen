@@ -1138,18 +1138,7 @@ pub trait GeneratorExt: Sealed + Generator {
         Self: Sized,
         F: FnMut(Self::Output, Self::Output) -> Self::Output,
     {
-        let mut left_value = {
-            // Grab the first item into an optional
-            let mut first = None;
-            self.run(|x| {
-                first = Some(x);
-                ValueResult::Stop
-            });
-
-            // In the hot loop we use an inplace updatable since we know we will never
-            // have a None option from now on.
-            crate::structs::utility::InplaceUpdatable::new(first?)
-        };
+        let mut left_value = crate::structs::utility::InplaceUpdatable::new(self.next().ok()?);
 
         self.run(|x| {
             left_value.inplace_reduce(x, &mut reducer);
@@ -1234,20 +1223,11 @@ pub trait GeneratorExt: Sealed + Generator {
                 prev
             } else {
                 // Grab the first item into an optional
-                let mut first = None;
-                let run_result = self.run(|x| {
-                    first = Some(x);
-                    ValueResult::Stop
-                });
-
-                // In the hot loop we use an inplace updatable since we know we will never
-                // have a None option from now on.
-                match run_result {
-                    GeneratorResult::Stopped => match first {
-                        None => return Err(None),
-                        Some(first) => first,
-                    },
-                    GeneratorResult::Complete => return Ok(first),
+                let first = self.next();
+                match first {
+                    Ok(first) => first,
+                    Err(GeneratorResult::Stopped) => return Err(None),
+                    Err(GeneratorResult::Complete) => return Ok(None),
                 }
             }
         };

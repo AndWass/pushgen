@@ -1,4 +1,4 @@
-use crate::{Generator, GeneratorResult, ValueResult};
+use crate::{Generator, GeneratorExt, GeneratorResult, ValueResult};
 
 /// Zip two generators. See [`.zip()`](crate::GeneratorExt::zip) for details.
 #[derive(Clone)]
@@ -59,17 +59,11 @@ where
 
         let mut right_result = GeneratorResult::Stopped;
 
-        let left_result = left.run(|left_value| {
-            let mut right_value = None;
-            right_result = right.run(|rv| {
-                right_value = Some(rv);
-                ValueResult::Stop
-            });
-
-            if let Some(right_value) = right_value {
-                output((left_value, right_value))
-            } else {
+        let left_result = left.run(|left_value| match right.next() {
+            Ok(right_value) => output((left_value, right_value)),
+            Err(x) => {
                 *last_left = Some(left_value);
+                right_result = x;
                 ValueResult::Stop
             }
         });

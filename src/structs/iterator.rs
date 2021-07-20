@@ -1,5 +1,4 @@
-use crate::{structs::utility::InplaceUpdatable, Generator, ValueResult};
-use core::option::Option::Some;
+use crate::{structs::utility::InplaceUpdatable, Generator, GeneratorExt, ValueResult};
 
 /// Adapt a generator into an iterator. See [`.iter()`](crate::GeneratorExt::iter) for more info.
 #[derive(Clone)]
@@ -28,12 +27,7 @@ where
 
     #[inline]
     fn next(&mut self) -> Option<Self::Item> {
-        let mut retval = None;
-        self.source.run(|x| {
-            retval = Some(x);
-            ValueResult::Stop
-        });
-        retval
+        self.source.next().ok()
     }
 
     #[inline]

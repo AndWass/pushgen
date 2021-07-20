@@ -1,4 +1,4 @@
-use crate::{Generator, GeneratorResult, ValueResult};
+use crate::{Generator, GeneratorExt, GeneratorResult, ValueResult};
 use core::mem;
 
 /// Deduplication of duplicate consecutive values. See [`.dedup()`](crate::GeneratorExt::dedup) for details.
@@ -34,19 +34,10 @@ where
     fn run(&mut self, mut output: impl FnMut(Self::Output) -> ValueResult) -> GeneratorResult {
         let mut prev = match self.next.take() {
             Some(value) => value,
-            None => {
-                let next = &mut self.next;
-                // Try to get the initial value
-                let take_one_res = self.source.run(|x| {
-                    *next = Some(x);
-                    ValueResult::Stop
-                });
-
-                match self.next.take() {
-                    Some(value) => value,
-                    None => return take_one_res,
-                }
-            }
+            None => match self.source.next() {
+                Ok(x) => x,
+                Err(err) => return err,
+            },
         };
 
         let mut result = self.source.run(|x| {
