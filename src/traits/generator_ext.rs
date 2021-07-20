@@ -126,6 +126,35 @@ pub trait GeneratorExt: Sealed + Generator {
         });
         retval
     }
+    /// Retrieve the next value from the generator
+    ///
+    /// If the generator is completed or stopped before a value is retrieved an `Err(GeneratorResult)`
+    /// with the status of the generator is returned. Otherwise an `Ok()` value is returned.
+    ///
+    /// ## Examples
+    ///
+    /// Basic usage:
+    ///
+    /// ```
+    /// use pushgen::{SliceGenerator, GeneratorExt, GeneratorResult};
+    /// let data = [1, 2];
+    /// let mut gen = SliceGenerator::new(&data);
+    /// assert_eq!(gen.next(), Ok(&1));
+    /// assert_eq!(gen.next(), Ok(&2));
+    /// assert_eq!(gen.next(), Err(GeneratorResult::Complete));
+    /// ```
+    #[inline]
+    fn next(&mut self) -> Result<Self::Output, GeneratorResult> {
+        let mut maybe_value = None;
+        let res = self.run(|x| {
+            maybe_value = Some(x);
+            ValueResult::Stop
+        });
+        match maybe_value {
+            Some(x) => Ok(x),
+            None => Err(res),
+        }
+    }
     /// Exhausts the generator, returning the last element.
     ///
     /// This method will evaluate the generator until it completes. While
