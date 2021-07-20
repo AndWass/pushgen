@@ -660,7 +660,7 @@ pub trait GeneratorExt: Sealed + Generator {
     ///
     /// ## Example
     /// ```rust
-    /// use pushgen::{BoxedGenerator, IntoGenerator, GeneratorExt};
+    /// use pushgen::{generators::BoxedGenerator, IntoGenerator, GeneratorExt};
     /// fn make_generator() -> BoxedGenerator<i32> {
     ///     vec![1, 2, 3, 4].into_gen().map(|x| x*2).boxed()
     /// }
