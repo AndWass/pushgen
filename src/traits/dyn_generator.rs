@@ -1,4 +1,4 @@
-use crate::generator_ext::Sealed;
+use crate::traits::generator_ext::Sealed;
 use crate::{Generator, GeneratorResult, ValueResult};
 
 /// Sealed trait to enable boxed generators. See [`.boxed()`](crate::GeneratorExt::boxed) for details.

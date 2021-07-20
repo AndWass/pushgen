@@ -670,11 +670,11 @@ pub trait GeneratorExt: Sealed + Generator {
     /// ```
     #[cfg(feature = "std")]
     #[inline]
-    fn boxed(self) -> crate::BoxedGenerator<Self::Output>
+    fn boxed(self) -> crate::generators::BoxedGenerator<Self::Output>
     where
         Self: Sized + 'static,
     {
-        crate::BoxedGenerator::new(self)
+        crate::generators::BoxedGenerator::new(self)
     }
 
     /// Sums the values of a generator. Takes each value and adds them together and returns

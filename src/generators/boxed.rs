@@ -1,4 +1,4 @@
-use crate::{DynGenerator, Generator, GeneratorResult, ValueResult};
+use crate::{traits::DynGenerator, Generator, GeneratorResult, ValueResult};
 
 /// Box a generator, type-erasing the actual generator type.
 /// See [`.boxed()`](crate::GeneratorExt::boxed) for details.

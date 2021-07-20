@@ -68,7 +68,7 @@ impl<'a, T> IntoGenerator for &'a Vec<T> {
 #[cfg(feature = "std")]
 impl<T> IntoGenerator for Vec<T> {
     type Output = T;
-    type IntoGen = crate::structs::FromIter<std::vec::IntoIter<T>>;
+    type IntoGen = crate::generators::FromIter<std::vec::IntoIter<T>>;
     #[inline]
     fn into_gen(self) -> Self::IntoGen {
         crate::from_iter(self)
@@ -77,18 +77,18 @@ impl<T> IntoGenerator for Vec<T> {
 
 impl<T> IntoGenerator for Option<T> {
     type Output = T;
-    type IntoGen = crate::structs::OptionGen<T>;
+    type IntoGen = crate::generators::OptionGen<T>;
     #[inline]
     fn into_gen(self) -> Self::IntoGen {
-        crate::structs::OptionGen::new(self)
+        crate::generators::OptionGen::new(self)
     }
 }
 
 impl<'t, T> IntoGenerator for &'t Option<T> {
     type Output = &'t T;
-    type IntoGen = crate::structs::OptionGen<&'t T>;
+    type IntoGen = crate::generators::OptionGen<&'t T>;
     #[inline]
     fn into_gen(self) -> Self::IntoGen {
-        crate::structs::OptionGen::new(self.as_ref())
+        crate::generators::OptionGen::new(self.as_ref())
     }
 }
