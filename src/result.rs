@@ -48,3 +48,44 @@ impl From<bool> for GeneratorResult {
         }
     }
 }
+
+/// The result of a reduction.
+///
+/// A reduction can either be partial, producing an intermediate value, or complete. Partial
+/// reductions can for instance be created when trying to reduce a spuriously stopping generator.
+#[derive(Copy, Clone, Debug, Ord, PartialOrd, Eq, PartialEq)]
+pub enum Reduction<T>
+{
+    Complete(T),
+    Partial(T),
+}
+
+impl<T> Reduction<T>
+{
+    /// Check if the reduction is complete.
+    #[inline]
+    pub fn is_complete(&self) -> bool {
+        match self {
+            Reduction::Complete(_) => true,
+            _ => false,
+        }
+    }
+
+    /// Check if the reduction is partial.
+    #[inline]
+    pub fn is_partial(&self) -> bool {
+        match self {
+            Reduction::Partial(_) => true,
+            _ => false,
+        }
+    }
+
+    /// Get the underlying value, no matter if it's complete or partial.
+    #[inline]
+    pub fn unwrap(self) -> T {
+        match self {
+            Reduction::Complete(x) => x,
+            Reduction::Partial(x) => x
+        }
+    }
+}

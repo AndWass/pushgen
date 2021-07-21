@@ -4,7 +4,7 @@ use crate::structs::{
     SkipWhile, Take, TakeWhile, Zip,
 };
 use crate::traits::{Product, Sum};
-use crate::{Generator, GeneratorResult, ValueResult};
+use crate::{Generator, GeneratorResult, Reduction, ValueResult};
 use core::cmp::Ordering;
 
 pub trait Sealed {}
@@ -1145,6 +1145,81 @@ pub trait GeneratorExt: Sealed + Generator {
         value.get_inner()
     }
 
+    /// Apply a function as long as the return value is successful, producing a single final value.
+    ///
+    /// `try_fold()` takes two arguments: an initial value, and a closure with two arguments:
+    /// an ‘accumulator’, and a value.
+    /// The closure either returns successfully, with the value that the accumulator should have for
+    /// the next iteration, or it returns failure, with an error value that is propagated back to
+    /// the caller immediately (short-circuiting).
+    ///
+    /// The return value from `try_fold()` can distinguish between 3 different return-conditions:
+    ///
+    ///   * `Ok(Reduction::Complete(B))` -> the generator has completed and produced a final value.
+    ///   * `Ok(Reduction::Partial(B))` -> the generator spuriously stopped early.
+    ///   Later `try_fold` calls should use the partial value as `init`.
+    ///   * `Err(E)` -> The provided closure returned an error.
+    ///
+    /// ## Examples
+    ///
+    /// Basic usage:
+    ///
+    /// ```
+    /// use pushgen::{IntoGenerator, GeneratorExt, Reduction};
+    /// let a = [1, 2, 3];
+    ///
+    /// // the checked sum of all of the elements of the array
+    /// let sum = a.into_gen().try_fold(0i8, |acc, &x| acc.checked_add(x).ok_or(()));
+    ///
+    /// assert_eq!(sum, Ok(Reduction::Complete(6)));
+    /// ```
+    ///
+    /// Short circuiting:
+    ///
+    /// ```
+    /// use pushgen::{IntoGenerator, GeneratorExt, Reduction, GeneratorResult};
+    /// let a = [10, 20, 30, 100, 40, 50];
+    /// let mut gen = a.into_gen();
+    ///
+    /// // This sum overflows when adding the 100 element
+    /// let sum = gen.try_fold(0i8, |acc, &x| acc.checked_add(x).ok_or(()));
+    /// assert_eq!(sum, Err(()));
+    ///
+    /// // Because it short-circuited, the remaining elements are still
+    /// // available through the iterator.
+    /// assert_eq!(gen.next(), Ok(&40));
+    /// assert_eq!(gen.next(), Ok(&50));
+    /// assert_eq!(gen.next(), Err(GeneratorResult::Complete));
+    /// ```
+    ///
+    #[inline]
+    fn try_fold<B, F, E>(&mut self, init: B, mut folder: F) -> Result<Reduction<B>, E>
+    where
+        Self: Sized,
+        F: FnMut(B, Self::Output) -> Result<B, E>,
+    {
+        let mut acc = InplaceUpdatable::new(Ok(init));
+        let run_result = self.run(|x| {
+            acc.update_with_result(|prev_acc| match prev_acc {
+                Ok(prev_acc) => match folder(prev_acc, x) {
+                    Ok(x) => (Ok(x), ValueResult::MoreValues),
+                    err => (err, ValueResult::Stop),
+                },
+                err => (err, ValueResult::Stop),
+            })
+        });
+        match acc.get_inner() {
+            Ok(value) => {
+                if run_result == GeneratorResult::Complete {
+                    Ok(Reduction::Complete(value))
+                } else {
+                    Ok(Reduction::Partial(value))
+                }
+            }
+            Err(err) => Err(err),
+        }
+    }
+
     /// Reduces the elements to a single one by repeatedly applying a reducing operation.
     ///
     /// ## Returns
@@ -1491,5 +1566,21 @@ mod tests {
         let result = gen.try_reduce(partial, |a, b| a + b);
         assert!(result.is_ok());
         assert_eq!(result.unwrap(), Some(0 + 1 + 2 + 3));
+    }
+
+    #[test]
+    fn spuriously_stopping_try_fold() {
+        let data = [0i32, 1, 2, 3];
+        for x in 0..4 {
+            let mut gen = StoppingGen::new(x, &data);
+            let partial = gen
+                .try_fold(0i32, |acc, x| x.checked_add(acc).ok_or(()))
+                .unwrap();
+            assert!(partial.is_partial());
+            let final_value = gen
+                .try_fold(partial.unwrap(), |acc, x| x.checked_add(acc).ok_or(()))
+                .unwrap();
+            assert_eq!(final_value, Reduction::Complete(6));
+        }
     }
 }
