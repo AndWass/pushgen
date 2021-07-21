@@ -54,14 +54,12 @@ impl From<bool> for GeneratorResult {
 /// A reduction can either be partial, producing an intermediate value, or complete. Partial
 /// reductions can for instance be created when trying to reduce a spuriously stopping generator.
 #[derive(Copy, Clone, Debug, Ord, PartialOrd, Eq, PartialEq)]
-pub enum Reduction<T>
-{
+pub enum Reduction<T> {
     Complete(T),
     Partial(T),
 }
 
-impl<T> Reduction<T>
-{
+impl<T> Reduction<T> {
     /// Check if the reduction is complete.
     #[inline]
     pub fn is_complete(&self) -> bool {
@@ -85,7 +83,7 @@ impl<T> Reduction<T>
     pub fn unwrap(self) -> T {
         match self {
             Reduction::Complete(x) => x,
-            Reduction::Partial(x) => x
+            Reduction::Partial(x) => x,
         }
     }
 }

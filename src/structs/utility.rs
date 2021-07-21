@@ -36,7 +36,7 @@ impl<T> InplaceUpdatable<T> {
     }
 
     #[inline(always)]
-    pub fn update_with_result<R>(&mut self, updater: impl FnOnce(T) -> (T, R)) -> R{
+    pub fn update_with_result<R>(&mut self, updater: impl FnOnce(T) -> (T, R)) -> R {
         let (new_val, r) = updater(unsafe { unwrap_unchecked(self.inner.take()) });
         self.inner = Some(new_val);
         r
