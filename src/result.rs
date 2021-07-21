@@ -74,10 +74,7 @@ impl<T> Reduction<T> {
     /// ```
     #[inline]
     pub fn is_complete(&self) -> bool {
-        match self {
-            Reduction::Complete(_) => true,
-            _ => false,
-        }
+        matches!(self, Reduction::Complete(_))
     }
 
     /// Check if the reduction is partial.
@@ -94,10 +91,7 @@ impl<T> Reduction<T> {
     /// ```
     #[inline]
     pub fn is_partial(&self) -> bool {
-        match self {
-            Reduction::Partial(_) => true,
-            _ => false,
-        }
+        matches!(self, Reduction::Partial(_))
     }
 
     /// Get the underlying value, no matter if it's complete or partial.
