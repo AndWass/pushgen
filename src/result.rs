@@ -61,6 +61,17 @@ pub enum Reduction<T> {
 
 impl<T> Reduction<T> {
     /// Check if the reduction is complete.
+    ///
+    /// ## Examples
+    ///
+    /// Basic usage:
+    ///
+    /// ```
+    /// use pushgen::Reduction;
+    /// let x = Reduction::Complete(());
+    /// assert!(x.is_complete());
+    /// assert!(!x.is_partial());
+    /// ```
     #[inline]
     pub fn is_complete(&self) -> bool {
         match self {
@@ -70,6 +81,17 @@ impl<T> Reduction<T> {
     }
 
     /// Check if the reduction is partial.
+    ///
+    /// ## Examples
+    ///
+    /// Basic usage:
+    ///
+    /// ```
+    /// use pushgen::Reduction;
+    /// let x = Reduction::Partial(());
+    /// assert!(x.is_partial());
+    /// assert!(!x.is_complete());
+    /// ```
     #[inline]
     pub fn is_partial(&self) -> bool {
         match self {
@@ -79,6 +101,18 @@ impl<T> Reduction<T> {
     }
 
     /// Get the underlying value, no matter if it's complete or partial.
+    ///
+    /// ## Examples
+    ///
+    /// Basic usage:
+    ///
+    /// ```
+    /// use pushgen::Reduction;
+    /// let complete = Reduction::Complete(1);
+    /// assert_eq!(complete.unwrap(), 1);
+    /// let partial = Reduction::Partial(2);
+    /// assert_eq!(partial.unwrap(), 2);
+    /// ```
     #[inline]
     pub fn unwrap(self) -> T {
         match self {
