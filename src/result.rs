@@ -48,3 +48,71 @@ impl From<bool> for GeneratorResult {
         }
     }
 }
+
+/// The result value of a `try_*` reduction.
+///
+/// A `try_*` reduction can either be partial, producing an intermediate value, or complete. Partial
+/// reductions can for instance be created when trying to reduce a spuriously stopping generator.
+///
+#[derive(Copy, Clone, Debug, Ord, PartialOrd, Eq, PartialEq)]
+pub enum TryReduction<T> {
+    Complete(T),
+    Partial(T),
+}
+
+impl<T> TryReduction<T> {
+    /// Check if the reduction is complete.
+    ///
+    /// ## Examples
+    ///
+    /// Basic usage:
+    ///
+    /// ```
+    /// use pushgen::TryReduction;
+    /// let x = TryReduction::Complete(());
+    /// assert!(x.is_complete());
+    /// assert!(!x.is_partial());
+    /// ```
+    #[inline]
+    pub fn is_complete(&self) -> bool {
+        matches!(self, TryReduction::Complete(_))
+    }
+
+    /// Check if the reduction is partial.
+    ///
+    /// ## Examples
+    ///
+    /// Basic usage:
+    ///
+    /// ```
+    /// use pushgen::TryReduction;
+    /// let x = TryReduction::Partial(());
+    /// assert!(x.is_partial());
+    /// assert!(!x.is_complete());
+    /// ```
+    #[inline]
+    pub fn is_partial(&self) -> bool {
+        matches!(self, TryReduction::Partial(_))
+    }
+
+    /// Get the underlying value, no matter if it's complete or partial.
+    ///
+    /// ## Examples
+    ///
+    /// Basic usage:
+    ///
+    /// ```
+    /// use pushgen::TryReduction;
+    /// let complete = TryReduction::Complete(1);
+    /// assert_eq!(complete.unwrap(), 1);
+    /// let partial = TryReduction::Partial(2);
+    /// assert_eq!(partial.unwrap(), 2);
+    /// ```
+    #[inline]
+    pub fn unwrap(self) -> T {
+        match self {
+            TryReduction::Complete(x) => x,
+            TryReduction::Partial(x) => x,
+        }
+    }
+}
