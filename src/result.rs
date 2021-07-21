@@ -49,17 +49,18 @@ impl From<bool> for GeneratorResult {
     }
 }
 
-/// The result of a reduction.
+/// The result value of a `try_*` reduction.
 ///
-/// A reduction can either be partial, producing an intermediate value, or complete. Partial
+/// A `try_*` reduction can either be partial, producing an intermediate value, or complete. Partial
 /// reductions can for instance be created when trying to reduce a spuriously stopping generator.
+///
 #[derive(Copy, Clone, Debug, Ord, PartialOrd, Eq, PartialEq)]
-pub enum Reduction<T> {
+pub enum TryReduction<T> {
     Complete(T),
     Partial(T),
 }
 
-impl<T> Reduction<T> {
+impl<T> TryReduction<T> {
     /// Check if the reduction is complete.
     ///
     /// ## Examples
@@ -67,14 +68,14 @@ impl<T> Reduction<T> {
     /// Basic usage:
     ///
     /// ```
-    /// use pushgen::Reduction;
-    /// let x = Reduction::Complete(());
+    /// use pushgen::TryReduction;
+    /// let x = TryReduction::Complete(());
     /// assert!(x.is_complete());
     /// assert!(!x.is_partial());
     /// ```
     #[inline]
     pub fn is_complete(&self) -> bool {
-        matches!(self, Reduction::Complete(_))
+        matches!(self, TryReduction::Complete(_))
     }
 
     /// Check if the reduction is partial.
@@ -84,14 +85,14 @@ impl<T> Reduction<T> {
     /// Basic usage:
     ///
     /// ```
-    /// use pushgen::Reduction;
-    /// let x = Reduction::Partial(());
+    /// use pushgen::TryReduction;
+    /// let x = TryReduction::Partial(());
     /// assert!(x.is_partial());
     /// assert!(!x.is_complete());
     /// ```
     #[inline]
     pub fn is_partial(&self) -> bool {
-        matches!(self, Reduction::Partial(_))
+        matches!(self, TryReduction::Partial(_))
     }
 
     /// Get the underlying value, no matter if it's complete or partial.
@@ -101,17 +102,17 @@ impl<T> Reduction<T> {
     /// Basic usage:
     ///
     /// ```
-    /// use pushgen::Reduction;
-    /// let complete = Reduction::Complete(1);
+    /// use pushgen::TryReduction;
+    /// let complete = TryReduction::Complete(1);
     /// assert_eq!(complete.unwrap(), 1);
-    /// let partial = Reduction::Partial(2);
+    /// let partial = TryReduction::Partial(2);
     /// assert_eq!(partial.unwrap(), 2);
     /// ```
     #[inline]
     pub fn unwrap(self) -> T {
         match self {
-            Reduction::Complete(x) => x,
-            Reduction::Partial(x) => x,
+            TryReduction::Complete(x) => x,
+            TryReduction::Partial(x) => x,
         }
     }
 }

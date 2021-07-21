@@ -4,7 +4,7 @@ use crate::structs::{
     SkipWhile, Take, TakeWhile, Zip,
 };
 use crate::traits::{Product, Sum};
-use crate::{Generator, GeneratorResult, Reduction, ValueResult};
+use crate::{Generator, GeneratorResult, TryReduction, ValueResult};
 use core::cmp::Ordering;
 
 pub trait Sealed {}
@@ -1167,19 +1167,19 @@ pub trait GeneratorExt: Sealed + Generator {
     /// Basic usage:
     ///
     /// ```
-    /// use pushgen::{IntoGenerator, GeneratorExt, Reduction};
+    /// use pushgen::{IntoGenerator, GeneratorExt, TryReduction};
     /// let a = [1, 2, 3];
     ///
     /// // the checked sum of all of the elements of the array
     /// let sum = a.into_gen().try_fold(0i8, |acc, &x| acc.checked_add(x).ok_or(()));
     ///
-    /// assert_eq!(sum, Ok(Reduction::Complete(6)));
+    /// assert_eq!(sum, Ok(TryReduction::Complete(6)));
     /// ```
     ///
     /// Short circuiting:
     ///
     /// ```
-    /// use pushgen::{IntoGenerator, GeneratorExt, Reduction, GeneratorResult};
+    /// use pushgen::{IntoGenerator, GeneratorExt, TryReduction, GeneratorResult};
     /// let a = [10, 20, 30, 100, 40, 50];
     /// let mut gen = a.into_gen();
     ///
@@ -1195,7 +1195,7 @@ pub trait GeneratorExt: Sealed + Generator {
     /// ```
     ///
     #[inline]
-    fn try_fold<B, F, E>(&mut self, init: B, mut folder: F) -> Result<Reduction<B>, E>
+    fn try_fold<B, F, E>(&mut self, init: B, mut folder: F) -> Result<TryReduction<B>, E>
     where
         Self: Sized,
         F: FnMut(B, Self::Output) -> Result<B, E>,
@@ -1213,9 +1213,9 @@ pub trait GeneratorExt: Sealed + Generator {
         match acc.get_inner() {
             Ok(value) => {
                 if run_result == GeneratorResult::Complete {
-                    Ok(Reduction::Complete(value))
+                    Ok(TryReduction::Complete(value))
                 } else {
-                    Ok(Reduction::Partial(value))
+                    Ok(TryReduction::Partial(value))
                 }
             }
             Err(err) => Err(err),
@@ -1379,7 +1379,7 @@ impl<T: Generator> GeneratorExt for T {}
 #[cfg(test)]
 mod tests {
     use crate::test::StoppingGen;
-    use crate::{Generator, GeneratorExt, GeneratorResult, IntoGenerator, Reduction, ValueResult};
+    use crate::{Generator, GeneratorExt, GeneratorResult, IntoGenerator, TryReduction, ValueResult};
 
     #[test]
     fn for_each_stopped() {
@@ -1582,7 +1582,7 @@ mod tests {
             let final_value = gen
                 .try_fold(partial.unwrap(), |acc, x| x.checked_add(acc).ok_or(()))
                 .unwrap();
-            assert_eq!(final_value, Reduction::Complete(6));
+            assert_eq!(final_value, TryReduction::Complete(6));
         }
     }
 }
