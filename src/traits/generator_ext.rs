@@ -1114,6 +1114,8 @@ pub trait GeneratorExt: Sealed + Generator {
     ///
     /// Use [`try_fold()`] to correctly handle spuriously stopping generators.
     ///
+    /// [`try_fold()`]: GeneratorExt::try_fold
+    ///
     /// ## Arguments
     ///
     /// `init` The initial accumulator value
@@ -1379,7 +1381,9 @@ impl<T: Generator> GeneratorExt for T {}
 #[cfg(test)]
 mod tests {
     use crate::test::StoppingGen;
-    use crate::{Generator, GeneratorExt, GeneratorResult, IntoGenerator, TryReduction, ValueResult};
+    use crate::{
+        Generator, GeneratorExt, GeneratorResult, IntoGenerator, TryReduction, ValueResult,
+    };
 
     #[test]
     fn for_each_stopped() {
