@@ -54,6 +54,13 @@
 <span id="54">54</span>
 <span id="55">55</span>
 <span id="56">56</span>
+<span id="57">57</span>
+<span id="58">58</span>
+<span id="59">59</span>
+<span id="60">60</span>
+<span id="61">61</span>
+<span id="62">62</span>
+<span id="63">63</span>
 </pre><pre class="rust">
 <span class="kw">use</span> <span class="ident">core::hint</span>;
 
@@ -90,6 +97,13 @@
         <span class="comment">// if updater ever panic</span>
         <span class="kw">let</span> <span class="ident">new_val</span> <span class="op">=</span> <span class="ident">updater</span>(<span class="kw">unsafe</span> { <span class="ident">unwrap_unchecked</span>(<span class="self">self</span>.<span class="ident">inner</span>.<span class="ident">take</span>()) });
         <span class="self">self</span>.<span class="ident">inner</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="ident">new_val</span>);
+    }
+
+    <span class="attribute">#[<span class="ident">inline</span>(<span class="ident">always</span>)]</span>
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">update_with_result</span><span class="op">&lt;</span><span class="ident">R</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">updater</span>: <span class="kw">impl</span> <span class="ident">FnOnce</span>(<span class="ident">T</span>) <span class="op">-</span><span class="op">&gt;</span> (<span class="ident">T</span>, <span class="ident">R</span>)) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">R</span> {
+        <span class="kw">let</span> (<span class="ident">new_val</span>, <span class="ident">r</span>) <span class="op">=</span> <span class="ident">updater</span>(<span class="kw">unsafe</span> { <span class="ident">unwrap_unchecked</span>(<span class="self">self</span>.<span class="ident">inner</span>.<span class="ident">take</span>()) });
+        <span class="self">self</span>.<span class="ident">inner</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="ident">new_val</span>);
+        <span class="ident">r</span>
     }
 
     <span class="attribute">#[<span class="ident">inline</span>(<span class="ident">always</span>)]</span>
