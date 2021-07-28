@@ -76,6 +76,7 @@ pub trait Generator {
     /// assert_eq!(gen.next(), Ok(&4));
     /// assert_eq!(gen.next(), Ok(&5));
     /// ```
+    #[inline]
     fn try_advance(&mut self, n: NonZeroUsize) -> (usize, GeneratorResult)
     {
         let amount_to_advance = n.get();
