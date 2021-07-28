@@ -878,12 +878,12 @@ pub trait GeneratorExt: Sealed + Generator {
     /// let mut gen = StoppingGen::new(1, &data);
     /// let partial = gen.try_min_by(None, Ord::cmp);
     /// // generator was stopped - indicated by an Err result
-    /// assert!(partial.is_err());
-    /// let partial = partial.unwrap_err();
+    /// assert!(partial.is_partial());
+    /// let partial = partial.unwrap();
     /// assert_eq!(partial, Some(&1));
     /// // Feed partial value to continue reduction from the partial value
     /// let res = gen.try_min_by(partial, Ord::cmp);
-    /// assert!(res.is_ok());
+    /// assert!(res.is_complete());
     /// assert_eq!(res.unwrap(), Some(&0));
     /// ```
     #[inline]
@@ -891,7 +891,7 @@ pub trait GeneratorExt: Sealed + Generator {
         &mut self,
         partial: Option<Self::Output>,
         mut compare: F,
-    ) -> Result<Option<Self::Output>, Option<Self::Output>>
+    ) -> TryReduction<Option<Self::Output>>
     where
         Self: Sized,
         F: FnMut(&Self::Output, &Self::Output) -> Ordering,
@@ -1034,12 +1034,12 @@ pub trait GeneratorExt: Sealed + Generator {
     /// let mut gen = StoppingGen::new(1, &data);
     /// let partial = gen.try_max_by(None, Ord::cmp);
     /// // generator was stopped - indicated by an Err result
-    /// assert!(partial.is_err());
-    /// let partial = partial.unwrap_err();
+    /// assert!(partial.is_partial());
+    /// let partial = partial.unwrap();
     /// assert_eq!(partial, Some(&1));
     /// // Feed partial value to continue from the partial value
     /// let res = gen.try_max_by(partial, Ord::cmp);
-    /// assert!(res.is_ok());
+    /// assert!(res.is_complete());
     /// assert_eq!(res.unwrap(), Some(&4));
     /// ```
     #[inline]
@@ -1047,7 +1047,7 @@ pub trait GeneratorExt: Sealed + Generator {
         &mut self,
         partial: Option<Self::Output>,
         mut compare: F,
-    ) -> Result<Option<Self::Output>, Option<Self::Output>>
+    ) -> TryReduction<Option<Self::Output>>
     where
         Self: Sized,
         F: FnMut(&Self::Output, &Self::Output) -> Ordering,
@@ -1304,8 +1304,8 @@ pub trait GeneratorExt: Sealed + Generator {
     /// Find the maximum value:
     ///
     /// ```
-    /// use pushgen::{Generator, GeneratorExt, IntoGenerator};
-    /// fn find_max<G>(gen: &mut G) -> Result<Option<G::Output>, Option<G::Output>>
+    /// use pushgen::{Generator, GeneratorExt, IntoGenerator, TryReduction};
+    /// fn find_max<G>(gen: &mut G) -> TryReduction<Option<G::Output>>
     ///     where G: Generator,
     ///           G::Output: Ord,
     /// {
@@ -1328,11 +1328,11 @@ pub trait GeneratorExt: Sealed + Generator {
     /// let data = [1, 2, 3, 0, 4, 5];
     /// let mut gen = StoppingGen::new(1, &data).copied();
     /// let partial = gen.try_reduce(None, |a, b| a + b);
-    /// assert!(partial.is_err());
-    /// let partial = partial.unwrap_err();
+    /// assert!(partial.is_partial());
+    /// let partial = partial.unwrap();
     /// assert_eq!(partial, Some(1));
     /// let res = gen.try_reduce(partial, |a, b| a + b);
-    /// assert!(res.is_ok());
+    /// assert!(res.is_complete());
     /// assert_eq!(res.unwrap(), Some(1+2+3+4+5));
     /// ```
     ///
@@ -1341,7 +1341,7 @@ pub trait GeneratorExt: Sealed + Generator {
         &mut self,
         prev_reduction: Option<Self::Output>,
         mut reducer: F,
-    ) -> Result<Option<Self::Output>, Option<Self::Output>>
+    ) -> TryReduction<Option<Self::Output>>
     where
         Self: Sized,
         F: FnMut(Self::Output, Self::Output) -> Self::Output,
@@ -1354,8 +1354,8 @@ pub trait GeneratorExt: Sealed + Generator {
                 let first = self.next();
                 match first {
                     Ok(first) => first,
-                    Err(GeneratorResult::Stopped) => return Err(None),
-                    Err(GeneratorResult::Complete) => return Ok(None),
+                    Err(GeneratorResult::Stopped) => return TryReduction::Partial(None),
+                    Err(GeneratorResult::Complete) => return TryReduction::Complete(None),
                 }
             }
         };
@@ -1370,8 +1370,8 @@ pub trait GeneratorExt: Sealed + Generator {
         let result = Some(left_value.get_inner());
 
         match run_result {
-            GeneratorResult::Stopped => Err(result),
-            GeneratorResult::Complete => Ok(result),
+            GeneratorResult::Stopped => TryReduction::Partial(result),
+            GeneratorResult::Complete => TryReduction::Complete(result),
         }
     }
 }
@@ -1473,7 +1473,10 @@ mod tests {
             a + b
         }
 
-        assert_eq!(x.into_gen().copied().try_reduce(None, reducer), Ok(None));
+        assert_eq!(
+            x.into_gen().copied().try_reduce(None, reducer),
+            TryReduction::Complete(None)
+        );
     }
 
     #[test]
@@ -1483,7 +1486,10 @@ mod tests {
             a + b
         }
 
-        assert_eq!(x.into_gen().copied().try_reduce(None, reducer), Ok(Some(1)));
+        assert_eq!(
+            x.into_gen().copied().try_reduce(None, reducer),
+            TryReduction::Complete(Some(1))
+        );
     }
 
     #[test]
@@ -1493,7 +1499,10 @@ mod tests {
             a + b
         }
 
-        assert_eq!(x.into_gen().copied().try_reduce(None, reducer), Ok(Some(3)));
+        assert_eq!(
+            x.into_gen().copied().try_reduce(None, reducer),
+            TryReduction::Complete(Some(3))
+        );
     }
 
     #[test]
@@ -1506,16 +1515,16 @@ mod tests {
                 false => b,
             });
 
-            assert!(res.is_err());
-            let partial = res.unwrap_err();
+            assert!(res.is_partial());
+            let partial = res.unwrap();
             if i == 0 {
                 assert_eq!(partial, None);
             } else {
                 assert_eq!(partial, Some(&1));
             }
             match gen.try_reduce(partial, |a, b| if a < b { a } else { b }) {
-                Ok(x) => assert_eq!(x, Some(&1)),
-                Err(_) => {
+                TryReduction::Complete(x) => assert_eq!(x, Some(&1)),
+                TryReduction::Partial(_) => {
                     assert!(false);
                 }
             }
@@ -1562,15 +1571,15 @@ mod tests {
             num_stops: 0,
         };
         let result = gen.try_reduce(None, |a, b| a + b);
-        assert!(result.is_err());
-        let partial = result.unwrap_err();
+        assert!(result.is_partial());
+        let partial = result.unwrap();
         assert_eq!(partial, Some(0 + 1));
         let result = gen.try_reduce(partial, |a, b| a + b);
-        assert!(result.is_err());
-        let partial = result.unwrap_err();
+        assert!(result.is_partial());
+        let partial = result.unwrap();
         assert_eq!(partial, Some(0 + 1));
         let result = gen.try_reduce(partial, |a, b| a + b);
-        assert!(result.is_ok());
+        assert!(result.is_complete());
         assert_eq!(result.unwrap(), Some(0 + 1 + 2 + 3));
     }
 
