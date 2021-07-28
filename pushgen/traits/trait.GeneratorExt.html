@@ -517,7 +517,7 @@ returned. If the generator is empty, <code>None</code> is returned.</p>
 <span class="kw">let</span> <span class="ident">data</span> <span class="op">=</span> [<span class="number">1</span>, <span class="number">2</span>, <span class="number">0</span>, <span class="number">4</span>];
 <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">gen</span> <span class="op">=</span> <span class="ident">StoppingGen::new</span>(<span class="number">1</span>, <span class="kw-2">&amp;</span><span class="ident">data</span>);
 <span class="kw">let</span> <span class="ident">partial</span> <span class="op">=</span> <span class="ident">gen</span>.<span class="ident">try_min_by</span>(<span class="prelude-val">None</span>, <span class="ident">Ord::cmp</span>);
-<span class="comment">// generator was stopped - indicated by an Err result</span>
+<span class="comment">// generator was stopped - indicated by a Partial reduction.</span>
 <span class="macro">assert!</span>(<span class="ident">partial</span>.<span class="ident">is_partial</span>());
 <span class="kw">let</span> <span class="ident">partial</span> <span class="op">=</span> <span class="ident">partial</span>.<span class="ident">unwrap</span>();
 <span class="macro">assert_eq!</span>(<span class="ident">partial</span>, <span class="prelude-val">Some</span>(<span class="kw-2">&amp;</span><span class="number">1</span>));
@@ -587,7 +587,7 @@ returned. If the generator is empty, <a href="https://doc.rust-lang.org/nightly/
 <span class="kw">let</span> <span class="ident">data</span> <span class="op">=</span> [<span class="number">1</span>, <span class="number">2</span>, <span class="number">0</span>, <span class="number">4</span>];
 <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">gen</span> <span class="op">=</span> <span class="ident">StoppingGen::new</span>(<span class="number">1</span>, <span class="kw-2">&amp;</span><span class="ident">data</span>);
 <span class="kw">let</span> <span class="ident">partial</span> <span class="op">=</span> <span class="ident">gen</span>.<span class="ident">try_max_by</span>(<span class="prelude-val">None</span>, <span class="ident">Ord::cmp</span>);
-<span class="comment">// generator was stopped - indicated by an Err result</span>
+<span class="comment">// generator was stopped - indicated by a Partial reduction.</span>
 <span class="macro">assert!</span>(<span class="ident">partial</span>.<span class="ident">is_partial</span>());
 <span class="kw">let</span> <span class="ident">partial</span> <span class="op">=</span> <span class="ident">partial</span>.<span class="ident">unwrap</span>();
 <span class="macro">assert_eq!</span>(<span class="ident">partial</span>, <span class="prelude-val">Some</span>(<span class="kw-2">&amp;</span><span class="number">1</span>));

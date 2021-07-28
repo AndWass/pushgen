@@ -2479,7 +2479,7 @@
     <span class="doccomment">/// let data = [1, 2, 0, 4];</span>
     <span class="doccomment">/// let mut gen = StoppingGen::new(1, &amp;data);</span>
     <span class="doccomment">/// let partial = gen.try_min_by(None, Ord::cmp);</span>
-    <span class="doccomment">/// // generator was stopped - indicated by an Err result</span>
+    <span class="doccomment">/// // generator was stopped - indicated by a Partial reduction.</span>
     <span class="doccomment">/// assert!(partial.is_partial());</span>
     <span class="doccomment">/// let partial = partial.unwrap();</span>
     <span class="doccomment">/// assert_eq!(partial, Some(&amp;1));</span>
@@ -2635,7 +2635,7 @@
     <span class="doccomment">/// let data = [1, 2, 0, 4];</span>
     <span class="doccomment">/// let mut gen = StoppingGen::new(1, &amp;data);</span>
     <span class="doccomment">/// let partial = gen.try_max_by(None, Ord::cmp);</span>
-    <span class="doccomment">/// // generator was stopped - indicated by an Err result</span>
+    <span class="doccomment">/// // generator was stopped - indicated by a Partial reduction.</span>
     <span class="doccomment">/// assert!(partial.is_partial());</span>
     <span class="doccomment">/// let partial = partial.unwrap();</span>
     <span class="doccomment">/// assert_eq!(partial, Some(&amp;1));</span>
