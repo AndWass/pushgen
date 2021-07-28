@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `src&#x2F;traits&#x2F;generator_ext.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>generator_ext.rs - source</title><link rel="stylesheet" type="text/css" href="../../../normalize.css"><link rel="stylesheet" type="text/css" href="../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../../light.css"  id="themeStyle"><link rel="stylesheet" type="text/css" href="../../../dark.css" disabled ><link rel="stylesheet" type="text/css" href="../../../ayu.css" disabled ><script id="default-settings" ></script><script src="../../../storage.js"></script><script src="../../../crates.js"></script><noscript><link rel="stylesheet" href="../../../noscript.css"></noscript><link rel="icon" type="image/svg+xml" href="../../../favicon.svg"><link rel="alternate icon" type="image/png" href="../../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../../favicon-32x32.png"><style type="text/css">#crate-search{background-image:url("../../../down-arrow.svg");}</style></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"><div class="sidebar-menu" role="button">&#9776;</div><a href='../../../pushgen/index.html'><div class='logo-container rust-logo'><img src='../../../rust-logo.png' alt='logo'></div></a></nav><div class="theme-picker"><button id="theme-picker" aria-label="Pick another theme!" aria-haspopup="menu" title="themes"><img width="18" height="18" alt="Pick another theme!" src="../../../brush.svg"></button><div id="theme-choices" role="menu"></div></div><nav class="sub"><form class="search-form"><div class="search-container"><div><select id="crate-search"><option value="All crates">All crates</option></select><input class="search-input"name="search" disabled autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"></div><button type="button" id="help-button" title="help">?</button><a id="settings-menu" href="../../../settings.html" title="settings"><img width="18" height="18" alt="Change settings" src="../../../wheel.svg"></a></div></form></nav><section id="main" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">   1</span>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `src&#x2F;traits&#x2F;generator_ext.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>generator_ext.rs - source</title><link rel="stylesheet" type="text/css" href="../../../normalize.css"><link rel="stylesheet" type="text/css" href="../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../../light.css"  id="themeStyle"><link rel="stylesheet" type="text/css" href="../../../dark.css" disabled ><link rel="stylesheet" type="text/css" href="../../../ayu.css" disabled ><script id="default-settings" ></script><script src="../../../storage.js"></script><script src="../../../crates.js"></script><noscript><link rel="stylesheet" href="../../../noscript.css"></noscript><link rel="icon" type="image/svg+xml" href="../../../favicon.svg"><link rel="alternate icon" type="image/png" href="../../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../../favicon-32x32.png"><style type="text/css">#crate-search{background-image:url("../../../down-arrow.svg");}</style></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"><div class="sidebar-menu" role="button">&#9776;</div><a href='../../../pushgen/index.html'><div class='logo-container rust-logo'><img src='../../../rust-logo.png' alt='logo'></div></a></nav><div class="theme-picker"><button id="theme-picker" aria-label="Pick another theme!" aria-haspopup="menu" title="themes"><img width="18" height="18" alt="Pick another theme!" src="../../../brush.svg"></button><div id="theme-choices" role="menu"></div></div><nav class="sub"><form class="search-form"><div class="search-container"><div><select id="crate-search"><option value="All crates">All crates</option></select><input class="search-input" name="search" disabled autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"></div><button type="button" id="help-button" title="help">?</button><a id="settings-menu" href="../../../settings.html" title="settings"><img width="18" height="18" alt="Change settings" src="../../../wheel.svg"></a></div></form></nav><section id="main" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">   1</span>
 <span id="2">   2</span>
 <span id="3">   3</span>
 <span id="4">   4</span>
@@ -1590,6 +1590,15 @@
 <span id="1590">1590</span>
 <span id="1591">1591</span>
 <span id="1592">1592</span>
+<span id="1593">1593</span>
+<span id="1594">1594</span>
+<span id="1595">1595</span>
+<span id="1596">1596</span>
+<span id="1597">1597</span>
+<span id="1598">1598</span>
+<span id="1599">1599</span>
+<span id="1600">1600</span>
+<span id="1601">1601</span>
 </pre><pre class="rust">
 <span class="kw">use</span> <span class="kw">crate</span><span class="ident">::structs::utility::InplaceUpdatable</span>;
 <span class="kw">use</span> <span class="kw">crate</span><span class="ident">::structs</span>::{
@@ -2471,12 +2480,12 @@
     <span class="doccomment">/// let mut gen = StoppingGen::new(1, &amp;data);</span>
     <span class="doccomment">/// let partial = gen.try_min_by(None, Ord::cmp);</span>
     <span class="doccomment">/// // generator was stopped - indicated by an Err result</span>
-    <span class="doccomment">/// assert!(partial.is_err());</span>
-    <span class="doccomment">/// let partial = partial.unwrap_err();</span>
+    <span class="doccomment">/// assert!(partial.is_partial());</span>
+    <span class="doccomment">/// let partial = partial.unwrap();</span>
     <span class="doccomment">/// assert_eq!(partial, Some(&amp;1));</span>
     <span class="doccomment">/// // Feed partial value to continue reduction from the partial value</span>
     <span class="doccomment">/// let res = gen.try_min_by(partial, Ord::cmp);</span>
-    <span class="doccomment">/// assert!(res.is_ok());</span>
+    <span class="doccomment">/// assert!(res.is_complete());</span>
     <span class="doccomment">/// assert_eq!(res.unwrap(), Some(&amp;0));</span>
     <span class="doccomment">/// ```</span>
     <span class="attribute">#[<span class="ident">inline</span>]</span>
@@ -2484,7 +2493,7 @@
         <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>,
         <span class="ident">partial</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="self">Self</span><span class="ident">::Output</span><span class="op">&gt;</span>,
         <span class="kw-2">mut</span> <span class="ident">compare</span>: <span class="ident">F</span>,
-    ) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="self">Self</span><span class="ident">::Output</span><span class="op">&gt;</span>, <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="self">Self</span><span class="ident">::Output</span><span class="op">&gt;</span><span class="op">&gt;</span>
+    ) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">TryReduction</span><span class="op">&lt;</span><span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="self">Self</span><span class="ident">::Output</span><span class="op">&gt;</span><span class="op">&gt;</span>
     <span class="kw">where</span>
         <span class="self">Self</span>: <span class="ident">Sized</span>,
         <span class="ident">F</span>: <span class="ident">FnMut</span>(<span class="kw-2">&amp;</span><span class="self">Self</span><span class="ident">::Output</span>, <span class="kw-2">&amp;</span><span class="self">Self</span><span class="ident">::Output</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Ordering</span>,
@@ -2627,12 +2636,12 @@
     <span class="doccomment">/// let mut gen = StoppingGen::new(1, &amp;data);</span>
     <span class="doccomment">/// let partial = gen.try_max_by(None, Ord::cmp);</span>
     <span class="doccomment">/// // generator was stopped - indicated by an Err result</span>
-    <span class="doccomment">/// assert!(partial.is_err());</span>
-    <span class="doccomment">/// let partial = partial.unwrap_err();</span>
+    <span class="doccomment">/// assert!(partial.is_partial());</span>
+    <span class="doccomment">/// let partial = partial.unwrap();</span>
     <span class="doccomment">/// assert_eq!(partial, Some(&amp;1));</span>
     <span class="doccomment">/// // Feed partial value to continue from the partial value</span>
     <span class="doccomment">/// let res = gen.try_max_by(partial, Ord::cmp);</span>
-    <span class="doccomment">/// assert!(res.is_ok());</span>
+    <span class="doccomment">/// assert!(res.is_complete());</span>
     <span class="doccomment">/// assert_eq!(res.unwrap(), Some(&amp;4));</span>
     <span class="doccomment">/// ```</span>
     <span class="attribute">#[<span class="ident">inline</span>]</span>
@@ -2640,7 +2649,7 @@
         <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>,
         <span class="ident">partial</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="self">Self</span><span class="ident">::Output</span><span class="op">&gt;</span>,
         <span class="kw-2">mut</span> <span class="ident">compare</span>: <span class="ident">F</span>,
-    ) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="self">Self</span><span class="ident">::Output</span><span class="op">&gt;</span>, <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="self">Self</span><span class="ident">::Output</span><span class="op">&gt;</span><span class="op">&gt;</span>
+    ) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">TryReduction</span><span class="op">&lt;</span><span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="self">Self</span><span class="ident">::Output</span><span class="op">&gt;</span><span class="op">&gt;</span>
     <span class="kw">where</span>
         <span class="self">Self</span>: <span class="ident">Sized</span>,
         <span class="ident">F</span>: <span class="ident">FnMut</span>(<span class="kw-2">&amp;</span><span class="self">Self</span><span class="ident">::Output</span>, <span class="kw-2">&amp;</span><span class="self">Self</span><span class="ident">::Output</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Ordering</span>,
@@ -2897,8 +2906,8 @@
     <span class="doccomment">/// Find the maximum value:</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// ```</span>
-    <span class="doccomment">/// use pushgen::{Generator, GeneratorExt, IntoGenerator};</span>
-    <span class="doccomment">/// fn find_max&lt;G&gt;(gen: &amp;mut G) -&gt; Result&lt;Option&lt;G::Output&gt;, Option&lt;G::Output&gt;&gt;</span>
+    <span class="doccomment">/// use pushgen::{Generator, GeneratorExt, IntoGenerator, TryReduction};</span>
+    <span class="doccomment">/// fn find_max&lt;G&gt;(gen: &amp;mut G) -&gt; TryReduction&lt;Option&lt;G::Output&gt;&gt;</span>
     <span class="doccomment">///     where G: Generator,</span>
     <span class="doccomment">///           G::Output: Ord,</span>
     <span class="doccomment">/// {</span>
@@ -2921,11 +2930,11 @@
     <span class="doccomment">/// let data = [1, 2, 3, 0, 4, 5];</span>
     <span class="doccomment">/// let mut gen = StoppingGen::new(1, &amp;data).copied();</span>
     <span class="doccomment">/// let partial = gen.try_reduce(None, |a, b| a + b);</span>
-    <span class="doccomment">/// assert!(partial.is_err());</span>
-    <span class="doccomment">/// let partial = partial.unwrap_err();</span>
+    <span class="doccomment">/// assert!(partial.is_partial());</span>
+    <span class="doccomment">/// let partial = partial.unwrap();</span>
     <span class="doccomment">/// assert_eq!(partial, Some(1));</span>
     <span class="doccomment">/// let res = gen.try_reduce(partial, |a, b| a + b);</span>
-    <span class="doccomment">/// assert!(res.is_ok());</span>
+    <span class="doccomment">/// assert!(res.is_complete());</span>
     <span class="doccomment">/// assert_eq!(res.unwrap(), Some(1+2+3+4+5));</span>
     <span class="doccomment">/// ```</span>
     <span class="doccomment">///</span>
@@ -2934,7 +2943,7 @@
         <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>,
         <span class="ident">prev_reduction</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="self">Self</span><span class="ident">::Output</span><span class="op">&gt;</span>,
         <span class="kw-2">mut</span> <span class="ident">reducer</span>: <span class="ident">F</span>,
-    ) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="self">Self</span><span class="ident">::Output</span><span class="op">&gt;</span>, <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="self">Self</span><span class="ident">::Output</span><span class="op">&gt;</span><span class="op">&gt;</span>
+    ) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">TryReduction</span><span class="op">&lt;</span><span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="self">Self</span><span class="ident">::Output</span><span class="op">&gt;</span><span class="op">&gt;</span>
     <span class="kw">where</span>
         <span class="self">Self</span>: <span class="ident">Sized</span>,
         <span class="ident">F</span>: <span class="ident">FnMut</span>(<span class="self">Self</span><span class="ident">::Output</span>, <span class="self">Self</span><span class="ident">::Output</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span><span class="ident">::Output</span>,
@@ -2947,8 +2956,8 @@
                 <span class="kw">let</span> <span class="ident">first</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">next</span>();
                 <span class="kw">match</span> <span class="ident">first</span> {
                     <span class="prelude-val">Ok</span>(<span class="ident">first</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">first</span>,
-                    <span class="prelude-val">Err</span>(<span class="ident">GeneratorResult::Stopped</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="prelude-val">None</span>),
-                    <span class="prelude-val">Err</span>(<span class="ident">GeneratorResult::Complete</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="kw">return</span> <span class="prelude-val">Ok</span>(<span class="prelude-val">None</span>),
+                    <span class="prelude-val">Err</span>(<span class="ident">GeneratorResult::Stopped</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="kw">return</span> <span class="ident">TryReduction::Partial</span>(<span class="prelude-val">None</span>),
+                    <span class="prelude-val">Err</span>(<span class="ident">GeneratorResult::Complete</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="kw">return</span> <span class="ident">TryReduction::Complete</span>(<span class="prelude-val">None</span>),
                 }
             }
         };
@@ -2963,8 +2972,8 @@
         <span class="kw">let</span> <span class="ident">result</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="ident">left_value</span>.<span class="ident">get_inner</span>());
 
         <span class="kw">match</span> <span class="ident">run_result</span> {
-            <span class="ident">GeneratorResult::Stopped</span> <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Err</span>(<span class="ident">result</span>),
-            <span class="ident">GeneratorResult::Complete</span> <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Ok</span>(<span class="ident">result</span>),
+            <span class="ident">GeneratorResult::Stopped</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">TryReduction::Partial</span>(<span class="ident">result</span>),
+            <span class="ident">GeneratorResult::Complete</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">TryReduction::Complete</span>(<span class="ident">result</span>),
         }
     }
 }
@@ -3066,7 +3075,10 @@
             <span class="ident">a</span> <span class="op">+</span> <span class="ident">b</span>
         }
 
-        <span class="macro">assert_eq!</span>(<span class="ident">x</span>.<span class="ident">into_gen</span>().<span class="ident">copied</span>().<span class="ident">try_reduce</span>(<span class="prelude-val">None</span>, <span class="ident">reducer</span>), <span class="prelude-val">Ok</span>(<span class="prelude-val">None</span>));
+        <span class="macro">assert_eq!</span>(
+            <span class="ident">x</span>.<span class="ident">into_gen</span>().<span class="ident">copied</span>().<span class="ident">try_reduce</span>(<span class="prelude-val">None</span>, <span class="ident">reducer</span>),
+            <span class="ident">TryReduction::Complete</span>(<span class="prelude-val">None</span>)
+        );
     }
 
     <span class="attribute">#[<span class="ident">test</span>]</span>
@@ -3076,7 +3088,10 @@
             <span class="ident">a</span> <span class="op">+</span> <span class="ident">b</span>
         }
 
-        <span class="macro">assert_eq!</span>(<span class="ident">x</span>.<span class="ident">into_gen</span>().<span class="ident">copied</span>().<span class="ident">try_reduce</span>(<span class="prelude-val">None</span>, <span class="ident">reducer</span>), <span class="prelude-val">Ok</span>(<span class="prelude-val">Some</span>(<span class="number">1</span>)));
+        <span class="macro">assert_eq!</span>(
+            <span class="ident">x</span>.<span class="ident">into_gen</span>().<span class="ident">copied</span>().<span class="ident">try_reduce</span>(<span class="prelude-val">None</span>, <span class="ident">reducer</span>),
+            <span class="ident">TryReduction::Complete</span>(<span class="prelude-val">Some</span>(<span class="number">1</span>))
+        );
     }
 
     <span class="attribute">#[<span class="ident">test</span>]</span>
@@ -3086,7 +3101,10 @@
             <span class="ident">a</span> <span class="op">+</span> <span class="ident">b</span>
         }
 
-        <span class="macro">assert_eq!</span>(<span class="ident">x</span>.<span class="ident">into_gen</span>().<span class="ident">copied</span>().<span class="ident">try_reduce</span>(<span class="prelude-val">None</span>, <span class="ident">reducer</span>), <span class="prelude-val">Ok</span>(<span class="prelude-val">Some</span>(<span class="number">3</span>)));
+        <span class="macro">assert_eq!</span>(
+            <span class="ident">x</span>.<span class="ident">into_gen</span>().<span class="ident">copied</span>().<span class="ident">try_reduce</span>(<span class="prelude-val">None</span>, <span class="ident">reducer</span>),
+            <span class="ident">TryReduction::Complete</span>(<span class="prelude-val">Some</span>(<span class="number">3</span>))
+        );
     }
 
     <span class="attribute">#[<span class="ident">test</span>]</span>
@@ -3099,16 +3117,16 @@
                 <span class="bool-val">false</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">b</span>,
             });
 
-            <span class="macro">assert!</span>(<span class="ident">res</span>.<span class="ident">is_err</span>());
-            <span class="kw">let</span> <span class="ident">partial</span> <span class="op">=</span> <span class="ident">res</span>.<span class="ident">unwrap_err</span>();
+            <span class="macro">assert!</span>(<span class="ident">res</span>.<span class="ident">is_partial</span>());
+            <span class="kw">let</span> <span class="ident">partial</span> <span class="op">=</span> <span class="ident">res</span>.<span class="ident">unwrap</span>();
             <span class="kw">if</span> <span class="ident">i</span> <span class="op">=</span><span class="op">=</span> <span class="number">0</span> {
                 <span class="macro">assert_eq!</span>(<span class="ident">partial</span>, <span class="prelude-val">None</span>);
             } <span class="kw">else</span> {
                 <span class="macro">assert_eq!</span>(<span class="ident">partial</span>, <span class="prelude-val">Some</span>(<span class="kw-2">&amp;</span><span class="number">1</span>));
             }
             <span class="kw">match</span> <span class="ident">gen</span>.<span class="ident">try_reduce</span>(<span class="ident">partial</span>, <span class="op">|</span><span class="ident">a</span>, <span class="ident">b</span><span class="op">|</span> <span class="kw">if</span> <span class="ident">a</span> <span class="op">&lt;</span> <span class="ident">b</span> { <span class="ident">a</span> } <span class="kw">else</span> { <span class="ident">b</span> }) {
-                <span class="prelude-val">Ok</span>(<span class="ident">x</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="macro">assert_eq!</span>(<span class="ident">x</span>, <span class="prelude-val">Some</span>(<span class="kw-2">&amp;</span><span class="number">1</span>)),
-                <span class="prelude-val">Err</span>(<span class="kw">_</span>) <span class="op">=</span><span class="op">&gt;</span> {
+                <span class="ident">TryReduction::Complete</span>(<span class="ident">x</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="macro">assert_eq!</span>(<span class="ident">x</span>, <span class="prelude-val">Some</span>(<span class="kw-2">&amp;</span><span class="number">1</span>)),
+                <span class="ident">TryReduction::Partial</span>(<span class="kw">_</span>) <span class="op">=</span><span class="op">&gt;</span> {
                     <span class="macro">assert!</span>(<span class="bool-val">false</span>);
                 }
             }
@@ -3155,15 +3173,15 @@
             <span class="ident">num_stops</span>: <span class="number">0</span>,
         };
         <span class="kw">let</span> <span class="ident">result</span> <span class="op">=</span> <span class="ident">gen</span>.<span class="ident">try_reduce</span>(<span class="prelude-val">None</span>, <span class="op">|</span><span class="ident">a</span>, <span class="ident">b</span><span class="op">|</span> <span class="ident">a</span> <span class="op">+</span> <span class="ident">b</span>);
-        <span class="macro">assert!</span>(<span class="ident">result</span>.<span class="ident">is_err</span>());
-        <span class="kw">let</span> <span class="ident">partial</span> <span class="op">=</span> <span class="ident">result</span>.<span class="ident">unwrap_err</span>();
+        <span class="macro">assert!</span>(<span class="ident">result</span>.<span class="ident">is_partial</span>());
+        <span class="kw">let</span> <span class="ident">partial</span> <span class="op">=</span> <span class="ident">result</span>.<span class="ident">unwrap</span>();
         <span class="macro">assert_eq!</span>(<span class="ident">partial</span>, <span class="prelude-val">Some</span>(<span class="number">0</span> <span class="op">+</span> <span class="number">1</span>));
         <span class="kw">let</span> <span class="ident">result</span> <span class="op">=</span> <span class="ident">gen</span>.<span class="ident">try_reduce</span>(<span class="ident">partial</span>, <span class="op">|</span><span class="ident">a</span>, <span class="ident">b</span><span class="op">|</span> <span class="ident">a</span> <span class="op">+</span> <span class="ident">b</span>);
-        <span class="macro">assert!</span>(<span class="ident">result</span>.<span class="ident">is_err</span>());
-        <span class="kw">let</span> <span class="ident">partial</span> <span class="op">=</span> <span class="ident">result</span>.<span class="ident">unwrap_err</span>();
+        <span class="macro">assert!</span>(<span class="ident">result</span>.<span class="ident">is_partial</span>());
+        <span class="kw">let</span> <span class="ident">partial</span> <span class="op">=</span> <span class="ident">result</span>.<span class="ident">unwrap</span>();
         <span class="macro">assert_eq!</span>(<span class="ident">partial</span>, <span class="prelude-val">Some</span>(<span class="number">0</span> <span class="op">+</span> <span class="number">1</span>));
         <span class="kw">let</span> <span class="ident">result</span> <span class="op">=</span> <span class="ident">gen</span>.<span class="ident">try_reduce</span>(<span class="ident">partial</span>, <span class="op">|</span><span class="ident">a</span>, <span class="ident">b</span><span class="op">|</span> <span class="ident">a</span> <span class="op">+</span> <span class="ident">b</span>);
-        <span class="macro">assert!</span>(<span class="ident">result</span>.<span class="ident">is_ok</span>());
+        <span class="macro">assert!</span>(<span class="ident">result</span>.<span class="ident">is_complete</span>());
         <span class="macro">assert_eq!</span>(<span class="ident">result</span>.<span class="ident">unwrap</span>(), <span class="prelude-val">Some</span>(<span class="number">0</span> <span class="op">+</span> <span class="number">1</span> <span class="op">+</span> <span class="number">2</span> <span class="op">+</span> <span class="number">3</span>));
     }
 
