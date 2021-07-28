@@ -877,7 +877,7 @@ pub trait GeneratorExt: Sealed + Generator {
     /// let data = [1, 2, 0, 4];
     /// let mut gen = StoppingGen::new(1, &data);
     /// let partial = gen.try_min_by(None, Ord::cmp);
-    /// // generator was stopped - indicated by an Err result
+    /// // generator was stopped - indicated by a Partial reduction.
     /// assert!(partial.is_partial());
     /// let partial = partial.unwrap();
     /// assert_eq!(partial, Some(&1));
@@ -1033,7 +1033,7 @@ pub trait GeneratorExt: Sealed + Generator {
     /// let data = [1, 2, 0, 4];
     /// let mut gen = StoppingGen::new(1, &data);
     /// let partial = gen.try_max_by(None, Ord::cmp);
-    /// // generator was stopped - indicated by an Err result
+    /// // generator was stopped - indicated by a Partial reduction.
     /// assert!(partial.is_partial());
     /// let partial = partial.unwrap();
     /// assert_eq!(partial, Some(&1));
