@@ -52,8 +52,7 @@ impl<'a, T> Generator for SliceGenerator<'a, T> {
         if n >= available {
             self.index = len;
             (available, GeneratorResult::Complete)
-        }
-        else {
+        } else {
             self.index += n;
             (n, GeneratorResult::Stopped)
         }
@@ -63,7 +62,7 @@ impl<'a, T> Generator for SliceGenerator<'a, T> {
 #[cfg(test)]
 mod tests {
     use super::*;
-    use crate::{GeneratorExt, Generator};
+    use crate::{Generator, GeneratorExt};
     use std::num::NonZeroUsize;
 
     #[test]

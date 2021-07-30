@@ -77,21 +77,19 @@ pub trait Generator {
     /// assert_eq!(gen.next(), Ok(&5));
     /// ```
     #[inline]
-    fn try_advance(&mut self, n: NonZeroUsize) -> (usize, GeneratorResult)
-    {
+    fn try_advance(&mut self, n: NonZeroUsize) -> (usize, GeneratorResult) {
         let amount_to_advance = n.get();
         let mut amount_left = amount_to_advance;
         let result = self.run(|_| {
             amount_left -= 1;
             if amount_left == 0 {
                 ValueResult::Stop
-            }
-            else {
+            } else {
                 ValueResult::MoreValues
             }
         });
 
-        (amount_to_advance-amount_left, result)
+        (amount_to_advance - amount_left, result)
     }
 }
 

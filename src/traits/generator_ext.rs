@@ -698,7 +698,7 @@ pub trait GeneratorExt: Sealed + Generator {
     /// use pushgen::{IntoGenerator, GeneratorExt, GeneratorResult};
     /// let a = [0, 1, 2, 3, 4, 5];
     /// let mut gen = a.into_gen().step_by(2);
-    /// 
+    ///
     /// assert_eq!(gen.next(), Ok(&0));
     /// assert_eq!(gen.next(), Ok(&2));
     /// assert_eq!(gen.next(), Ok(&4));
