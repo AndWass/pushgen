@@ -23,16 +23,21 @@ where
     #[inline]
     fn run(&mut self, mut output: impl FnMut(Self::Output) -> ValueResult) -> GeneratorResult {
         if self.amount > 0 {
-            let amount = &mut self.amount;
-            let skip_run = self.generator.run(move |_| {
-                *amount -= 1;
-                (*amount != 0).into()
-            });
-
-            if skip_run == GeneratorResult::Complete {
-                return GeneratorResult::Complete;
-            } else if self.amount > 0 {
-                return GeneratorResult::Stopped;
+            // Safety: checked by if clause
+            match self
+                .generator
+                .try_advance(unsafe { core::num::NonZeroUsize::new_unchecked(self.amount) })
+            {
+                (_, GeneratorResult::Complete) => {
+                    self.amount = 0;
+                    return GeneratorResult::Complete;
+                }
+                (x, _) => {
+                    self.amount -= x;
+                    if self.amount != 0 {
+                        return GeneratorResult::Stopped;
+                    }
+                }
             }
         }
 
