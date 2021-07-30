@@ -52,6 +52,11 @@
 <span id="52">52</span>
 <span id="53">53</span>
 <span id="54">54</span>
+<span id="55">55</span>
+<span id="56">56</span>
+<span id="57">57</span>
+<span id="58">58</span>
+<span id="59">59</span>
 </pre><pre class="rust">
 <span class="kw">use</span> <span class="kw">crate</span>::{<span class="ident">Generator</span>, <span class="ident">GeneratorResult</span>, <span class="ident">ValueResult</span>};
 
@@ -84,6 +89,11 @@
     <span class="kw">fn</span> <span class="ident">run</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="kw-2">mut</span> <span class="ident">output</span>: <span class="kw">impl</span> <span class="ident">FnMut</span>(<span class="self">Self</span><span class="ident">::Output</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">ValueResult</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">GeneratorResult</span> {
         <span class="kw">let</span> <span class="ident">transform</span> <span class="op">=</span> <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>.<span class="ident">transform</span>;
         <span class="self">self</span>.<span class="ident">source</span>.<span class="ident">run</span>(<span class="kw">move</span> <span class="op">|</span><span class="ident">value</span><span class="op">|</span> <span class="ident">output</span>(<span class="ident">transform</span>(<span class="ident">value</span>)))
+    }
+
+    <span class="attribute">#[<span class="ident">inline</span>]</span>
+    <span class="kw">fn</span> <span class="ident">try_advance</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">n</span>: <span class="ident">core::num::NonZeroUsize</span>) <span class="op">-</span><span class="op">&gt;</span> (<span class="ident">usize</span>, <span class="ident">GeneratorResult</span>) {
+        <span class="self">self</span>.<span class="ident">source</span>.<span class="ident">try_advance</span>(<span class="ident">n</span>)
     }
 }
 
