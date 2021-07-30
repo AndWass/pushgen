@@ -1,6 +1,6 @@
 use crate::{GeneratorResult, ValueResult};
-use either::Either;
 use core::num::NonZeroUsize;
+use either::Either;
 
 /// Trait for generating values into a closure.
 ///
