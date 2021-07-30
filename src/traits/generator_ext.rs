@@ -1,7 +1,7 @@
 use crate::structs::utility::InplaceUpdatable;
 use crate::structs::{
     Chain, Cloned, Copied, Dedup, Filter, FilterMap, Flatten, IteratorAdaptor, Map, Skip,
-    SkipWhile, Take, TakeWhile, Zip,
+    SkipWhile, StepBy, Take, TakeWhile, Zip,
 };
 use crate::traits::{Product, Sum};
 use crate::{Generator, GeneratorResult, TryReduction, ValueResult};
@@ -680,6 +680,36 @@ pub trait GeneratorExt: Sealed + Generator {
         Self: Sized,
     {
         IteratorAdaptor::new(self)
+    }
+
+    /// Create a generator that starts at the same point but steps by the given amount.
+    ///
+    /// Note 1: The first value will always be generated, regardless of the step given
+    ///
+    /// ## Panics
+    ///
+    /// The method will panic if given a step size of `0`
+    ///
+    /// ## Examples
+    ///
+    /// Basic usage:
+    ///
+    /// ```
+    /// use pushgen::{IntoGenerator, GeneratorExt, GeneratorResult};
+    /// let a = [0, 1, 2, 3, 4, 5];
+    /// let mut gen = a.into_gen().step_by(2);
+    /// 
+    /// assert_eq!(gen.next(), Ok(&0));
+    /// assert_eq!(gen.next(), Ok(&2));
+    /// assert_eq!(gen.next(), Ok(&4));
+    /// assert_eq!(gen.next(), Err(GeneratorResult::Complete));
+    /// ```
+    #[inline]
+    fn step_by(self, step_size: usize) -> StepBy<Self>
+    where
+        Self: Sized,
+    {
+        StepBy::new(self, step_size)
     }
 
     /// Box a generator, making it possible to use as return value in for instance traits.

@@ -49,3 +49,48 @@ impl<'a, T> Generator for StoppingGen<'a, T> {
         result
     }
 }
+
+pub struct MultiStoppingGen<'a, T> {
+    stop_at: &'a [usize],
+    stop_at_index: usize,
+    index: usize,
+    data: &'a [T],
+}
+
+impl<'a, T> MultiStoppingGen<'a, T> {
+    pub fn new(stop_at: &'a [usize], data: &'a [T]) -> Self {
+        Self {
+            stop_at,
+            stop_at_index: 0,
+            index: 0,
+            data,
+        }
+    }
+}
+
+impl<'a, T> Generator for MultiStoppingGen<'a, T> {
+    type Output = &'a T;
+
+    fn run(&mut self, mut output: impl FnMut(Self::Output) -> ValueResult) -> GeneratorResult {
+        while self.data.len() > 0 {
+            if self.stop_at_index < self.stop_at.len()
+                && self.index == self.stop_at[self.stop_at_index]
+            {
+                self.index += 1;
+                self.stop_at_index += 1;
+                return GeneratorResult::Stopped;
+            }
+
+            let data = &self.data[0];
+            let out_result = output(data);
+            self.data = self.data.split_at(1).1;
+            self.index += 1;
+
+            if out_result == ValueResult::Stop {
+                return GeneratorResult::Stopped;
+            }
+        }
+
+        GeneratorResult::Complete
+    }
+}
