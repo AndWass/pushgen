@@ -1,6 +1,6 @@
 use crate::{GeneratorResult, ValueResult};
 use either::Either;
-use std::num::NonZeroUsize;
+use core::num::NonZeroUsize;
 
 /// Trait for generating values into a closure.
 ///
@@ -68,7 +68,7 @@ pub trait Generator {
     /// ## Examples
     /// ```
     /// use pushgen::{IntoGenerator, Generator, GeneratorExt, GeneratorResult};
-    /// use std::num::NonZeroUsize;
+    /// use core::num::NonZeroUsize;
     /// let data = [1, 2, 3, 4, 5];
     /// let mut gen = data.into_gen();
     /// let advance_result = gen.try_advance(NonZeroUsize::new(3).unwrap());

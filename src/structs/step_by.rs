@@ -1,5 +1,5 @@
 use crate::{Generator, GeneratorExt, GeneratorResult, ValueResult};
-use std::num::NonZeroUsize;
+use core::num::NonZeroUsize;
 
 pub struct StepBy<Src> {
     source: Src,

@@ -1,5 +1,5 @@
 use crate::{Generator, GeneratorResult, ValueResult};
-use std::num::NonZeroUsize;
+use core::num::NonZeroUsize;
 
 /// A generator that generates values from a slice.
 ///
@@ -63,7 +63,7 @@ impl<'a, T> Generator for SliceGenerator<'a, T> {
 mod tests {
     use super::*;
     use crate::{Generator, GeneratorExt};
-    use std::num::NonZeroUsize;
+    use core::num::NonZeroUsize;
 
     #[test]
     fn try_advance() {
