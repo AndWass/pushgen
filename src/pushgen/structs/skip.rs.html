@@ -160,8 +160,72 @@
 <span id="160">160</span>
 <span id="161">161</span>
 <span id="162">162</span>
+<span id="163">163</span>
+<span id="164">164</span>
+<span id="165">165</span>
+<span id="166">166</span>
+<span id="167">167</span>
+<span id="168">168</span>
+<span id="169">169</span>
+<span id="170">170</span>
+<span id="171">171</span>
+<span id="172">172</span>
+<span id="173">173</span>
+<span id="174">174</span>
+<span id="175">175</span>
+<span id="176">176</span>
+<span id="177">177</span>
+<span id="178">178</span>
+<span id="179">179</span>
+<span id="180">180</span>
+<span id="181">181</span>
+<span id="182">182</span>
+<span id="183">183</span>
+<span id="184">184</span>
+<span id="185">185</span>
+<span id="186">186</span>
+<span id="187">187</span>
+<span id="188">188</span>
+<span id="189">189</span>
+<span id="190">190</span>
+<span id="191">191</span>
+<span id="192">192</span>
+<span id="193">193</span>
+<span id="194">194</span>
+<span id="195">195</span>
+<span id="196">196</span>
+<span id="197">197</span>
+<span id="198">198</span>
+<span id="199">199</span>
+<span id="200">200</span>
+<span id="201">201</span>
+<span id="202">202</span>
+<span id="203">203</span>
+<span id="204">204</span>
+<span id="205">205</span>
+<span id="206">206</span>
+<span id="207">207</span>
+<span id="208">208</span>
+<span id="209">209</span>
+<span id="210">210</span>
+<span id="211">211</span>
+<span id="212">212</span>
+<span id="213">213</span>
+<span id="214">214</span>
+<span id="215">215</span>
+<span id="216">216</span>
+<span id="217">217</span>
+<span id="218">218</span>
+<span id="219">219</span>
+<span id="220">220</span>
+<span id="221">221</span>
+<span id="222">222</span>
+<span id="223">223</span>
+<span id="224">224</span>
+<span id="225">225</span>
 </pre><pre class="rust">
 <span class="kw">use</span> <span class="kw">crate</span>::{<span class="ident">Generator</span>, <span class="ident">GeneratorResult</span>, <span class="ident">ValueResult</span>};
+<span class="kw">use</span> <span class="ident">core::num::NonZeroUsize</span>;
 
 <span class="doccomment">/// Skip over a set amount of values. See [`.skip()`](crate::GeneratorExt::skip) for more details.</span>
 <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>)]</span>
@@ -205,6 +269,29 @@
         }
 
         <span class="self">self</span>.<span class="ident">generator</span>.<span class="ident">run</span>(<span class="op">|</span><span class="ident">value</span><span class="op">|</span> <span class="ident">output</span>(<span class="ident">value</span>))
+    }
+
+    <span class="attribute">#[<span class="ident">inline</span>]</span>
+    <span class="kw">fn</span> <span class="ident">try_advance</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">n</span>: <span class="ident">NonZeroUsize</span>) <span class="op">-</span><span class="op">&gt;</span> (<span class="ident">usize</span>, <span class="ident">GeneratorResult</span>) {
+        <span class="kw">if</span> <span class="self">self</span>.<span class="ident">amount</span> <span class="op">&gt;</span> <span class="number">0</span> {
+            <span class="kw">match</span> <span class="self">self</span>
+                .<span class="ident">generator</span>
+                .<span class="ident">try_advance</span>(<span class="kw">unsafe</span> { <span class="ident">NonZeroUsize::new_unchecked</span>(<span class="self">self</span>.<span class="ident">amount</span>) })
+            {
+                (<span class="kw">_</span>, <span class="ident">GeneratorResult::Complete</span>) <span class="op">=</span><span class="op">&gt;</span> {
+                    <span class="self">self</span>.<span class="ident">amount</span> <span class="op">=</span> <span class="number">0</span>;
+                    <span class="kw">return</span> (<span class="number">0</span>, <span class="ident">GeneratorResult::Complete</span>);
+                }
+                (<span class="ident">x</span>, <span class="kw">_</span>) <span class="op">=</span><span class="op">&gt;</span> {
+                    <span class="self">self</span>.<span class="ident">amount</span> <span class="op">-</span><span class="op">=</span> <span class="ident">x</span>;
+                    <span class="kw">if</span> <span class="self">self</span>.<span class="ident">amount</span> <span class="op">!</span><span class="op">=</span> <span class="number">0</span> {
+                        <span class="kw">return</span> (<span class="number">0</span>, <span class="ident">GeneratorResult::Stopped</span>);
+                    }
+                }
+            }
+        }
+
+        <span class="self">self</span>.<span class="ident">generator</span>.<span class="ident">try_advance</span>(<span class="ident">n</span>)
     }
 }
 
@@ -321,6 +408,45 @@
             <span class="macro">assert_eq!</span>(<span class="ident">result</span>, <span class="ident">GeneratorResult::Complete</span>);
             <span class="macro">assert_eq!</span>(<span class="ident">output</span>, [<span class="kw-2">&amp;</span><span class="number">0</span>, <span class="kw-2">&amp;</span><span class="op">-</span><span class="number">1</span>, <span class="kw-2">&amp;</span><span class="number">2</span>]);
         }
+    }
+
+    <span class="attribute">#[<span class="ident">test</span>]</span>
+    <span class="kw">fn</span> <span class="ident">try_advance</span>() {
+        <span class="kw">let</span> <span class="ident">data</span> <span class="op">=</span> [<span class="number">0</span>, <span class="number">1</span>, <span class="number">2</span>, <span class="number">3</span>, <span class="number">4</span>, <span class="number">5</span>, <span class="number">6</span>, <span class="number">7</span>, <span class="number">8</span>];
+        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">gen</span> <span class="op">=</span> <span class="ident">data</span>.<span class="ident">into_gen</span>().<span class="ident">skip</span>(<span class="number">3</span>);
+        <span class="kw">let</span> <span class="ident">result</span> <span class="op">=</span> <span class="ident">gen</span>.<span class="ident">try_advance</span>(<span class="ident">NonZeroUsize::new</span>(<span class="number">2</span>).<span class="ident">unwrap</span>());
+        <span class="macro">assert_eq!</span>(<span class="ident">result</span>, (<span class="number">2</span>, <span class="ident">GeneratorResult::Stopped</span>));
+        <span class="macro">assert_eq!</span>(<span class="ident">gen</span>.<span class="ident">next</span>(), <span class="prelude-val">Ok</span>(<span class="kw-2">&amp;</span><span class="number">5</span>));
+    }
+
+    <span class="attribute">#[<span class="ident">test</span>]</span>
+    <span class="kw">fn</span> <span class="ident">try_advance_stopping_skip_region</span>() {
+        <span class="kw">let</span> <span class="ident">data</span> <span class="op">=</span> [<span class="number">0</span>, <span class="number">1</span>, <span class="number">2</span>, <span class="number">3</span>, <span class="number">4</span>, <span class="number">5</span>, <span class="number">6</span>, <span class="number">7</span>, <span class="number">8</span>];
+        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">gen</span> <span class="op">=</span> <span class="ident">StoppingGen::new</span>(<span class="number">1</span>, <span class="kw-2">&amp;</span><span class="ident">data</span>).<span class="ident">skip</span>(<span class="number">3</span>);
+        <span class="kw">let</span> <span class="ident">result</span> <span class="op">=</span> <span class="ident">gen</span>.<span class="ident">try_advance</span>(<span class="ident">NonZeroUsize::new</span>(<span class="number">2</span>).<span class="ident">unwrap</span>());
+        <span class="macro">assert_eq!</span>(<span class="ident">result</span>, (<span class="number">0</span>, <span class="ident">GeneratorResult::Stopped</span>));
+        <span class="kw">let</span> <span class="ident">result</span> <span class="op">=</span> <span class="ident">gen</span>.<span class="ident">try_advance</span>(<span class="ident">NonZeroUsize::new</span>(<span class="number">2</span>).<span class="ident">unwrap</span>());
+        <span class="macro">assert_eq!</span>(<span class="ident">result</span>, (<span class="number">2</span>, <span class="ident">GeneratorResult::Stopped</span>));
+        <span class="macro">assert_eq!</span>(<span class="ident">gen</span>.<span class="ident">next</span>(), <span class="prelude-val">Ok</span>(<span class="kw-2">&amp;</span><span class="number">5</span>));
+    }
+
+    <span class="attribute">#[<span class="ident">test</span>]</span>
+    <span class="kw">fn</span> <span class="ident">try_advance_stopping</span>() {
+        <span class="kw">let</span> <span class="ident">data</span> <span class="op">=</span> [<span class="number">0</span>, <span class="number">1</span>, <span class="number">2</span>, <span class="number">3</span>, <span class="number">4</span>, <span class="number">5</span>, <span class="number">6</span>, <span class="number">7</span>, <span class="number">8</span>];
+        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">gen</span> <span class="op">=</span> <span class="ident">StoppingGen::new</span>(<span class="number">4</span>, <span class="kw-2">&amp;</span><span class="ident">data</span>).<span class="ident">skip</span>(<span class="number">3</span>);
+        <span class="kw">let</span> <span class="ident">result</span> <span class="op">=</span> <span class="ident">gen</span>.<span class="ident">try_advance</span>(<span class="ident">NonZeroUsize::new</span>(<span class="number">2</span>).<span class="ident">unwrap</span>());
+        <span class="macro">assert_eq!</span>(<span class="ident">result</span>, (<span class="number">1</span>, <span class="ident">GeneratorResult::Stopped</span>));
+        <span class="kw">let</span> <span class="ident">result</span> <span class="op">=</span> <span class="ident">gen</span>.<span class="ident">try_advance</span>(<span class="ident">NonZeroUsize::new</span>(<span class="number">1</span>).<span class="ident">unwrap</span>());
+        <span class="macro">assert_eq!</span>(<span class="ident">result</span>, (<span class="number">1</span>, <span class="ident">GeneratorResult::Stopped</span>));
+        <span class="macro">assert_eq!</span>(<span class="ident">gen</span>.<span class="ident">next</span>(), <span class="prelude-val">Ok</span>(<span class="kw-2">&amp;</span><span class="number">5</span>));
+    }
+
+    <span class="attribute">#[<span class="ident">test</span>]</span>
+    <span class="kw">fn</span> <span class="ident">try_advance_max</span>() {
+        <span class="kw">let</span> <span class="ident">data</span> <span class="op">=</span> [<span class="number">0</span>, <span class="number">1</span>, <span class="number">2</span>, <span class="number">3</span>, <span class="number">4</span>, <span class="number">5</span>, <span class="number">6</span>, <span class="number">7</span>, <span class="number">8</span>];
+        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">gen</span> <span class="op">=</span> <span class="ident">data</span>.<span class="ident">into_gen</span>().<span class="ident">skip</span>(<span class="number">3</span>);
+        <span class="kw">let</span> <span class="ident">result</span> <span class="op">=</span> <span class="ident">gen</span>.<span class="ident">try_advance</span>(<span class="ident">NonZeroUsize::new</span>(<span class="ident">usize::MAX</span>).<span class="ident">unwrap</span>());
+        <span class="macro">assert_eq!</span>(<span class="ident">result</span>, (<span class="number">6</span>, <span class="ident">GeneratorResult::Complete</span>));
     }
 }
 </pre></div>
