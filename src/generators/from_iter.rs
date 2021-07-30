@@ -39,7 +39,7 @@ impl<I: Iterator> Generator for FromIter<I> {
 
     #[inline]
     fn run(&mut self, mut output: impl FnMut(Self::Output) -> ValueResult) -> GeneratorResult {
-        while let Some(v) = self.0.next() {
+        for v in &mut self.0 {
             if output(v) == ValueResult::Stop {
                 return GeneratorResult::Stopped;
             }
