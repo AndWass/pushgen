@@ -30,6 +30,11 @@ where
         let transform = &mut self.transform;
         self.source.run(move |value| output(transform(value)))
     }
+
+    #[inline]
+    fn try_advance(&mut self, n: core::num::NonZeroUsize) -> (usize, GeneratorResult) {
+        self.source.try_advance(n)
+    }
 }
 
 #[cfg(test)]
