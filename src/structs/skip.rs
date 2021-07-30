@@ -1,4 +1,5 @@
 use crate::{Generator, GeneratorResult, ValueResult};
+use core::num::NonZeroUsize;
 
 /// Skip over a set amount of values. See [`.skip()`](crate::GeneratorExt::skip) for more details.
 #[derive(Clone)]
@@ -42,6 +43,29 @@ where
         }
 
         self.generator.run(|value| output(value))
+    }
+
+    #[inline]
+    fn try_advance(&mut self, n: NonZeroUsize) -> (usize, GeneratorResult) {
+        if self.amount > 0 {
+            match self
+                .generator
+                .try_advance(unsafe { NonZeroUsize::new_unchecked(self.amount) })
+            {
+                (_, GeneratorResult::Complete) => {
+                    self.amount = 0;
+                    return (0, GeneratorResult::Complete);
+                }
+                (x, _) => {
+                    self.amount -= x;
+                    if self.amount != 0 {
+                        return (0, GeneratorResult::Stopped);
+                    }
+                }
+            }
+        }
+
+        self.generator.try_advance(n)
     }
 }
 
@@ -158,5 +182,44 @@ mod tests {
             assert_eq!(result, GeneratorResult::Complete);
             assert_eq!(output, [&0, &-1, &2]);
         }
+    }
+
+    #[test]
+    fn try_advance() {
+        let data = [0, 1, 2, 3, 4, 5, 6, 7, 8];
+        let mut gen = data.into_gen().skip(3);
+        let result = gen.try_advance(NonZeroUsize::new(2).unwrap());
+        assert_eq!(result, (2, GeneratorResult::Stopped));
+        assert_eq!(gen.next(), Ok(&5));
+    }
+
+    #[test]
+    fn try_advance_stopping_skip_region() {
+        let data = [0, 1, 2, 3, 4, 5, 6, 7, 8];
+        let mut gen = StoppingGen::new(1, &data).skip(3);
+        let result = gen.try_advance(NonZeroUsize::new(2).unwrap());
+        assert_eq!(result, (0, GeneratorResult::Stopped));
+        let result = gen.try_advance(NonZeroUsize::new(2).unwrap());
+        assert_eq!(result, (2, GeneratorResult::Stopped));
+        assert_eq!(gen.next(), Ok(&5));
+    }
+
+    #[test]
+    fn try_advance_stopping() {
+        let data = [0, 1, 2, 3, 4, 5, 6, 7, 8];
+        let mut gen = StoppingGen::new(4, &data).skip(3);
+        let result = gen.try_advance(NonZeroUsize::new(2).unwrap());
+        assert_eq!(result, (1, GeneratorResult::Stopped));
+        let result = gen.try_advance(NonZeroUsize::new(1).unwrap());
+        assert_eq!(result, (1, GeneratorResult::Stopped));
+        assert_eq!(gen.next(), Ok(&5));
+    }
+
+    #[test]
+    fn try_advance_max() {
+        let data = [0, 1, 2, 3, 4, 5, 6, 7, 8];
+        let mut gen = data.into_gen().skip(3);
+        let result = gen.try_advance(NonZeroUsize::new(usize::MAX).unwrap());
+        assert_eq!(result, (6, GeneratorResult::Complete));
     }
 }
