@@ -141,3 +141,19 @@ harness = false
 [[bench]]
 name = "pushgen_reduce"
 harness = false
+
+[[bench]]
+name = "pushgen_step_by"
+harness = false
+
+[[bench]]
+name = "for_each_step_by"
+harness = false
+
+[[bench]]
+name = "pushgen_map_filter_step_by"
+harness = false
+
+[[bench]]
+name = "for_each_map_filter_step_by"
+harness = false

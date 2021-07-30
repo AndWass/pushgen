@@ -10,6 +10,7 @@ pub use flatten::Flatten;
 pub use iterator::IteratorAdaptor;
 pub use map::Map;
 pub use skip::{Skip, SkipWhile};
+pub use step_by::StepBy;
 pub use take::{Take, TakeWhile};
 pub use zip::Zip;
 
@@ -23,6 +24,7 @@ mod flatten;
 mod iterator;
 mod map;
 mod skip;
+mod step_by;
 mod take;
 pub(crate) mod utility;
 mod zip;
