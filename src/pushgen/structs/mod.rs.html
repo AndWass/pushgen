@@ -26,6 +26,8 @@
 <span id="26">26</span>
 <span id="27">27</span>
 <span id="28">28</span>
+<span id="29">29</span>
+<span id="30">30</span>
 </pre><pre class="rust">
 <span class="doccomment">//! Generator adaptor implementations. See [`GeneratorExt`](crate::GeneratorExt) for more info.</span>
 
@@ -39,6 +41,7 @@
 <span class="kw">pub</span> <span class="kw">use</span> <span class="ident">iterator::IteratorAdaptor</span>;
 <span class="kw">pub</span> <span class="kw">use</span> <span class="ident">map::Map</span>;
 <span class="kw">pub</span> <span class="kw">use</span> <span class="ident">skip</span>::{<span class="ident">Skip</span>, <span class="ident">SkipWhile</span>};
+<span class="kw">pub</span> <span class="kw">use</span> <span class="ident">step_by::StepBy</span>;
 <span class="kw">pub</span> <span class="kw">use</span> <span class="ident">take</span>::{<span class="ident">Take</span>, <span class="ident">TakeWhile</span>};
 <span class="kw">pub</span> <span class="kw">use</span> <span class="ident">zip::Zip</span>;
 
@@ -52,6 +55,7 @@
 <span class="kw">mod</span> <span class="ident">iterator</span>;
 <span class="kw">mod</span> <span class="ident">map</span>;
 <span class="kw">mod</span> <span class="ident">skip</span>;
+<span class="kw">mod</span> <span class="ident">step_by</span>;
 <span class="kw">mod</span> <span class="ident">take</span>;
 <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">mod</span> <span class="ident">utility</span>;
 <span class="kw">mod</span> <span class="ident">zip</span>;
