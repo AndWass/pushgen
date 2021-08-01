@@ -3,7 +3,7 @@ use crate::structs::{
     Chain, Cloned, Copied, Dedup, Filter, FilterMap, Flatten, IteratorAdaptor, Map, Skip,
     SkipWhile, StepBy, Take, TakeWhile, Zip,
 };
-use crate::traits::{Product, Sum};
+use crate::traits::{FromGenerator, Product, Sum};
 use crate::{Generator, GeneratorResult, TryReduction, ValueResult};
 use core::cmp::Ordering;
 
@@ -1404,6 +1404,42 @@ pub trait GeneratorExt: Sealed + Generator {
             GeneratorResult::Complete => TryReduction::Complete(result),
         }
     }
+
+    /// Transforms a generator into a collection.
+    ///
+    /// `collect()` can take any generator and turn it into a relevant collection.
+    ///
+    /// ## Spuriously stopping generators
+    ///
+    /// Collect will stop collecting values as soon as the generator is stopped. It doesn't matter
+    /// if the generator was completed or not.
+    ///
+    /// To handle spuriously stopping generators one should manually do the collecting with for instance
+    /// [`for_each()`](GeneratorExt::for_each).
+    ///
+    /// ## Examples
+    ///
+    /// Basic usage:
+    ///
+    /// ```
+    /// use pushgen::{IntoGenerator, GeneratorExt};
+    /// let a = [1, 2, 3];
+    ///
+    /// let doubled: Vec<i32> = a.into_gen()
+    ///                          .map(|&x| x * 2)
+    ///                          .collect();
+    ///
+    /// assert_eq!(vec![2, 4, 6], doubled);
+    /// ```
+    ///
+    #[inline]
+    fn collect<B>(self) -> B
+    where
+        Self: Sized,
+        B: FromGenerator<Self::Output>,
+    {
+        B::from_gen(self)
+    }
 }
 
 impl<T: Generator> GeneratorExt for T {}
@@ -1627,5 +1663,27 @@ mod tests {
                 .unwrap();
             assert_eq!(final_value, TryReduction::Complete(6));
         }
+    }
+
+    #[test]
+    fn collect_vec() {
+        let data = [0, 1, 2, 3, 4];
+        let out: Vec<i32> = data.into_gen().filter(|x| *x % 2 == 0).copied().collect();
+        assert_eq!(out, [0, 2, 4]);
+    }
+
+    #[test]
+    fn collect_string() {
+        let data = ['a', 'B', 'c', 'D'];
+        let out: String = data
+            .into_gen()
+            .filter(|x| x.is_uppercase())
+            .copied()
+            .collect();
+        assert_eq!(out, "BD");
+
+        let data = ['f', 'G', 'H', 'i'];
+        let out: String = data.into_gen().filter(|x| x.is_uppercase()).collect();
+        assert_eq!(out, "GH");
     }
 }
