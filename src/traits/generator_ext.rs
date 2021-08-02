@@ -1,7 +1,7 @@
 use crate::structs::utility::InplaceUpdatable;
 use crate::structs::{
-    Chain, Cloned, Copied, Dedup, Filter, FilterMap, Flatten, Inspect, IteratorAdaptor, Map, Skip,
-    SkipWhile, StepBy, Take, TakeWhile, Zip,
+    Chain, Cloned, Copied, Dedup, Enumerate, Filter, FilterMap, Flatten, Inspect, IteratorAdaptor,
+    Map, Skip, SkipWhile, StepBy, Take, TakeWhile, Zip,
 };
 use crate::traits::{FromGenerator, Product, Sum};
 use crate::{Generator, GeneratorResult, TryReduction, ValueResult};
@@ -1440,6 +1440,42 @@ pub trait GeneratorExt: Sealed + Generator {
         B: FromGenerator<Self::Output>,
     {
         B::from_gen(self)
+    }
+
+    /// Creates a generator which gives the current generation count as well as the value.
+    ///
+    /// The generator generates `(i, val)` values, where `i` is the current index of the value and
+    /// `val` is the current value.
+    ///
+    /// ## Overflow behaviour
+    ///
+    /// The method does not guard against overflows, so enumerating more than `usize::MAX` values
+    /// will either produce the wrong result or panic.
+    ///
+    /// ## Panics
+    ///
+    /// The generator might panic if the index overflows a `usize`.
+    ///
+    /// ## Examples
+    ///
+    /// Basic usage:
+    ///
+    /// ```
+    /// use pushgen::{SliceGenerator, GeneratorExt, GeneratorResult};
+    /// let data = ['a', 'b', 'c'];
+    ///
+    /// let mut gen = SliceGenerator::new(&data).enumerate();
+    /// assert_eq!(gen.next(), Ok((0, &'a')));
+    /// assert_eq!(gen.next(), Ok((1, &'b')));
+    /// assert_eq!(gen.next(), Ok((2, &'c')));
+    /// assert_eq!(gen.next(), Err(GeneratorResult::Complete));
+    /// ```
+    #[inline]
+    fn enumerate(self) -> Enumerate<Self>
+    where
+        Self: Sized,
+    {
+        Enumerate::new(self)
     }
 
     /// Does something with each value from the generator, passing the value on.
