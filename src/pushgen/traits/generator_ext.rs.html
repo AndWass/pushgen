@@ -1687,10 +1687,63 @@
 <span id="1687">1687</span>
 <span id="1688">1688</span>
 <span id="1689">1689</span>
+<span id="1690">1690</span>
+<span id="1691">1691</span>
+<span id="1692">1692</span>
+<span id="1693">1693</span>
+<span id="1694">1694</span>
+<span id="1695">1695</span>
+<span id="1696">1696</span>
+<span id="1697">1697</span>
+<span id="1698">1698</span>
+<span id="1699">1699</span>
+<span id="1700">1700</span>
+<span id="1701">1701</span>
+<span id="1702">1702</span>
+<span id="1703">1703</span>
+<span id="1704">1704</span>
+<span id="1705">1705</span>
+<span id="1706">1706</span>
+<span id="1707">1707</span>
+<span id="1708">1708</span>
+<span id="1709">1709</span>
+<span id="1710">1710</span>
+<span id="1711">1711</span>
+<span id="1712">1712</span>
+<span id="1713">1713</span>
+<span id="1714">1714</span>
+<span id="1715">1715</span>
+<span id="1716">1716</span>
+<span id="1717">1717</span>
+<span id="1718">1718</span>
+<span id="1719">1719</span>
+<span id="1720">1720</span>
+<span id="1721">1721</span>
+<span id="1722">1722</span>
+<span id="1723">1723</span>
+<span id="1724">1724</span>
+<span id="1725">1725</span>
+<span id="1726">1726</span>
+<span id="1727">1727</span>
+<span id="1728">1728</span>
+<span id="1729">1729</span>
+<span id="1730">1730</span>
+<span id="1731">1731</span>
+<span id="1732">1732</span>
+<span id="1733">1733</span>
+<span id="1734">1734</span>
+<span id="1735">1735</span>
+<span id="1736">1736</span>
+<span id="1737">1737</span>
+<span id="1738">1738</span>
+<span id="1739">1739</span>
+<span id="1740">1740</span>
+<span id="1741">1741</span>
+<span id="1742">1742</span>
 </pre><pre class="rust">
 <span class="kw">use</span> <span class="kw">crate</span><span class="ident">::structs::utility::InplaceUpdatable</span>;
 <span class="kw">use</span> <span class="kw">crate</span><span class="ident">::structs</span>::{
-    <span class="ident">Chain</span>, <span class="ident">Cloned</span>, <span class="ident">Copied</span>, <span class="ident">Dedup</span>, <span class="ident">Filter</span>, <span class="ident">FilterMap</span>, <span class="ident">Flatten</span>, <span class="ident">IteratorAdaptor</span>, <span class="ident">Map</span>, <span class="ident">Skip</span>,
+    <span class="ident">Chain</span>, <span class="ident">Cloned</span>, <span class="ident">Copied</span>, <span class="ident">Dedup</span>, <span class="ident">Filter</span>, <span class="ident">FilterMap</span>, <span class="ident">Flatten</span>, <span class="ident">Inspect</span>, <span class="ident">IteratorAdaptor</span>, <span class="ident">Map</span>, <span class="ident">Skip</span>,
     <span class="ident">SkipWhile</span>, <span class="ident">StepBy</span>, <span class="ident">Take</span>, <span class="ident">TakeWhile</span>, <span class="ident">Zip</span>,
 };
 <span class="kw">use</span> <span class="kw">crate</span><span class="ident">::traits</span>::{<span class="ident">FromGenerator</span>, <span class="ident">Product</span>, <span class="ident">Sum</span>};
@@ -3129,6 +3182,59 @@
         <span class="ident">B</span>: <span class="ident">FromGenerator</span><span class="op">&lt;</span><span class="self">Self</span><span class="ident">::Output</span><span class="op">&gt;</span>,
     {
         <span class="ident">B::from_gen</span>(<span class="self">self</span>)
+    }
+
+    <span class="doccomment">/// Does something with each value from the generator, passing the value on.</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// This is useful if you want to inspect a value in the middle of a pipeline, for instance to</span>
+    <span class="doccomment">/// add debug output.</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// ## Example</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// Basic usage:</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// ```</span>
+    <span class="doccomment">/// use pushgen::{IntoGenerator, GeneratorExt};</span>
+    <span class="doccomment">/// let a = [1, 4, 2, 3];</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// // this iterator sequence is complex.</span>
+    <span class="doccomment">/// let sum = a.into_gen()</span>
+    <span class="doccomment">///     .cloned()</span>
+    <span class="doccomment">///     .filter(|x| x % 2 == 0)</span>
+    <span class="doccomment">///     .fold(0, |sum, i| sum + i);</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// println!(&quot;{}&quot;, sum);</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// // let&#39;s add some inspect() calls to investigate what&#39;s happening</span>
+    <span class="doccomment">/// let sum = a.into_gen()</span>
+    <span class="doccomment">///     .cloned()</span>
+    <span class="doccomment">///     .inspect(|x| println!(&quot;about to filter: {}&quot;, x))</span>
+    <span class="doccomment">///     .filter(|x| x % 2 == 0)</span>
+    <span class="doccomment">///     .inspect(|x| println!(&quot;made it through filter: {}&quot;, x))</span>
+    <span class="doccomment">///     .fold(0, |sum, i| sum + i);</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// println!(&quot;{}&quot;, sum);</span>
+    <span class="doccomment">/// ```</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// This will print</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// ```text</span>
+    <span class="doccomment">/// 6</span>
+    <span class="doccomment">/// about to filter: 1</span>
+    <span class="doccomment">/// about to filter: 4</span>
+    <span class="doccomment">/// made it through filter: 4</span>
+    <span class="doccomment">/// about to filter: 2</span>
+    <span class="doccomment">/// made it through filter: 2</span>
+    <span class="doccomment">/// about to filter: 3</span>
+    <span class="doccomment">/// 6</span>
+    <span class="doccomment">/// ```</span>
+    <span class="attribute">#[<span class="ident">inline</span>]</span>
+    <span class="kw">fn</span> <span class="ident">inspect</span><span class="op">&lt;</span><span class="ident">F</span><span class="op">&gt;</span>(<span class="self">self</span>, <span class="ident">inspector</span>: <span class="ident">F</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Inspect</span><span class="op">&lt;</span><span class="self">Self</span>, <span class="ident">F</span><span class="op">&gt;</span>
+    <span class="kw">where</span>
+        <span class="self">Self</span>: <span class="ident">Sized</span>,
+        <span class="ident">F</span>: <span class="ident">FnMut</span>(<span class="kw-2">&amp;</span><span class="self">Self</span><span class="ident">::Output</span>),
+    {
+        <span class="ident">Inspect::new</span>(<span class="self">self</span>, <span class="ident">inspector</span>)
     }
 }
 
