@@ -1741,11 +1741,47 @@
 <span id="1741">1741</span>
 <span id="1742">1742</span>
 <span id="1743">1743</span>
+<span id="1744">1744</span>
+<span id="1745">1745</span>
+<span id="1746">1746</span>
+<span id="1747">1747</span>
+<span id="1748">1748</span>
+<span id="1749">1749</span>
+<span id="1750">1750</span>
+<span id="1751">1751</span>
+<span id="1752">1752</span>
+<span id="1753">1753</span>
+<span id="1754">1754</span>
+<span id="1755">1755</span>
+<span id="1756">1756</span>
+<span id="1757">1757</span>
+<span id="1758">1758</span>
+<span id="1759">1759</span>
+<span id="1760">1760</span>
+<span id="1761">1761</span>
+<span id="1762">1762</span>
+<span id="1763">1763</span>
+<span id="1764">1764</span>
+<span id="1765">1765</span>
+<span id="1766">1766</span>
+<span id="1767">1767</span>
+<span id="1768">1768</span>
+<span id="1769">1769</span>
+<span id="1770">1770</span>
+<span id="1771">1771</span>
+<span id="1772">1772</span>
+<span id="1773">1773</span>
+<span id="1774">1774</span>
+<span id="1775">1775</span>
+<span id="1776">1776</span>
+<span id="1777">1777</span>
+<span id="1778">1778</span>
+<span id="1779">1779</span>
 </pre><pre class="rust">
 <span class="kw">use</span> <span class="kw">crate</span><span class="ident">::structs::utility::InplaceUpdatable</span>;
 <span class="kw">use</span> <span class="kw">crate</span><span class="ident">::structs</span>::{
-    <span class="ident">Chain</span>, <span class="ident">Cloned</span>, <span class="ident">Copied</span>, <span class="ident">Dedup</span>, <span class="ident">Filter</span>, <span class="ident">FilterMap</span>, <span class="ident">Flatten</span>, <span class="ident">Inspect</span>, <span class="ident">IteratorAdaptor</span>, <span class="ident">Map</span>, <span class="ident">Skip</span>,
-    <span class="ident">SkipWhile</span>, <span class="ident">StepBy</span>, <span class="ident">Take</span>, <span class="ident">TakeWhile</span>, <span class="ident">Zip</span>,
+    <span class="ident">Chain</span>, <span class="ident">Cloned</span>, <span class="ident">Copied</span>, <span class="ident">Dedup</span>, <span class="ident">Enumerate</span>, <span class="ident">Filter</span>, <span class="ident">FilterMap</span>, <span class="ident">Flatten</span>, <span class="ident">Inspect</span>, <span class="ident">IteratorAdaptor</span>,
+    <span class="ident">Map</span>, <span class="ident">Skip</span>, <span class="ident">SkipWhile</span>, <span class="ident">StepBy</span>, <span class="ident">Take</span>, <span class="ident">TakeWhile</span>, <span class="ident">Zip</span>,
 };
 <span class="kw">use</span> <span class="kw">crate</span><span class="ident">::traits</span>::{<span class="ident">FromGenerator</span>, <span class="ident">Product</span>, <span class="ident">Sum</span>};
 <span class="kw">use</span> <span class="kw">crate</span>::{<span class="ident">Generator</span>, <span class="ident">GeneratorResult</span>, <span class="ident">TryReduction</span>, <span class="ident">ValueResult</span>};
@@ -3184,6 +3220,42 @@
         <span class="ident">B</span>: <span class="ident">FromGenerator</span><span class="op">&lt;</span><span class="self">Self</span><span class="ident">::Output</span><span class="op">&gt;</span>,
     {
         <span class="ident">B::from_gen</span>(<span class="self">self</span>)
+    }
+
+    <span class="doccomment">/// Creates a generator which gives the current generation count as well as the value.</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// The generator generates `(i, val)` values, where `i` is the current index of the value and</span>
+    <span class="doccomment">/// `val` is the current value.</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// ## Overflow behaviour</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// The method does not guard against overflows, so enumerating more than `usize::MAX` values</span>
+    <span class="doccomment">/// will either produce the wrong result or panic.</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// ## Panics</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// The generator might panic if the index overflows a `usize`.</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// ## Examples</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// Basic usage:</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// ```</span>
+    <span class="doccomment">/// use pushgen::{SliceGenerator, GeneratorExt, GeneratorResult};</span>
+    <span class="doccomment">/// let data = [&#39;a&#39;, &#39;b&#39;, &#39;c&#39;];</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// let mut gen = SliceGenerator::new(&amp;data).enumerate();</span>
+    <span class="doccomment">/// assert_eq!(gen.next(), Ok((0, &amp;&#39;a&#39;)));</span>
+    <span class="doccomment">/// assert_eq!(gen.next(), Ok((1, &amp;&#39;b&#39;)));</span>
+    <span class="doccomment">/// assert_eq!(gen.next(), Ok((2, &amp;&#39;c&#39;)));</span>
+    <span class="doccomment">/// assert_eq!(gen.next(), Err(GeneratorResult::Complete));</span>
+    <span class="doccomment">/// ```</span>
+    <span class="attribute">#[<span class="ident">inline</span>]</span>
+    <span class="kw">fn</span> <span class="ident">enumerate</span>(<span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Enumerate</span><span class="op">&lt;</span><span class="self">Self</span><span class="op">&gt;</span>
+    <span class="kw">where</span>
+        <span class="self">Self</span>: <span class="ident">Sized</span>,
+    {
+        <span class="ident">Enumerate::new</span>(<span class="self">self</span>)
     }
 
     <span class="doccomment">/// Does something with each value from the generator, passing the value on.</span>
