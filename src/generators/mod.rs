@@ -13,6 +13,8 @@ mod option;
 mod slice_generator;
 
 #[cfg(feature = "std")]
+#[cfg_attr(docsrs, doc(cfg(feature = "std")))]
 mod boxed;
 #[cfg(feature = "std")]
+#[cfg_attr(docsrs, doc(cfg(feature = "std")))]
 pub use boxed::BoxedGenerator;

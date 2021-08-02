@@ -26,6 +26,14 @@ either = { version = "1.0", default-features = false }
 criterion = "0.3"
 itertools = "0.10.1"
 
+# docs.rs-specific configuration
+[package.metadata.docs.rs]
+# document all features
+all-features = true
+# defines the configuration attribute `docsrs`
+rustdoc-args = ["--cfg", "docsrs"]
+
+
 [[bench]]
 name = "iter_next_filter_map"
 harness = false

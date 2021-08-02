@@ -85,6 +85,7 @@ pub trait FromGenerator<A> {
 }
 
 #[cfg(feature = "std")]
+#[cfg_attr(docsrs, doc(cfg(feature = "std")))]
 impl<T> FromGenerator<T> for Vec<T> {
     #[inline]
     fn from_gen<G>(gen: G) -> Self
@@ -98,6 +99,7 @@ impl<T> FromGenerator<T> for Vec<T> {
 }
 
 #[cfg(feature = "std")]
+#[cfg_attr(docsrs, doc(cfg(feature = "std")))]
 impl FromGenerator<char> for String {
     #[inline]
     fn from_gen<G>(gen: G) -> Self
@@ -111,6 +113,7 @@ impl FromGenerator<char> for String {
 }
 
 #[cfg(feature = "std")]
+#[cfg_attr(docsrs, doc(cfg(feature = "std")))]
 impl<'a> FromGenerator<&'a char> for String {
     #[inline]
     fn from_gen<G>(gen: G) -> Self

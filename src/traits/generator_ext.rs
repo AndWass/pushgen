@@ -729,6 +729,7 @@ pub trait GeneratorExt: Sealed + Generator {
     /// assert_eq!(output, [2, 4, 6, 8]);
     /// ```
     #[cfg(feature = "std")]
+    #[cfg_attr(docsrs, doc(cfg(feature = "std")))]
     #[inline]
     fn boxed(self) -> crate::generators::BoxedGenerator<Self::Output>
     where

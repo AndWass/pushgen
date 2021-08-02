@@ -24,12 +24,20 @@
 //! SliceGenerator::new(&data).filter(|x| *x % 2 == 0).map(|x| x * 3).for_each(process);
 //! ```
 //!
+//! ## Features
+//!
+//! `std`: Enable boxing and trait implementations for types that requires `std`. If this feature
+//! is disabled, `pushgen` is `no_std`. This is *enabled* by default.
+//!
+//! `test`: Enable test tools that can be used to test generators and adaptors. This is *disabled* by default.
+//!
 //! ## Performance
 //!
 //! I make no performance-claims, however there are some benchmarked cases where the push-based approach
 //! wins over the iterator approach, but I have made no attempts to analyze this in any depth.
 
 #![cfg_attr(not(any(test, feature = "std")), no_std)]
+#![cfg_attr(docsrs, feature(doc_cfg))]
 
 pub use either::Either;
 
@@ -51,4 +59,5 @@ pub mod structs;
 pub mod traits;
 
 #[cfg(any(test, feature = "test"))]
+#[cfg_attr(docsrs, doc(cfg(feature = "test")))]
 pub mod test;
