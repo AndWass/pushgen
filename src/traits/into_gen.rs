@@ -56,6 +56,7 @@ impl<'a, T, const N: usize> IntoGenerator for &'a [T; N] {
 }
 
 #[cfg(feature = "std")]
+#[cfg_attr(docsrs, doc(cfg(feature = "std")))]
 impl<'a, T> IntoGenerator for &'a Vec<T> {
     type Output = &'a T;
     type IntoGen = crate::SliceGenerator<'a, T>;
@@ -66,6 +67,7 @@ impl<'a, T> IntoGenerator for &'a Vec<T> {
 }
 
 #[cfg(feature = "std")]
+#[cfg_attr(docsrs, doc(cfg(feature = "std")))]
 impl<T> IntoGenerator for Vec<T> {
     type Output = T;
     type IntoGen = crate::generators::FromIter<std::vec::IntoIter<T>>;

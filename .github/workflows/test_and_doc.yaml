@@ -72,6 +72,8 @@ jobs:
     name: Rustdoc
     runs-on: ubuntu-latest
     needs: [check, test, fmt, clippy]
+    env:
+      RUSTDOCFLAGS: --cfg docsrs
     steps:
       - uses: actions/checkout@v2
       - uses: actions-rs/toolchain@v1
@@ -82,7 +84,7 @@ jobs:
       - uses: actions-rs/cargo@v1
         with:
           command: doc
-          args: --no-deps
+          args: --no-deps --all-features -v
       - name: Deploy
         uses: peaceiris/actions-gh-pages@v3
         if: github.ref == 'refs/heads/main'
