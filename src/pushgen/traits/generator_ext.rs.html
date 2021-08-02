@@ -1740,6 +1740,7 @@
 <span id="1740">1740</span>
 <span id="1741">1741</span>
 <span id="1742">1742</span>
+<span id="1743">1743</span>
 </pre><pre class="rust">
 <span class="kw">use</span> <span class="kw">crate</span><span class="ident">::structs::utility::InplaceUpdatable</span>;
 <span class="kw">use</span> <span class="kw">crate</span><span class="ident">::structs</span>::{
@@ -2472,6 +2473,7 @@
     <span class="doccomment">/// assert_eq!(output, [2, 4, 6, 8]);</span>
     <span class="doccomment">/// ```</span>
     <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;std&quot;</span>)]</span>
+    <span class="attribute">#[<span class="ident">cfg_attr</span>(<span class="ident">docsrs</span>, <span class="ident">doc</span>(<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;std&quot;</span>)))]</span>
     <span class="attribute">#[<span class="ident">inline</span>]</span>
     <span class="kw">fn</span> <span class="ident">boxed</span>(<span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="kw">crate</span><span class="ident">::generators::BoxedGenerator</span><span class="op">&lt;</span><span class="self">Self</span><span class="ident">::Output</span><span class="op">&gt;</span>
     <span class="kw">where</span>
