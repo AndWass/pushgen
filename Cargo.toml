@@ -1,6 +1,6 @@
 [package]
 name = "pushgen"
-version = "0.0.1"
+version = "0.0.2"
 edition = "2018"
 license = "MIT/Apache-2.0"
 repository = "https://github.com/AndWass/pushgen"
