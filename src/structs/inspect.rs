@@ -1,5 +1,5 @@
 use crate::{Generator, GeneratorResult, ValueResult};
-use std::num::NonZeroUsize;
+use core::num::NonZeroUsize;
 
 /// Inspect each value and then pass it on. See [`inspect()`](crate::GeneratorExt::inspect) for details.
 pub struct Inspect<Src, F> {
