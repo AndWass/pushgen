@@ -1,6 +1,6 @@
 use crate::structs::utility::InplaceUpdatable;
 use crate::structs::{
-    Chain, Cloned, Copied, Dedup, Filter, FilterMap, Flatten, IteratorAdaptor, Map, Skip,
+    Chain, Cloned, Copied, Dedup, Filter, FilterMap, Flatten, Inspect, IteratorAdaptor, Map, Skip,
     SkipWhile, StepBy, Take, TakeWhile, Zip,
 };
 use crate::traits::{FromGenerator, Product, Sum};
@@ -1439,6 +1439,59 @@ pub trait GeneratorExt: Sealed + Generator {
         B: FromGenerator<Self::Output>,
     {
         B::from_gen(self)
+    }
+
+    /// Does something with each value from the generator, passing the value on.
+    ///
+    /// This is useful if you want to inspect a value in the middle of a pipeline, for instance to
+    /// add debug output.
+    ///
+    /// ## Example
+    ///
+    /// Basic usage:
+    ///
+    /// ```
+    /// use pushgen::{IntoGenerator, GeneratorExt};
+    /// let a = [1, 4, 2, 3];
+    ///
+    /// // this iterator sequence is complex.
+    /// let sum = a.into_gen()
+    ///     .cloned()
+    ///     .filter(|x| x % 2 == 0)
+    ///     .fold(0, |sum, i| sum + i);
+    ///
+    /// println!("{}", sum);
+    ///
+    /// // let's add some inspect() calls to investigate what's happening
+    /// let sum = a.into_gen()
+    ///     .cloned()
+    ///     .inspect(|x| println!("about to filter: {}", x))
+    ///     .filter(|x| x % 2 == 0)
+    ///     .inspect(|x| println!("made it through filter: {}", x))
+    ///     .fold(0, |sum, i| sum + i);
+    ///
+    /// println!("{}", sum);
+    /// ```
+    ///
+    /// This will print
+    ///
+    /// ```text
+    /// 6
+    /// about to filter: 1
+    /// about to filter: 4
+    /// made it through filter: 4
+    /// about to filter: 2
+    /// made it through filter: 2
+    /// about to filter: 3
+    /// 6
+    /// ```
+    #[inline]
+    fn inspect<F>(self, inspector: F) -> Inspect<Self, F>
+    where
+        Self: Sized,
+        F: FnMut(&Self::Output),
+    {
+        Inspect::new(self, inspector)
     }
 }
 
