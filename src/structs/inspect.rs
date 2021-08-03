@@ -57,7 +57,7 @@ where
 
 #[cfg(test)]
 mod tests {
-    use crate::{GeneratorExt, SliceGenerator, ValueResult, ReverseGenerator};
+    use crate::{GeneratorExt, ReverseGenerator, SliceGenerator, ValueResult};
     use std::num::NonZeroUsize;
 
     #[test]
@@ -92,7 +92,7 @@ mod tests {
 
         gen.run_back(|_| ValueResult::MoreValues);
 
-        assert_eq!(before_filter,  [3, 2, 4, 1]);
+        assert_eq!(before_filter, [3, 2, 4, 1]);
         assert_eq!(after_filter, [2, 4]);
 
         let mut before_filter = Vec::new();
@@ -107,7 +107,7 @@ mod tests {
         gen.try_advance_back(NonZeroUsize::new(1).unwrap());
         gen.run_back(|_| ValueResult::MoreValues);
 
-        assert_eq!(before_filter,  [3, 2, 4, 1]);
+        assert_eq!(before_filter, [3, 2, 4, 1]);
         assert_eq!(after_filter, [4]);
     }
 }

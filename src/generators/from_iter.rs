@@ -1,4 +1,4 @@
-use crate::{Generator, GeneratorResult, ValueResult, ReverseGenerator};
+use crate::{Generator, GeneratorResult, ReverseGenerator, ValueResult};
 
 /// Creates a generator that wraps an `Iterator`.
 ///
@@ -49,7 +49,6 @@ impl<I: Iterator> Generator for FromIter<I> {
 }
 
 impl<I: DoubleEndedIterator> ReverseGenerator for FromIter<I> {
-
     #[inline]
     fn run_back(&mut self, mut output: impl FnMut(Self::Output) -> ValueResult) -> GeneratorResult {
         while let Some(v) = self.0.next_back() {

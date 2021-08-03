@@ -1,4 +1,4 @@
-use crate::{Generator, GeneratorResult, ValueResult, ReverseGenerator};
+use crate::{Generator, GeneratorResult, ReverseGenerator, ValueResult};
 use core::num::NonZeroUsize;
 
 /// A generator that clones the elements of an underlying generator. See `[.cloned()](crate::GeneratorExt::cloned)
@@ -52,7 +52,7 @@ where
 #[cfg(test)]
 mod tests {
     use crate::test::StoppingGen;
-    use crate::{GeneratorExt, GeneratorResult, SliceGenerator, ReverseGenerator};
+    use crate::{GeneratorExt, GeneratorResult, ReverseGenerator, SliceGenerator};
     use std::num::NonZeroUsize;
 
     #[test]

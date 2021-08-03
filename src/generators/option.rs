@@ -1,4 +1,4 @@
-use crate::{Generator, GeneratorResult, ValueResult, ReverseGenerator};
+use crate::{Generator, GeneratorResult, ReverseGenerator, ValueResult};
 
 /// A generator over the value in [`Some`] variant of an [`Option`].
 ///
@@ -34,7 +34,6 @@ impl<T> Generator for OptionGen<T> {
 }
 
 impl<T> ReverseGenerator for OptionGen<T> {
-
     #[inline]
     fn run_back(&mut self, mut output: impl FnMut(Self::Output) -> ValueResult) -> GeneratorResult {
         if let Some(v) = self.inner.take() {

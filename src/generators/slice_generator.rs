@@ -1,4 +1,4 @@
-use crate::{Generator, GeneratorResult, ValueResult, ReverseGenerator};
+use crate::{Generator, GeneratorResult, ReverseGenerator, ValueResult};
 use core::num::NonZeroUsize;
 
 /// A generator that generates values from a slice.
@@ -24,7 +24,11 @@ pub struct SliceGenerator<'a, T> {
 impl<'a, T> SliceGenerator<'a, T> {
     #[inline]
     pub fn new(slice: &'a [T]) -> Self {
-        Self { slice, begin: 0, end: slice.len() }
+        Self {
+            slice,
+            begin: 0,
+            end: slice.len(),
+        }
     }
 }
 
@@ -65,12 +69,12 @@ impl<'a, T> ReverseGenerator for SliceGenerator<'a, T> {
         let end_back = self.begin;
         while self.end > end_back {
             // If self.end > end_back, then self.end > 0, so this will not underflow.
-            let index = self.end-1;
+            let index = self.end - 1;
             // shrink the slice from the back
             self.end -= 1;
             // Safety: index always less than total len and greater or equal to 0
             if output(unsafe { self.slice.get_unchecked(index) }) == ValueResult::Stop {
-                return GeneratorResult::Stopped
+                return GeneratorResult::Stopped;
             }
         }
 
@@ -84,8 +88,7 @@ impl<'a, T> ReverseGenerator for SliceGenerator<'a, T> {
         if n > available {
             self.end = self.begin;
             (available, GeneratorResult::Complete)
-        }
-        else {
+        } else {
             self.end -= n;
             (n, GeneratorResult::Stopped)
         }
@@ -233,7 +236,10 @@ mod tests {
         let mut gen = SliceGenerator::new(&data);
 
         gen.try_advance_back(NonZeroUsize::new(1).unwrap());
-        assert_eq!(gen.try_advance(NonZeroUsize::new(5).unwrap()), (4, GeneratorResult::Complete));
+        assert_eq!(
+            gen.try_advance(NonZeroUsize::new(5).unwrap()),
+            (4, GeneratorResult::Complete)
+        );
 
         assert_eq!(gen.next_back(), Err(GeneratorResult::Complete));
         assert_eq!(gen.next(), Err(GeneratorResult::Complete));

@@ -58,7 +58,7 @@ where
 #[cfg(test)]
 mod tests {
     use crate::test::StoppingGen;
-    use crate::{GeneratorExt, GeneratorResult, SliceGenerator, ReverseGenerator};
+    use crate::{GeneratorExt, GeneratorResult, ReverseGenerator, SliceGenerator};
     use std::num::NonZeroUsize;
 
     #[test]
