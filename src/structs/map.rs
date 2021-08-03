@@ -1,5 +1,5 @@
 use crate::{Generator, GeneratorResult, ReverseGenerator, ValueResult};
-use std::num::NonZeroUsize;
+use core::num::NonZeroUsize;
 
 /// Implements a mapped generator. See [`.map()`](crate::GeneratorExt::map) for details.
 #[derive(Clone)]
