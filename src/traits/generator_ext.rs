@@ -1530,6 +1530,30 @@ pub trait GeneratorExt: Sealed + Generator {
     {
         Inspect::new(self, inspector)
     }
+
+    /// Borrows a generator rather than consuming it.
+    ///
+    /// This is useful to allow applying generator adaptors while still retaining ownership of the
+    /// original generator.
+    ///
+    /// ## Examples
+    ///
+    /// Basic usage:
+    ///
+    /// ```
+    /// use pushgen::{IntoGenerator, GeneratorExt};
+    /// let mut words = ["hello", "world", "of", "rust"].into_gen();
+    ///
+    /// let hello_world: Vec<_> = words.by_ref().take(2).collect();
+    /// assert_eq!(hello_world, [&"hello", &"world"]);
+    ///
+    /// let of_rust: Vec<_> = words.collect();
+    /// assert_eq!(of_rust, [&"of", &"rust"]);
+    /// ```
+    #[inline]
+    fn by_ref(&mut self) -> &mut Self {
+        self
+    }
 }
 
 impl<T: Generator> GeneratorExt for T {}

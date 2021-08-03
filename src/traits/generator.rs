@@ -108,3 +108,17 @@ where
         }
     }
 }
+
+impl<T: Generator> Generator for &mut T {
+    type Output = T::Output;
+
+    #[inline]
+    fn run(&mut self, output: impl FnMut(Self::Output) -> ValueResult) -> GeneratorResult {
+        (**self).run(output)
+    }
+
+    #[inline]
+    fn try_advance(&mut self, n: NonZeroUsize) -> (usize, GeneratorResult) {
+        (**self).try_advance(n)
+    }
+}
