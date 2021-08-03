@@ -4,7 +4,7 @@ use crate::structs::{
     Map, Skip, SkipWhile, StepBy, Take, TakeWhile, Zip,
 };
 use crate::traits::{FromGenerator, Product, Sum};
-use crate::{Generator, GeneratorResult, TryReduction, ValueResult};
+use crate::{Generator, GeneratorResult, ReverseGenerator, TryReduction, ValueResult};
 use core::cmp::Ordering;
 
 pub trait Sealed {}
@@ -148,6 +148,22 @@ pub trait GeneratorExt: Sealed + Generator {
     fn next(&mut self) -> Result<Self::Output, GeneratorResult> {
         let mut maybe_value = None;
         let res = self.run(|x| {
+            maybe_value = Some(x);
+            ValueResult::Stop
+        });
+        match maybe_value {
+            Some(x) => Ok(x),
+            None => Err(res),
+        }
+    }
+
+    #[inline]
+    fn next_back(&mut self) -> Result<Self::Output, GeneratorResult>
+    where
+        Self: ReverseGenerator,
+    {
+        let mut maybe_value = None;
+        let res = self.run_back(|x| {
             maybe_value = Some(x);
             ValueResult::Stop
         });

@@ -1,4 +1,6 @@
-use crate::{structs::utility::InplaceUpdatable, Generator, GeneratorExt, ValueResult};
+use crate::{
+    structs::utility::InplaceUpdatable, Generator, GeneratorExt, ReverseGenerator, ValueResult,
+};
 
 /// Adapt a generator into an iterator. See [`.iter()`](crate::GeneratorExt::iter) for more info.
 #[derive(Clone)]
@@ -45,6 +47,16 @@ where
     }
 }
 
+impl<Src> DoubleEndedIterator for IteratorAdaptor<Src>
+where
+    Src: ReverseGenerator,
+{
+    #[inline]
+    fn next_back(&mut self) -> Option<Self::Item> {
+        self.source.next_back().ok()
+    }
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
@@ -59,6 +71,17 @@ mod tests {
         }
 
         assert_eq!(sum, data.iter().sum());
+    }
+
+    #[test]
+    fn reverse_iter() {
+        let data = [1, 2, 3, 4];
+        let mut out = Vec::new();
+        for x in IteratorAdaptor::new(SliceGenerator::new(&data)).rev() {
+            out.push(*x);
+        }
+
+        assert_eq!(out, [4, 3, 2, 1]);
     }
 
     #[test]

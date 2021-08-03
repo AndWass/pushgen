@@ -3,6 +3,7 @@ pub use accum::Sum;
 pub use dyn_generator::DynGenerator;
 pub use from_gen::FromGenerator;
 pub use generator::Generator;
+pub use generator::ReverseGenerator;
 pub use generator_ext::GeneratorExt;
 pub use into_gen::IntoGenerator;
 
