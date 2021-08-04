@@ -77,7 +77,7 @@ where
                     GeneratorResult::Stopped
                 } else {
                     GeneratorResult::Complete
-                }
+                };
             }
         }
 
@@ -115,7 +115,7 @@ where
                     GeneratorResult::Stopped
                 } else {
                     GeneratorResult::Complete
-                }
+                };
             }
         }
 
