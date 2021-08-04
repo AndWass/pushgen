@@ -39,12 +39,12 @@ impl<'a, T> Generator for SliceGenerator<'a, T> {
     fn run(&mut self, mut output: impl FnMut(Self::Output) -> ValueResult) -> GeneratorResult {
         let end = self.end;
         while self.begin < end {
-            let index = self.begin;
-            self.begin += 1;
             // Safety: index < self.end always true.
-            if output(unsafe { self.slice.get_unchecked(index) }) == ValueResult::Stop {
+            if output(unsafe { self.slice.get_unchecked(self.begin) }) == ValueResult::Stop {
+                self.begin += 1;
                 return GeneratorResult::Stopped;
             }
+            self.begin += 1;
         }
         GeneratorResult::Complete
     }
@@ -68,14 +68,13 @@ impl<'a, T> ReverseGenerator for SliceGenerator<'a, T> {
     fn run_back(&mut self, mut output: impl FnMut(Self::Output) -> ValueResult) -> GeneratorResult {
         let end_back = self.begin;
         while self.end > end_back {
-            // If self.end > end_back, then self.end > 0, so this will not underflow.
-            let index = self.end - 1;
-            // shrink the slice from the back
-            self.end -= 1;
-            // Safety: index always less than total len and greater or equal to 0
-            if output(unsafe { self.slice.get_unchecked(index) }) == ValueResult::Stop {
+            // self.end > end_back -> self.end > 0, so self.end-1 is safe
+            // Safety: self.end-1 always in range [0, self.slice.len())
+            if output(unsafe { self.slice.get_unchecked(self.end - 1) }) == ValueResult::Stop {
+                self.end -= 1;
                 return GeneratorResult::Stopped;
             }
+            self.end -= 1;
         }
 
         GeneratorResult::Complete
