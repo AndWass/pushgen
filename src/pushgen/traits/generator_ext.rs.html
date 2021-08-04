@@ -1843,6 +1843,68 @@
 <span id="1843">1843</span>
 <span id="1844">1844</span>
 <span id="1845">1845</span>
+<span id="1846">1846</span>
+<span id="1847">1847</span>
+<span id="1848">1848</span>
+<span id="1849">1849</span>
+<span id="1850">1850</span>
+<span id="1851">1851</span>
+<span id="1852">1852</span>
+<span id="1853">1853</span>
+<span id="1854">1854</span>
+<span id="1855">1855</span>
+<span id="1856">1856</span>
+<span id="1857">1857</span>
+<span id="1858">1858</span>
+<span id="1859">1859</span>
+<span id="1860">1860</span>
+<span id="1861">1861</span>
+<span id="1862">1862</span>
+<span id="1863">1863</span>
+<span id="1864">1864</span>
+<span id="1865">1865</span>
+<span id="1866">1866</span>
+<span id="1867">1867</span>
+<span id="1868">1868</span>
+<span id="1869">1869</span>
+<span id="1870">1870</span>
+<span id="1871">1871</span>
+<span id="1872">1872</span>
+<span id="1873">1873</span>
+<span id="1874">1874</span>
+<span id="1875">1875</span>
+<span id="1876">1876</span>
+<span id="1877">1877</span>
+<span id="1878">1878</span>
+<span id="1879">1879</span>
+<span id="1880">1880</span>
+<span id="1881">1881</span>
+<span id="1882">1882</span>
+<span id="1883">1883</span>
+<span id="1884">1884</span>
+<span id="1885">1885</span>
+<span id="1886">1886</span>
+<span id="1887">1887</span>
+<span id="1888">1888</span>
+<span id="1889">1889</span>
+<span id="1890">1890</span>
+<span id="1891">1891</span>
+<span id="1892">1892</span>
+<span id="1893">1893</span>
+<span id="1894">1894</span>
+<span id="1895">1895</span>
+<span id="1896">1896</span>
+<span id="1897">1897</span>
+<span id="1898">1898</span>
+<span id="1899">1899</span>
+<span id="1900">1900</span>
+<span id="1901">1901</span>
+<span id="1902">1902</span>
+<span id="1903">1903</span>
+<span id="1904">1904</span>
+<span id="1905">1905</span>
+<span id="1906">1906</span>
+<span id="1907">1907</span>
 </pre><pre class="rust">
 <span class="kw">use</span> <span class="kw">crate</span><span class="ident">::structs::utility::InplaceUpdatable</span>;
 <span class="kw">use</span> <span class="kw">crate</span><span class="ident">::structs</span>::{
@@ -3441,6 +3503,68 @@
     <span class="attribute">#[<span class="ident">inline</span>]</span>
     <span class="kw">fn</span> <span class="ident">by_ref</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">Self</span> {
         <span class="self">self</span>
+    }
+
+    <span class="doccomment">/// Searches for a value among the values generated, returning its index.</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// `position()` takes a closure that returns `true` or `false`. This is applied to each value</span>
+    <span class="doccomment">/// and if one of them returns true, then `position()` returns `Some(index)`. Otherwise `None`</span>
+    <span class="doccomment">/// is returned.</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// `position()` is short-circuiting; it will stop processing as soon as it finds a `true`.</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// ## Panics</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// This function might panic if the generator generates more than `usize::MAX` `false` values.</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// ## Spuriously stopping generators</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// `position()` does not attempt to handle spuriously stopping generators.</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// ## Examples</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// Basic usage:</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// ```</span>
+    <span class="doccomment">/// use pushgen::{IntoGenerator, GeneratorExt};</span>
+    <span class="doccomment">/// let a = [1, 2, 3];</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// assert_eq!(a.into_gen().position(|&amp;x| x == 2), Some(1));</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// assert_eq!(a.into_gen().position(|&amp;x| x == 5), None);</span>
+    <span class="doccomment">/// ```</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// Stopping at first `true`:</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// ```</span>
+    <span class="doccomment">/// use pushgen::{IntoGenerator, GeneratorExt};</span>
+    <span class="doccomment">/// let a = [1, 2, 3, 4];</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// let mut gen = a.into_gen();</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// assert_eq!(gen.position(|&amp;x| x &gt;= 2), Some(1));</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// // we can still use `iter`, as there are more elements.</span>
+    <span class="doccomment">/// assert_eq!(gen.next(), Ok(&amp;3));</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// // The returned index depends on iterator state</span>
+    <span class="doccomment">/// assert_eq!(gen.position(|&amp;x| x == 4), Some(0));</span>
+    <span class="doccomment">/// ```</span>
+    <span class="doccomment">///</span>
+    <span class="attribute">#[<span class="ident">inline</span>]</span>
+    <span class="kw">fn</span> <span class="ident">position</span><span class="op">&lt;</span><span class="ident">P</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="kw-2">mut</span> <span class="ident">predicate</span>: <span class="ident">P</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">usize</span><span class="op">&gt;</span>
+    <span class="kw">where</span>
+        <span class="self">Self</span>: <span class="ident">Sized</span>,
+        <span class="ident">P</span>: <span class="ident">FnMut</span>(<span class="self">Self</span><span class="ident">::Output</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">bool</span>,
+    {
+        <span class="self">self</span>.<span class="ident">try_fold</span>(<span class="number">0</span>, <span class="op">|</span><span class="ident">index</span>, <span class="ident">value</span><span class="op">|</span> {
+            <span class="kw">if</span> <span class="ident">predicate</span>(<span class="ident">value</span>) {
+                <span class="prelude-val">Err</span>(<span class="ident">index</span>)
+            } <span class="kw">else</span> {
+                <span class="prelude-val">Ok</span>(<span class="ident">index</span> <span class="op">+</span> <span class="number">1</span>)
+            }
+        })
+        .<span class="ident">err</span>()
     }
 }
 
