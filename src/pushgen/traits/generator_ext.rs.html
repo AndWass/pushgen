@@ -1801,14 +1801,56 @@
 <span id="1801">1801</span>
 <span id="1802">1802</span>
 <span id="1803">1803</span>
+<span id="1804">1804</span>
+<span id="1805">1805</span>
+<span id="1806">1806</span>
+<span id="1807">1807</span>
+<span id="1808">1808</span>
+<span id="1809">1809</span>
+<span id="1810">1810</span>
+<span id="1811">1811</span>
+<span id="1812">1812</span>
+<span id="1813">1813</span>
+<span id="1814">1814</span>
+<span id="1815">1815</span>
+<span id="1816">1816</span>
+<span id="1817">1817</span>
+<span id="1818">1818</span>
+<span id="1819">1819</span>
+<span id="1820">1820</span>
+<span id="1821">1821</span>
+<span id="1822">1822</span>
+<span id="1823">1823</span>
+<span id="1824">1824</span>
+<span id="1825">1825</span>
+<span id="1826">1826</span>
+<span id="1827">1827</span>
+<span id="1828">1828</span>
+<span id="1829">1829</span>
+<span id="1830">1830</span>
+<span id="1831">1831</span>
+<span id="1832">1832</span>
+<span id="1833">1833</span>
+<span id="1834">1834</span>
+<span id="1835">1835</span>
+<span id="1836">1836</span>
+<span id="1837">1837</span>
+<span id="1838">1838</span>
+<span id="1839">1839</span>
+<span id="1840">1840</span>
+<span id="1841">1841</span>
+<span id="1842">1842</span>
+<span id="1843">1843</span>
+<span id="1844">1844</span>
+<span id="1845">1845</span>
 </pre><pre class="rust">
 <span class="kw">use</span> <span class="kw">crate</span><span class="ident">::structs::utility::InplaceUpdatable</span>;
 <span class="kw">use</span> <span class="kw">crate</span><span class="ident">::structs</span>::{
     <span class="ident">Chain</span>, <span class="ident">Cloned</span>, <span class="ident">Copied</span>, <span class="ident">Dedup</span>, <span class="ident">Enumerate</span>, <span class="ident">Filter</span>, <span class="ident">FilterMap</span>, <span class="ident">Flatten</span>, <span class="ident">Inspect</span>, <span class="ident">IteratorAdaptor</span>,
-    <span class="ident">Map</span>, <span class="ident">Skip</span>, <span class="ident">SkipWhile</span>, <span class="ident">StepBy</span>, <span class="ident">Take</span>, <span class="ident">TakeWhile</span>, <span class="ident">Zip</span>,
+    <span class="ident">Map</span>, <span class="ident">Reverse</span>, <span class="ident">Skip</span>, <span class="ident">SkipWhile</span>, <span class="ident">StepBy</span>, <span class="ident">Take</span>, <span class="ident">TakeWhile</span>, <span class="ident">Zip</span>,
 };
 <span class="kw">use</span> <span class="kw">crate</span><span class="ident">::traits</span>::{<span class="ident">FromGenerator</span>, <span class="ident">Product</span>, <span class="ident">Sum</span>};
-<span class="kw">use</span> <span class="kw">crate</span>::{<span class="ident">Generator</span>, <span class="ident">GeneratorResult</span>, <span class="ident">TryReduction</span>, <span class="ident">ValueResult</span>};
+<span class="kw">use</span> <span class="kw">crate</span>::{<span class="ident">Generator</span>, <span class="ident">GeneratorResult</span>, <span class="ident">ReverseGenerator</span>, <span class="ident">TryReduction</span>, <span class="ident">ValueResult</span>};
 <span class="kw">use</span> <span class="ident">core::cmp::Ordering</span>;
 
 <span class="kw">pub</span> <span class="kw">trait</span> <span class="ident">Sealed</span> {}
@@ -1952,6 +1994,22 @@
     <span class="kw">fn</span> <span class="ident">next</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="self">Self</span><span class="ident">::Output</span>, <span class="ident">GeneratorResult</span><span class="op">&gt;</span> {
         <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">maybe_value</span> <span class="op">=</span> <span class="prelude-val">None</span>;
         <span class="kw">let</span> <span class="ident">res</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">run</span>(<span class="op">|</span><span class="ident">x</span><span class="op">|</span> {
+            <span class="ident">maybe_value</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="ident">x</span>);
+            <span class="ident">ValueResult::Stop</span>
+        });
+        <span class="kw">match</span> <span class="ident">maybe_value</span> {
+            <span class="prelude-val">Some</span>(<span class="ident">x</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Ok</span>(<span class="ident">x</span>),
+            <span class="prelude-val">None</span> <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Err</span>(<span class="ident">res</span>),
+        }
+    }
+
+    <span class="attribute">#[<span class="ident">inline</span>]</span>
+    <span class="kw">fn</span> <span class="ident">next_back</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="self">Self</span><span class="ident">::Output</span>, <span class="ident">GeneratorResult</span><span class="op">&gt;</span>
+    <span class="kw">where</span>
+        <span class="self">Self</span>: <span class="ident">ReverseGenerator</span>,
+    {
+        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">maybe_value</span> <span class="op">=</span> <span class="prelude-val">None</span>;
+        <span class="kw">let</span> <span class="ident">res</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">run_back</span>(<span class="op">|</span><span class="ident">x</span><span class="op">|</span> {
             <span class="ident">maybe_value</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="ident">x</span>);
             <span class="ident">ValueResult::Stop</span>
         });
@@ -3333,6 +3391,32 @@
         <span class="ident">F</span>: <span class="ident">FnMut</span>(<span class="kw-2">&amp;</span><span class="self">Self</span><span class="ident">::Output</span>),
     {
         <span class="ident">Inspect::new</span>(<span class="self">self</span>, <span class="ident">inspector</span>)
+    }
+
+    <span class="doccomment">/// Reverses a generators direction.</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// ## Examples</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// Basic usage:</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// ```</span>
+    <span class="doccomment">/// use pushgen::{IntoGenerator, GeneratorExt, GeneratorResult};</span>
+    <span class="doccomment">/// let a = [1, 2, 3];</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// let mut gen = a.into_gen().rev();</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// assert_eq!(gen.next(), Ok(&amp;3));</span>
+    <span class="doccomment">/// assert_eq!(gen.next(), Ok(&amp;2));</span>
+    <span class="doccomment">/// assert_eq!(gen.next(), Ok(&amp;1));</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// assert_eq!(gen.next(), Err(GeneratorResult::Complete));</span>
+    <span class="doccomment">/// ```</span>
+    <span class="attribute">#[<span class="ident">inline</span>]</span>
+    <span class="kw">fn</span> <span class="ident">rev</span>(<span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Reverse</span><span class="op">&lt;</span><span class="self">Self</span><span class="op">&gt;</span>
+    <span class="kw">where</span>
+        <span class="self">Self</span>: <span class="ident">Sized</span> <span class="op">+</span> <span class="ident">ReverseGenerator</span>,
+    {
+        <span class="ident">Reverse::new</span>(<span class="self">self</span>)
     }
 
     <span class="doccomment">/// Borrows a generator rather than consuming it.</span>

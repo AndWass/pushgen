@@ -32,8 +32,20 @@
 <span id="32">32</span>
 <span id="33">33</span>
 <span id="34">34</span>
+<span id="35">35</span>
+<span id="36">36</span>
+<span id="37">37</span>
+<span id="38">38</span>
+<span id="39">39</span>
+<span id="40">40</span>
+<span id="41">41</span>
+<span id="42">42</span>
+<span id="43">43</span>
+<span id="44">44</span>
+<span id="45">45</span>
+<span id="46">46</span>
 </pre><pre class="rust">
-<span class="kw">use</span> <span class="kw">crate</span>::{<span class="ident">Generator</span>, <span class="ident">GeneratorResult</span>, <span class="ident">ValueResult</span>};
+<span class="kw">use</span> <span class="kw">crate</span>::{<span class="ident">Generator</span>, <span class="ident">GeneratorResult</span>, <span class="ident">ReverseGenerator</span>, <span class="ident">ValueResult</span>};
 
 <span class="doccomment">/// A generator over the value in [`Some`] variant of an [`Option`].</span>
 <span class="doccomment">///</span>
@@ -59,6 +71,18 @@
 
     <span class="attribute">#[<span class="ident">inline</span>]</span>
     <span class="kw">fn</span> <span class="ident">run</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="kw-2">mut</span> <span class="ident">output</span>: <span class="kw">impl</span> <span class="ident">FnMut</span>(<span class="self">Self</span><span class="ident">::Output</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">ValueResult</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">GeneratorResult</span> {
+        <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">v</span>) <span class="op">=</span> <span class="self">self</span>.<span class="ident">inner</span>.<span class="ident">take</span>() {
+            <span class="kw">if</span> <span class="ident">output</span>(<span class="ident">v</span>) <span class="op">=</span><span class="op">=</span> <span class="ident">ValueResult::Stop</span> {
+                <span class="kw">return</span> <span class="ident">GeneratorResult::Stopped</span>;
+            }
+        }
+        <span class="ident">GeneratorResult::Complete</span>
+    }
+}
+
+<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span> <span class="ident">ReverseGenerator</span> <span class="kw">for</span> <span class="ident">OptionGen</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span> {
+    <span class="attribute">#[<span class="ident">inline</span>]</span>
+    <span class="kw">fn</span> <span class="ident">run_back</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="kw-2">mut</span> <span class="ident">output</span>: <span class="kw">impl</span> <span class="ident">FnMut</span>(<span class="self">Self</span><span class="ident">::Output</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">ValueResult</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">GeneratorResult</span> {
         <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">v</span>) <span class="op">=</span> <span class="self">self</span>.<span class="ident">inner</span>.<span class="ident">take</span>() {
             <span class="kw">if</span> <span class="ident">output</span>(<span class="ident">v</span>) <span class="op">=</span><span class="op">=</span> <span class="ident">ValueResult::Stop</span> {
                 <span class="kw">return</span> <span class="ident">GeneratorResult::Stopped</span>;
