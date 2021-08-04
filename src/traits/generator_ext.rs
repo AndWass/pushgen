@@ -1,7 +1,7 @@
 use crate::structs::utility::InplaceUpdatable;
 use crate::structs::{
     Chain, Cloned, Copied, Dedup, Enumerate, Filter, FilterMap, Flatten, Inspect, IteratorAdaptor,
-    Map, Skip, SkipWhile, StepBy, Take, TakeWhile, Zip,
+    Map, Reverse, Skip, SkipWhile, StepBy, Take, TakeWhile, Zip,
 };
 use crate::traits::{FromGenerator, Product, Sum};
 use crate::{Generator, GeneratorResult, ReverseGenerator, TryReduction, ValueResult};
@@ -1545,6 +1545,32 @@ pub trait GeneratorExt: Sealed + Generator {
         F: FnMut(&Self::Output),
     {
         Inspect::new(self, inspector)
+    }
+
+    /// Reverses a generators direction.
+    ///
+    /// ## Examples
+    ///
+    /// Basic usage:
+    ///
+    /// ```
+    /// use pushgen::{IntoGenerator, GeneratorExt, GeneratorResult};
+    /// let a = [1, 2, 3];
+    ///
+    /// let mut gen = a.into_gen().rev();
+    ///
+    /// assert_eq!(gen.next(), Ok(&3));
+    /// assert_eq!(gen.next(), Ok(&2));
+    /// assert_eq!(gen.next(), Ok(&1));
+    ///
+    /// assert_eq!(gen.next(), Err(GeneratorResult::Complete));
+    /// ```
+    #[inline]
+    fn rev(self) -> Reverse<Self>
+    where
+        Self: Sized + ReverseGenerator,
+    {
+        Reverse::new(self)
     }
 
     /// Borrows a generator rather than consuming it.
