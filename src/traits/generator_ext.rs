@@ -1596,6 +1596,68 @@ pub trait GeneratorExt: Sealed + Generator {
     fn by_ref(&mut self) -> &mut Self {
         self
     }
+
+    /// Searches for a value among the values generated, returning its index.
+    ///
+    /// `position()` takes a closure that returns `true` or `false`. This is applied to each value
+    /// and if one of them returns true, then `position()` returns `Some(index)`. Otherwise `None`
+    /// is returned.
+    ///
+    /// `position()` is short-circuiting; it will stop processing as soon as it finds a `true`.
+    ///
+    /// ## Panics
+    ///
+    /// This function might panic if the generator generates more than `usize::MAX` `false` values.
+    ///
+    /// ## Spuriously stopping generators
+    ///
+    /// `position()` does not attempt to handle spuriously stopping generators.
+    ///
+    /// ## Examples
+    ///
+    /// Basic usage:
+    ///
+    /// ```
+    /// use pushgen::{IntoGenerator, GeneratorExt};
+    /// let a = [1, 2, 3];
+    ///
+    /// assert_eq!(a.into_gen().position(|&x| x == 2), Some(1));
+    ///
+    /// assert_eq!(a.into_gen().position(|&x| x == 5), None);
+    /// ```
+    ///
+    /// Stopping at first `true`:
+    ///
+    /// ```
+    /// use pushgen::{IntoGenerator, GeneratorExt};
+    /// let a = [1, 2, 3, 4];
+    ///
+    /// let mut gen = a.into_gen();
+    ///
+    /// assert_eq!(gen.position(|&x| x >= 2), Some(1));
+    ///
+    /// // we can still use `iter`, as there are more elements.
+    /// assert_eq!(gen.next(), Ok(&3));
+    ///
+    /// // The returned index depends on iterator state
+    /// assert_eq!(gen.position(|&x| x == 4), Some(0));
+    /// ```
+    ///
+    #[inline]
+    fn position<P>(&mut self, mut predicate: P) -> Option<usize>
+    where
+        Self: Sized,
+        P: FnMut(Self::Output) -> bool,
+    {
+        self.try_fold(0, |index, value| {
+            if predicate(value) {
+                Err(index)
+            } else {
+                Ok(index + 1)
+            }
+        })
+        .err()
+    }
 }
 
 impl<T: Generator> GeneratorExt for T {}
