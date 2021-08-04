@@ -1,4 +1,7 @@
-use crate::{structs::utility::set_some, Generator, GeneratorResult, IntoGenerator, ValueResult};
+use crate::{
+    structs::utility::set_some, Generator, GeneratorResult, IntoGenerator, ReverseGenerator,
+    ValueResult,
+};
 
 /// Flatten generator implementation. See [`.flatten()`](crate::GeneratorExt::flatten) for details.
 pub struct Flatten<Src>
@@ -8,6 +11,7 @@ where
 {
     source: Src,
     current_generator: Option<<Src::Output as IntoGenerator>::IntoGen>,
+    current_back_generator: Option<<Src::Output as IntoGenerator>::IntoGen>,
 }
 
 impl<Src> Flatten<Src>
@@ -20,6 +24,7 @@ where
         Self {
             source,
             current_generator: None,
+            current_back_generator: None,
         }
     }
 }
@@ -37,6 +42,7 @@ where
         Self {
             source: self.source.clone(),
             current_generator: self.current_generator.clone(),
+            current_back_generator: self.current_back_generator.clone(),
         }
     }
 }
@@ -57,12 +63,63 @@ where
         }
 
         let current_generator = &mut self.current_generator;
-        self.source.run(|x| {
+        let result = self.source.run(|x| {
             match set_some(current_generator, x.into_gen()).run(|value| output(value)) {
                 GeneratorResult::Stopped => ValueResult::Stop,
                 GeneratorResult::Complete => ValueResult::MoreValues,
             }
-        })
+        });
+
+        if result == GeneratorResult::Complete {
+            if let Some(mut last) = self.current_back_generator.take() {
+                return if last.run(output) == GeneratorResult::Stopped {
+                    self.current_back_generator = Some(last);
+                    GeneratorResult::Stopped
+                } else {
+                    GeneratorResult::Complete
+                };
+            }
+        }
+
+        result
+    }
+}
+
+impl<Src> ReverseGenerator for Flatten<Src>
+where
+    Src: ReverseGenerator,
+    Src::Output: IntoGenerator,
+    <Src::Output as IntoGenerator>::IntoGen: ReverseGenerator,
+{
+    #[inline]
+    fn run_back(&mut self, mut output: impl FnMut(Self::Output) -> ValueResult) -> GeneratorResult {
+        if let Some(mut current) = self.current_back_generator.take() {
+            if current.run_back(|x| output(x)) == GeneratorResult::Stopped {
+                self.current_back_generator = Some(current);
+                return GeneratorResult::Stopped;
+            }
+        }
+
+        let current = &mut self.current_back_generator;
+        let result = self.source.run_back(|x| {
+            match set_some(current, x.into_gen()).run_back(|value| output(value)) {
+                GeneratorResult::Stopped => ValueResult::Stop,
+                GeneratorResult::Complete => ValueResult::MoreValues,
+            }
+        });
+
+        if result == GeneratorResult::Complete {
+            if let Some(mut last) = self.current_generator.take() {
+                return if last.run_back(output) == GeneratorResult::Stopped {
+                    self.current_generator = Some(last);
+                    GeneratorResult::Stopped
+                } else {
+                    GeneratorResult::Complete
+                };
+            }
+        }
+
+        result
     }
 }
 
@@ -155,5 +212,102 @@ mod tests {
                 assert_eq!(output, expected);
             }
         }
+    }
+
+    #[test]
+    fn reverse() {
+        let data = [[1, 2], [3, 4], [5, 6]];
+        let mut gen = SliceGenerator::new(&data).flatten();
+        assert_eq!(gen.next_back(), Ok(&6));
+        assert_eq!(gen.next_back(), Ok(&5));
+        assert_eq!(gen.next_back(), Ok(&4));
+        assert_eq!(gen.next_back(), Ok(&3));
+        assert_eq!(gen.next_back(), Ok(&2));
+        assert_eq!(gen.next_back(), Ok(&1));
+        assert_eq!(gen.next_back(), Err(GeneratorResult::Complete));
+        assert_eq!(gen.next(), Err(GeneratorResult::Complete));
+    }
+
+    #[test]
+    fn forward_then_reverse() {
+        let data = [[1, 2], [3, 4], [5, 6]];
+        let mut gen = SliceGenerator::new(&data).flatten();
+        assert_eq!(gen.next(), Ok(&1));
+        assert_eq!(gen.next_back(), Ok(&6));
+        assert_eq!(gen.next_back(), Ok(&5));
+        assert_eq!(gen.next_back(), Ok(&4));
+        assert_eq!(gen.next_back(), Ok(&3));
+        assert_eq!(gen.next_back(), Ok(&2));
+        assert_eq!(gen.next_back(), Err(GeneratorResult::Complete));
+        assert_eq!(gen.next(), Err(GeneratorResult::Complete));
+    }
+    #[test]
+    fn forward_then_reverse2() {
+        let data = [[1, 2], [3, 4], [5, 6]];
+        let mut gen = SliceGenerator::new(&data).flatten();
+        assert_eq!(gen.next(), Ok(&1));
+        assert_eq!(gen.next(), Ok(&2));
+        assert_eq!(gen.next_back(), Ok(&6));
+        assert_eq!(gen.next_back(), Ok(&5));
+        assert_eq!(gen.next_back(), Ok(&4));
+        assert_eq!(gen.next_back(), Ok(&3));
+        assert_eq!(gen.next_back(), Err(GeneratorResult::Complete));
+        assert_eq!(gen.next(), Err(GeneratorResult::Complete));
+    }
+
+    #[test]
+    fn forward_then_reverse3() {
+        let data = [[1, 2], [3, 4], [5, 6]];
+        let mut gen = SliceGenerator::new(&data).flatten();
+        assert_eq!(gen.next(), Ok(&1));
+        assert_eq!(gen.next(), Ok(&2));
+        assert_eq!(gen.next(), Ok(&3));
+        assert_eq!(gen.next_back(), Ok(&6));
+        assert_eq!(gen.next_back(), Ok(&5));
+        assert_eq!(gen.next_back(), Ok(&4));
+        assert_eq!(gen.next_back(), Err(GeneratorResult::Complete));
+        assert_eq!(gen.next(), Err(GeneratorResult::Complete));
+    }
+
+    #[test]
+    fn reverse_then_foward3() {
+        let data = [[1, 2], [3, 4], [5, 6]];
+        let mut gen = SliceGenerator::new(&data).flatten();
+        assert_eq!(gen.next_back(), Ok(&6));
+        assert_eq!(gen.next_back(), Ok(&5));
+        assert_eq!(gen.next_back(), Ok(&4));
+        assert_eq!(gen.next(), Ok(&1));
+        assert_eq!(gen.next(), Ok(&2));
+        assert_eq!(gen.next(), Ok(&3));
+        assert_eq!(gen.next_back(), Err(GeneratorResult::Complete));
+        assert_eq!(gen.next(), Err(GeneratorResult::Complete));
+    }
+
+    #[test]
+    fn reverse_then_foward_alt() {
+        let data = [[1, 2], [3, 4], [5, 6]];
+        let mut gen = SliceGenerator::new(&data).flatten();
+        assert_eq!(gen.next_back(), Ok(&6));
+        assert_eq!(gen.next(), Ok(&1));
+        assert_eq!(gen.next_back(), Ok(&5));
+        assert_eq!(gen.next(), Ok(&2));
+        assert_eq!(gen.next_back(), Ok(&4));
+        assert_eq!(gen.next(), Ok(&3));
+        assert_eq!(gen.next_back(), Err(GeneratorResult::Complete));
+        assert_eq!(gen.next(), Err(GeneratorResult::Complete));
+    }
+
+    #[test]
+    fn forward_then_reverse_alt() {
+        let data = [[1, 2], [3, 4], [5, 6]];
+        let mut gen = SliceGenerator::new(&data).flatten();
+        assert_eq!(gen.next(), Ok(&1));
+        assert_eq!(gen.next_back(), Ok(&6));
+        assert_eq!(gen.next(), Ok(&2));
+        assert_eq!(gen.next_back(), Ok(&5));
+        assert_eq!(gen.next(), Ok(&3));
+        assert_eq!(gen.next_back(), Ok(&4));
+        assert_eq!(gen.next(), Err(GeneratorResult::Complete));
+        assert_eq!(gen.next_back(), Err(GeneratorResult::Complete));
     }
 }

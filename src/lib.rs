@@ -47,6 +47,7 @@ pub use traits::FromGenerator;
 pub use traits::Generator;
 pub use traits::GeneratorExt;
 pub use traits::IntoGenerator;
+pub use traits::ReverseGenerator;
 
 pub use generators::from_fn;
 pub use generators::from_iter;

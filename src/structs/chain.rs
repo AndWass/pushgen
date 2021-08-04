@@ -1,4 +1,4 @@
-use crate::{Generator, GeneratorResult, ValueResult};
+use crate::{Generator, GeneratorResult, ReverseGenerator, ValueResult};
 
 /// Implements a chained generator. See [`.chain()`](crate::GeneratorExt::chain) for details.
 #[derive(Clone)]
@@ -36,6 +36,22 @@ where
             self.first_active = false;
         }
         self.second.run(|x| output(x))
+    }
+}
+
+impl<First, Second> ReverseGenerator for Chain<First, Second>
+where
+    First: ReverseGenerator,
+    Second: ReverseGenerator<Output = First::Output>,
+{
+    #[inline]
+    fn run_back(&mut self, mut output: impl FnMut(Self::Output) -> ValueResult) -> GeneratorResult {
+        match self.second.run_back(|x| output(x)) {
+            GeneratorResult::Stopped => return GeneratorResult::Stopped,
+            GeneratorResult::Complete => {}
+        }
+
+        self.first.run_back(output)
     }
 }
 
@@ -89,5 +105,34 @@ mod tests {
             assert_eq!(result, GeneratorResult::Complete);
             assert_eq!(output, [1, 2, 3, 1, 2, 3]);
         }
+    }
+
+    #[test]
+    fn reverse() {
+        let data = [1, 2, 3];
+        let data2 = [4, 5, 6];
+        let mut gen = SliceGenerator::new(&data).chain(SliceGenerator::new(&data2));
+        assert_eq!(gen.next_back(), Ok(&6));
+        assert_eq!(gen.next_back(), Ok(&5));
+        assert_eq!(gen.next_back(), Ok(&4));
+        assert_eq!(gen.next_back(), Ok(&3));
+        assert_eq!(gen.next_back(), Ok(&2));
+        assert_eq!(gen.next_back(), Ok(&1));
+        assert_eq!(gen.next_back(), Err(GeneratorResult::Complete));
+    }
+
+    #[test]
+    fn reverse_back_front() {
+        let data = [1, 2, 3];
+        let data2 = [4, 5, 6];
+        let mut gen = SliceGenerator::new(&data).chain(SliceGenerator::new(&data2));
+        assert_eq!(gen.next_back(), Ok(&6));
+        assert_eq!(gen.next_back(), Ok(&5));
+        assert_eq!(gen.next_back(), Ok(&4));
+        assert_eq!(gen.next(), Ok(&1));
+        assert_eq!(gen.next(), Ok(&2));
+        assert_eq!(gen.next(), Ok(&3));
+        assert_eq!(gen.next_back(), Err(GeneratorResult::Complete));
+        assert_eq!(gen.next(), Err(GeneratorResult::Complete));
     }
 }

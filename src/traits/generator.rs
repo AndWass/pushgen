@@ -93,6 +93,53 @@ pub trait Generator {
     }
 }
 
+/// A generator able to produce values from in reverse order.
+///
+/// A generator that implements `ReverseGenerator` can produce values in reverse order.
+///
+/// Both forward and reverse generation work on the same range and do not cross: a generator is complete
+/// when the forward and reverse generator meets.
+///
+/// ## Examples
+///
+/// Basic usage:
+///
+/// ```
+/// use pushgen::{SliceGenerator, GeneratorResult, GeneratorExt};
+/// let numbers = [1, 2, 3, 4, 5, 6];
+/// let mut gen = SliceGenerator::new(&numbers);
+///
+/// assert_eq!(Ok(&1), gen.next());
+/// assert_eq!(Ok(&6), gen.next_back());
+/// assert_eq!(Ok(&5), gen.next_back());
+/// assert_eq!(Ok(&2), gen.next());
+/// assert_eq!(Ok(&3), gen.next());
+/// assert_eq!(Ok(&4), gen.next());
+/// assert_eq!(Err(GeneratorResult::Complete), gen.next());
+/// assert_eq!(Err(GeneratorResult::Complete), gen.next_back());
+/// ```
+pub trait ReverseGenerator: Generator {
+    /// Run a generator backwards, producing values from the end to the beginning.
+    fn run_back(&mut self, output: impl FnMut(Self::Output) -> ValueResult) -> GeneratorResult;
+
+    /// Tries to advance the generator from the back by `n` values.
+    #[inline]
+    fn try_advance_back(&mut self, n: NonZeroUsize) -> (usize, GeneratorResult) {
+        let amount_to_advance = n.get();
+        let mut amount_left = amount_to_advance;
+        let result = self.run_back(|_| {
+            amount_left -= 1;
+            if amount_left == 0 {
+                ValueResult::Stop
+            } else {
+                ValueResult::MoreValues
+            }
+        });
+
+        (amount_to_advance - amount_left, result)
+    }
+}
+
 impl<L, R> Generator for Either<L, R>
 where
     L: Generator,
@@ -105,6 +152,36 @@ where
         match self {
             Either::Left(left) => left.run(output),
             Either::Right(right) => right.run(output),
+        }
+    }
+
+    #[inline]
+    fn try_advance(&mut self, n: NonZeroUsize) -> (usize, GeneratorResult) {
+        match self {
+            Either::Left(left) => left.try_advance(n),
+            Either::Right(right) => right.try_advance(n),
+        }
+    }
+}
+
+impl<L, R> ReverseGenerator for Either<L, R>
+where
+    L: ReverseGenerator,
+    R: ReverseGenerator<Output = L::Output>,
+{
+    #[inline]
+    fn run_back(&mut self, output: impl FnMut(Self::Output) -> ValueResult) -> GeneratorResult {
+        match self {
+            Either::Left(left) => left.run_back(output),
+            Either::Right(right) => right.run_back(output),
+        }
+    }
+
+    #[inline]
+    fn try_advance_back(&mut self, n: NonZeroUsize) -> (usize, GeneratorResult) {
+        match self {
+            Either::Left(left) => left.try_advance_back(n),
+            Either::Right(right) => right.try_advance_back(n),
         }
     }
 }

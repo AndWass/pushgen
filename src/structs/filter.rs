@@ -1,4 +1,4 @@
-use crate::{Generator, GeneratorResult, ValueResult};
+use crate::{Generator, GeneratorResult, ReverseGenerator, ValueResult};
 
 /// Implements a filtered generator. See [`.filter()`](crate::GeneratorExt::filter) for more details.
 #[derive(Clone)]
@@ -41,10 +41,29 @@ where
     }
 }
 
+impl<Gen, Pred> ReverseGenerator for Filter<Gen, Pred>
+where
+    Gen: ReverseGenerator,
+    Pred: FnMut(&Gen::Output) -> bool,
+{
+    #[inline]
+    fn run_back(&mut self, mut output: impl FnMut(Self::Output) -> ValueResult) -> GeneratorResult {
+        let (generator, predicate) = (&mut self.generator, &mut self.predicate);
+        generator.run_back(move |x| {
+            if predicate(&x) {
+                output(x)
+            } else {
+                ValueResult::MoreValues
+            }
+        })
+    }
+}
+
 #[cfg(test)]
 mod tests {
     use crate::test::StoppingGen;
-    use crate::{GeneratorExt, GeneratorResult};
+    use crate::{GeneratorExt, GeneratorResult, ReverseGenerator, SliceGenerator};
+    use std::num::NonZeroUsize;
 
     #[test]
     fn spuriously_stopping() {
@@ -62,5 +81,20 @@ mod tests {
             assert_eq!(result, GeneratorResult::Complete);
             assert_eq!(output, [&1, &3]);
         }
+    }
+
+    #[test]
+    fn reverse() {
+        let data = [1, 2, 3];
+        let mut gen = SliceGenerator::new(&data).filter(|x| *x % 2 == 1);
+        assert_eq!(gen.next_back(), Ok(&3));
+        assert_eq!(gen.next_back(), Ok(&1));
+        assert_eq!(gen.next_back(), Err(GeneratorResult::Complete));
+
+        let data = [1, 2, 3];
+        let mut gen = SliceGenerator::new(&data).filter(|x| *x % 2 == 1);
+        gen.try_advance_back(NonZeroUsize::new(1).unwrap());
+        assert_eq!(gen.next_back(), Ok(&1));
+        assert_eq!(gen.next_back(), Err(GeneratorResult::Complete));
     }
 }
