@@ -23,7 +23,7 @@ impl<T> Sealed for T where T: Generator {}
 /// SliceGenerator::new(&data).map(|x| x*3).for_each(|x| output.push(x));
 /// assert_eq!(output, [3,6,9,12]);
 /// ```
-pub trait GeneratorExt: Sealed + Generator {
+pub trait GeneratorExt: Sealed + Generator + Sized {
     /// Tests if every value from the generator matches a predicate.
     ///
     /// `all()` takes a closure that returns `true` or `false`. It applies this closure to each
@@ -1748,6 +1748,40 @@ pub trait GeneratorExt: Sealed + Generator {
         })
         .err()
     }
+
+    /// Consumes the generator, counting the number of values generated and returning it.
+    ///
+    /// ## Overflow behaviour
+    ///
+    /// The method does no guarding against overflows, so counting more than `usize::MAX` values
+    /// either produces the wrong result or panics. If debug assertions are enabled, a panic is guaranteed.
+    ///
+    /// ## Panics
+    ///
+    /// May panic if the generator generates more than `usize::MAX` values.
+    ///
+    /// ## Spuriously stopping generators
+    ///
+    /// This method does not handle spuriously stopping generators. Use [`try_fold()`](GeneratorExt::try_fold)
+    /// if the generator may spuriously stop generating values.
+    ///
+    /// ## Examples
+    ///
+    /// Basic usage:
+    ///
+    /// ```
+    /// use pushgen::{IntoGenerator, GeneratorExt};
+    /// let a = [1, 2, 3];
+    /// assert_eq!(a.into_gen().count(), 3);
+    ///
+    /// let a = [1, 2, 3, 4, 5];
+    /// assert_eq!(a.into_gen().count(), 5);
+    /// ```
+    ///
+    #[inline]
+    fn count(self) -> usize {
+        self.fold(0, |acc, _| acc + 1)
+    }
 }
 
 impl<T: Generator> GeneratorExt for T {}
@@ -1993,5 +2027,12 @@ mod tests {
         let data = ['f', 'G', 'H', 'i'];
         let out: String = data.into_gen().filter(|x| x.is_uppercase()).collect();
         assert_eq!(out, "GH");
+    }
+
+    #[test]
+    fn count() {
+        let data: [i32; 0] = [];
+        assert_eq!(data.into_gen().count(), 0);
+        assert_eq!([0, 1, 2, 3].into_gen().count(), 4);
     }
 }
