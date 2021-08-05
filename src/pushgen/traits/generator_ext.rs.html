@@ -1995,6 +1995,47 @@
 <span id="1995">1995</span>
 <span id="1996">1996</span>
 <span id="1997">1997</span>
+<span id="1998">1998</span>
+<span id="1999">1999</span>
+<span id="2000">2000</span>
+<span id="2001">2001</span>
+<span id="2002">2002</span>
+<span id="2003">2003</span>
+<span id="2004">2004</span>
+<span id="2005">2005</span>
+<span id="2006">2006</span>
+<span id="2007">2007</span>
+<span id="2008">2008</span>
+<span id="2009">2009</span>
+<span id="2010">2010</span>
+<span id="2011">2011</span>
+<span id="2012">2012</span>
+<span id="2013">2013</span>
+<span id="2014">2014</span>
+<span id="2015">2015</span>
+<span id="2016">2016</span>
+<span id="2017">2017</span>
+<span id="2018">2018</span>
+<span id="2019">2019</span>
+<span id="2020">2020</span>
+<span id="2021">2021</span>
+<span id="2022">2022</span>
+<span id="2023">2023</span>
+<span id="2024">2024</span>
+<span id="2025">2025</span>
+<span id="2026">2026</span>
+<span id="2027">2027</span>
+<span id="2028">2028</span>
+<span id="2029">2029</span>
+<span id="2030">2030</span>
+<span id="2031">2031</span>
+<span id="2032">2032</span>
+<span id="2033">2033</span>
+<span id="2034">2034</span>
+<span id="2035">2035</span>
+<span id="2036">2036</span>
+<span id="2037">2037</span>
+<span id="2038">2038</span>
 </pre><pre class="rust">
 <span class="kw">use</span> <span class="kw">crate</span><span class="ident">::structs::utility::InplaceUpdatable</span>;
 <span class="kw">use</span> <span class="kw">crate</span><span class="ident">::structs</span>::{
@@ -2021,7 +2062,7 @@
 <span class="doccomment">/// SliceGenerator::new(&amp;data).map(|x| x*3).for_each(|x| output.push(x));</span>
 <span class="doccomment">/// assert_eq!(output, [3,6,9,12]);</span>
 <span class="doccomment">/// ```</span>
-<span class="kw">pub</span> <span class="kw">trait</span> <span class="ident">GeneratorExt</span>: <span class="ident">Sealed</span> <span class="op">+</span> <span class="ident">Generator</span> {
+<span class="kw">pub</span> <span class="kw">trait</span> <span class="ident">GeneratorExt</span>: <span class="ident">Sealed</span> <span class="op">+</span> <span class="ident">Generator</span> <span class="op">+</span> <span class="ident">Sized</span> {
     <span class="doccomment">/// Tests if every value from the generator matches a predicate.</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// `all()` takes a closure that returns `true` or `false`. It applies this closure to each</span>
@@ -3746,6 +3787,40 @@
         })
         .<span class="ident">err</span>()
     }
+
+    <span class="doccomment">/// Consumes the generator, counting the number of values generated and returning it.</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// ## Overflow behaviour</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// The method does no guarding against overflows, so counting more than `usize::MAX` values</span>
+    <span class="doccomment">/// either produces the wrong result or panics. If debug assertions are enabled, a panic is guaranteed.</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// ## Panics</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// May panic if the generator generates more than `usize::MAX` values.</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// ## Spuriously stopping generators</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// This method does not handle spuriously stopping generators. Use [`try_fold()`](GeneratorExt::try_fold)</span>
+    <span class="doccomment">/// if the generator may spuriously stop generating values.</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// ## Examples</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// Basic usage:</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// ```</span>
+    <span class="doccomment">/// use pushgen::{IntoGenerator, GeneratorExt};</span>
+    <span class="doccomment">/// let a = [1, 2, 3];</span>
+    <span class="doccomment">/// assert_eq!(a.into_gen().count(), 3);</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// let a = [1, 2, 3, 4, 5];</span>
+    <span class="doccomment">/// assert_eq!(a.into_gen().count(), 5);</span>
+    <span class="doccomment">/// ```</span>
+    <span class="doccomment">///</span>
+    <span class="attribute">#[<span class="ident">inline</span>]</span>
+    <span class="kw">fn</span> <span class="ident">count</span>(<span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">usize</span> {
+        <span class="self">self</span>.<span class="ident">fold</span>(<span class="number">0</span>, <span class="op">|</span><span class="ident">acc</span>, <span class="kw">_</span><span class="op">|</span> <span class="ident">acc</span> <span class="op">+</span> <span class="number">1</span>)
+    }
 }
 
 <span class="kw">impl</span><span class="op">&lt;</span><span class="ident">T</span>: <span class="ident">Generator</span><span class="op">&gt;</span> <span class="ident">GeneratorExt</span> <span class="kw">for</span> <span class="ident">T</span> {}
@@ -3991,6 +4066,13 @@
         <span class="kw">let</span> <span class="ident">data</span> <span class="op">=</span> [<span class="string">&#39;f&#39;</span>, <span class="string">&#39;G&#39;</span>, <span class="string">&#39;H&#39;</span>, <span class="string">&#39;i&#39;</span>];
         <span class="kw">let</span> <span class="ident">out</span>: <span class="ident">String</span> <span class="op">=</span> <span class="ident">data</span>.<span class="ident">into_gen</span>().<span class="ident">filter</span>(<span class="op">|</span><span class="ident">x</span><span class="op">|</span> <span class="ident">x</span>.<span class="ident">is_uppercase</span>()).<span class="ident">collect</span>();
         <span class="macro">assert_eq!</span>(<span class="ident">out</span>, <span class="string">&quot;GH&quot;</span>);
+    }
+
+    <span class="attribute">#[<span class="ident">test</span>]</span>
+    <span class="kw">fn</span> <span class="ident">count</span>() {
+        <span class="kw">let</span> <span class="ident">data</span>: [<span class="ident">i32</span>; <span class="number">0</span>] <span class="op">=</span> [];
+        <span class="macro">assert_eq!</span>(<span class="ident">data</span>.<span class="ident">into_gen</span>().<span class="ident">count</span>(), <span class="number">0</span>);
+        <span class="macro">assert_eq!</span>([<span class="number">0</span>, <span class="number">1</span>, <span class="number">2</span>, <span class="number">3</span>].<span class="ident">into_gen</span>().<span class="ident">count</span>(), <span class="number">4</span>);
     }
 }
 </pre></div>
