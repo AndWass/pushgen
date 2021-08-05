@@ -1658,6 +1658,96 @@ pub trait GeneratorExt: Sealed + Generator {
         })
         .err()
     }
+
+    /// Searches for a value that satisifes a predicate.
+    ///
+    /// `find()` takes a closure that returns `true` or `false`. This is applied to each value
+    /// and if one of them returns true, then `find()` returns `Some(value)`. Otherwise `None`
+    /// is returned.
+    ///
+    /// `find()` is short-circuiting; it will stop processing as soon as it finds a `true`.
+    ///
+    /// ## Spuriously stopping generators
+    ///
+    /// `find()` does not attempt to handle spuriously stopping generators. To handle spuriously
+    /// stopping generators, use [`try_fold()`](GeneratorExt::try_fold). Another option is to use
+    /// `gen.by_ref().filter(predicate).next()`.
+    ///
+    /// ## Examples
+    ///
+    /// Basic usage:
+    ///
+    /// ```
+    /// use pushgen::{GeneratorExt, IntoGenerator};
+    /// let a = [1, 2, 3];
+    ///
+    /// assert_eq!(a.into_gen().find(|&&x| x == 2), Some(&2));
+    ///
+    /// assert_eq!(a.into_gen().find(|&&x| x == 5), None);
+    /// ```
+    ///
+    /// Stopping at the first `true`:
+    ///
+    /// ```
+    /// use pushgen::{IntoGenerator, GeneratorExt};
+    /// let a = [1, 2, 3];
+    ///
+    /// let mut gen = a.into_gen();
+    ///
+    /// assert_eq!(gen.find(|&&x| x == 2), Some(&2));
+    ///
+    /// // we can still use `iter`, as there are more elements.
+    /// assert_eq!(gen.next(), Ok(&3));
+    /// ```
+    ///
+    #[inline]
+    fn find<P>(&mut self, mut predicate: P) -> Option<Self::Output>
+    where
+        Self: Sized,
+        P: FnMut(&Self::Output) -> bool,
+    {
+        self.try_fold((), |_, value| {
+            if predicate(&value) {
+                Err(value)
+            } else {
+                Ok(())
+            }
+        })
+        .err()
+    }
+
+    /// Applies a function to the values and returns the first non-none result.
+    ///
+    /// `gen.find_map(f)` is equivalent to `gen.by_ref().filter_map(f).next()`.
+    ///
+    /// ## Spuriously stopping generators
+    ///
+    /// `find_map()` does not attempt to handle spuriously stopping generators.
+    ///
+    /// ## Examples
+    ///
+    /// Basic usage:
+    ///
+    /// ```
+    /// use pushgen::{IntoGenerator, GeneratorExt};
+    /// let a = ["lol", "NaN", "2", "5"];
+    ///
+    /// let first_number = a.into_gen().find_map(|s| s.parse().ok());
+    ///
+    /// assert_eq!(first_number, Some(2));
+    /// ```
+    #[inline]
+    fn find_map<B, F>(&mut self, mut f: F) -> Option<B>
+    where
+        Self: Sized,
+        F: FnMut(Self::Output) -> Option<B>,
+    {
+        self.try_fold((), |_, value| match f(value) {
+            Some(x) => Err(x),
+            _ => Ok(()),
+        })
+        .err()
+    }
 }
 
 impl<T: Generator> GeneratorExt for T {}
