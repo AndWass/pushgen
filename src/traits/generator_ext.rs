@@ -193,10 +193,7 @@ pub trait GeneratorExt: Sealed + Generator + Sized {
     /// assert_eq!(a.into_gen().last(), Some(&5));
     /// ```
     #[inline]
-    fn last(mut self) -> Option<Self::Output>
-    where
-        Self: Sized,
-    {
+    fn last(mut self) -> Option<Self::Output> {
         let mut res = None;
         let res_mut = &mut res;
         self.run(move |value| {
@@ -225,7 +222,7 @@ pub trait GeneratorExt: Sealed + Generator + Sized {
     #[inline]
     fn cloned<'a, T>(self) -> Cloned<Self>
     where
-        Self: Generator<Output = &'a T> + Sized,
+        Self: Generator<Output = &'a T>,
         T: 'a + Clone,
     {
         Cloned::new(self)
@@ -251,7 +248,7 @@ pub trait GeneratorExt: Sealed + Generator + Sized {
     fn copied<'a, T>(self) -> Copied<Self>
     where
         T: 'a + Copy,
-        Self: Generator<Output = &'a T> + Sized,
+        Self: Generator<Output = &'a T>,
     {
         Copied::new(self)
     }
@@ -269,7 +266,6 @@ pub trait GeneratorExt: Sealed + Generator + Sized {
     #[inline]
     fn chain<Gen>(self, other: Gen) -> Chain<Self, Gen>
     where
-        Self: Sized,
         Gen: Generator<Output = Self::Output>,
     {
         Chain::new(self, other)
@@ -291,7 +287,6 @@ pub trait GeneratorExt: Sealed + Generator + Sized {
     #[inline]
     fn filter<Pred>(self, predicate: Pred) -> Filter<Self, Pred>
     where
-        Self: Sized,
         Pred: FnMut(&Self::Output) -> bool,
     {
         Filter::new(self, predicate)
@@ -337,7 +332,6 @@ pub trait GeneratorExt: Sealed + Generator + Sized {
     #[inline]
     fn filter_map<B, F>(self, f: F) -> FilterMap<Self, F>
     where
-        Self: Sized,
         F: FnMut(Self::Output) -> Option<B>,
     {
         FilterMap::new(self, f)
@@ -356,7 +350,6 @@ pub trait GeneratorExt: Sealed + Generator + Sized {
     #[inline]
     fn map<Trans, Out>(self, transform_fn: Trans) -> Map<Self, Trans>
     where
-        Self: Sized,
         Trans: FnMut(Self::Output) -> Out,
     {
         Map::new(self, transform_fn)
@@ -375,10 +368,7 @@ pub trait GeneratorExt: Sealed + Generator + Sized {
     /// assert_eq!(output, [3,4]);
     /// ```
     #[inline]
-    fn skip(self, n: usize) -> Skip<Self>
-    where
-        Self: Sized,
-    {
+    fn skip(self, n: usize) -> Skip<Self> {
         Skip::new(self, n)
     }
 
@@ -403,7 +393,6 @@ pub trait GeneratorExt: Sealed + Generator + Sized {
     #[inline]
     fn skip_while<P>(self, predicate: P) -> SkipWhile<Self, P>
     where
-        Self: Sized,
         P: FnMut(&Self::Output) -> bool,
     {
         SkipWhile::new(self, predicate)
@@ -420,10 +409,7 @@ pub trait GeneratorExt: Sealed + Generator + Sized {
     /// assert_eq!(output, [1, 2]);
     /// ```
     #[inline]
-    fn take(self, n: usize) -> Take<Self>
-    where
-        Self: Sized,
-    {
+    fn take(self, n: usize) -> Take<Self> {
         Take::new(self, n)
     }
 
@@ -449,7 +435,6 @@ pub trait GeneratorExt: Sealed + Generator + Sized {
     #[inline]
     fn take_while<P>(self, predicate: P) -> TakeWhile<Self, P>
     where
-        Self: Sized,
         P: FnMut(&Self::Output) -> bool,
     {
         TakeWhile::new(self, predicate)
@@ -491,7 +476,6 @@ pub trait GeneratorExt: Sealed + Generator + Sized {
     #[inline]
     fn flat_map<U, F>(self, f: F) -> Flatten<Map<Self, F>>
     where
-        Self: Sized,
         U: crate::IntoGenerator,
         F: FnMut(Self::Output) -> U,
     {
@@ -536,7 +520,6 @@ pub trait GeneratorExt: Sealed + Generator + Sized {
     #[inline]
     fn flatten(self) -> Flatten<Self>
     where
-        Self: Sized,
         Self::Output: crate::IntoGenerator,
     {
         Flatten::new(self)
@@ -559,7 +542,6 @@ pub trait GeneratorExt: Sealed + Generator + Sized {
     #[inline]
     fn for_each<Func>(&mut self, mut func: Func) -> GeneratorResult
     where
-        Self: Sized,
         Func: FnMut(Self::Output),
     {
         self.run(move |value| {
@@ -601,7 +583,6 @@ pub trait GeneratorExt: Sealed + Generator + Sized {
     #[inline]
     fn try_for_each<F, E>(&mut self, mut f: F) -> Result<(), E>
     where
-        Self: Sized,
         F: FnMut(Self::Output) -> Result<(), E>,
     {
         let mut res = Ok(());
@@ -636,7 +617,6 @@ pub trait GeneratorExt: Sealed + Generator + Sized {
     #[inline]
     fn zip<Right>(self, right: Right) -> Zip<Self, Right>
     where
-        Self: Sized,
         Right: Generator,
     {
         Zip::new(self, right)
@@ -670,7 +650,6 @@ pub trait GeneratorExt: Sealed + Generator + Sized {
     #[inline]
     fn dedup(self) -> Dedup<Self>
     where
-        Self: Sized,
         Self::Output: PartialEq,
     {
         Dedup::new(self)
@@ -691,10 +670,7 @@ pub trait GeneratorExt: Sealed + Generator + Sized {
     /// assert_eq!(sum, data.iter().sum());
     /// ```
     #[inline]
-    fn iter(self) -> IteratorAdaptor<Self>
-    where
-        Self: Sized,
-    {
+    fn iter(self) -> IteratorAdaptor<Self> {
         IteratorAdaptor::new(self)
     }
 
@@ -721,10 +697,7 @@ pub trait GeneratorExt: Sealed + Generator + Sized {
     /// assert_eq!(gen.next(), Err(GeneratorResult::Complete));
     /// ```
     #[inline]
-    fn step_by(self, step_size: usize) -> StepBy<Self>
-    where
-        Self: Sized,
-    {
+    fn step_by(self, step_size: usize) -> StepBy<Self> {
         StepBy::new(self, step_size)
     }
 
@@ -749,7 +722,7 @@ pub trait GeneratorExt: Sealed + Generator + Sized {
     #[inline]
     fn boxed(self) -> crate::generators::BoxedGenerator<Self::Output>
     where
-        Self: Sized + 'static,
+        Self: 'static,
     {
         crate::generators::BoxedGenerator::new(self)
     }
@@ -785,7 +758,6 @@ pub trait GeneratorExt: Sealed + Generator + Sized {
     #[inline]
     fn sum<S>(self) -> S
     where
-        Self: Sized,
         S: Sum<Self::Output>,
     {
         S::sum(self)
@@ -826,7 +798,6 @@ pub trait GeneratorExt: Sealed + Generator + Sized {
     #[inline]
     fn product<P>(self) -> P
     where
-        Self: Sized,
         P: Product<Self::Output>,
     {
         P::product(self)
@@ -861,7 +832,6 @@ pub trait GeneratorExt: Sealed + Generator + Sized {
     #[inline]
     fn min(self) -> Option<Self::Output>
     where
-        Self: Sized,
         Self::Output: Ord,
     {
         self.min_by(Ord::cmp)
@@ -892,7 +862,6 @@ pub trait GeneratorExt: Sealed + Generator + Sized {
     #[inline]
     fn min_by<F>(self, mut compare: F) -> Option<Self::Output>
     where
-        Self: Sized,
         F: FnMut(&Self::Output, &Self::Output) -> Ordering,
     {
         self.reduce(|a, b| core::cmp::min_by(a, b, &mut compare))
@@ -940,7 +909,6 @@ pub trait GeneratorExt: Sealed + Generator + Sized {
         mut compare: F,
     ) -> TryReduction<Option<Self::Output>>
     where
-        Self: Sized,
         F: FnMut(&Self::Output, &Self::Output) -> Ordering,
     {
         self.try_reduce(partial, |a, b| core::cmp::min_by(a, b, &mut compare))
@@ -970,7 +938,6 @@ pub trait GeneratorExt: Sealed + Generator + Sized {
     #[inline]
     fn min_by_key<F, B>(self, f: F) -> Option<Self::Output>
     where
-        Self: Sized,
         F: FnMut(&Self::Output) -> B,
         B: Ord,
     {
@@ -1017,7 +984,6 @@ pub trait GeneratorExt: Sealed + Generator + Sized {
     #[inline]
     fn max(self) -> Option<Self::Output>
     where
-        Self: Sized,
         Self::Output: Ord,
     {
         self.max_by(Ord::cmp)
@@ -1048,7 +1014,6 @@ pub trait GeneratorExt: Sealed + Generator + Sized {
     #[inline]
     fn max_by<F>(self, mut compare: F) -> Option<Self::Output>
     where
-        Self: Sized,
         F: FnMut(&Self::Output, &Self::Output) -> Ordering,
     {
         self.reduce(|a, b| core::cmp::max_by(a, b, &mut compare))
@@ -1096,7 +1061,6 @@ pub trait GeneratorExt: Sealed + Generator + Sized {
         mut compare: F,
     ) -> TryReduction<Option<Self::Output>>
     where
-        Self: Sized,
         F: FnMut(&Self::Output, &Self::Output) -> Ordering,
     {
         self.try_reduce(partial, |a, b| core::cmp::max_by(a, b, &mut compare))
@@ -1126,7 +1090,6 @@ pub trait GeneratorExt: Sealed + Generator + Sized {
     #[inline]
     fn max_by_key<F, B>(self, f: F) -> Option<Self::Output>
     where
-        Self: Sized,
         F: FnMut(&Self::Output) -> B,
         B: Ord,
     {
@@ -1186,7 +1149,6 @@ pub trait GeneratorExt: Sealed + Generator + Sized {
     #[inline]
     fn fold<B, F>(mut self, init: B, mut folder: F) -> B
     where
-        Self: Sized,
         F: FnMut(B, Self::Output) -> B,
     {
         let mut value = InplaceUpdatable::new(init);
@@ -1246,7 +1208,6 @@ pub trait GeneratorExt: Sealed + Generator + Sized {
     #[inline]
     fn try_fold<B, F, E>(&mut self, init: B, mut folder: F) -> Result<TryReduction<B>, E>
     where
-        Self: Sized,
         F: FnMut(B, Self::Output) -> Result<B, E>,
     {
         let mut acc = InplaceUpdatable::new(Ok(init));
@@ -1310,7 +1271,6 @@ pub trait GeneratorExt: Sealed + Generator + Sized {
     #[inline]
     fn reduce<F>(mut self, mut reducer: F) -> Option<Self::Output>
     where
-        Self: Sized,
         F: FnMut(Self::Output, Self::Output) -> Self::Output,
     {
         let mut left_value = crate::structs::utility::InplaceUpdatable::new(self.next().ok()?);
@@ -1390,7 +1350,6 @@ pub trait GeneratorExt: Sealed + Generator + Sized {
         mut reducer: F,
     ) -> TryReduction<Option<Self::Output>>
     where
-        Self: Sized,
         F: FnMut(Self::Output, Self::Output) -> Self::Output,
     {
         let left_value = {
@@ -1452,7 +1411,6 @@ pub trait GeneratorExt: Sealed + Generator + Sized {
     #[inline]
     fn collect<B>(self) -> B
     where
-        Self: Sized,
         B: FromGenerator<Self::Output>,
     {
         B::from_gen(self)
@@ -1487,10 +1445,7 @@ pub trait GeneratorExt: Sealed + Generator + Sized {
     /// assert_eq!(gen.next(), Err(GeneratorResult::Complete));
     /// ```
     #[inline]
-    fn enumerate(self) -> Enumerate<Self>
-    where
-        Self: Sized,
-    {
+    fn enumerate(self) -> Enumerate<Self> {
         Enumerate::new(self)
     }
 
@@ -1541,7 +1496,6 @@ pub trait GeneratorExt: Sealed + Generator + Sized {
     #[inline]
     fn inspect<F>(self, inspector: F) -> Inspect<Self, F>
     where
-        Self: Sized,
         F: FnMut(&Self::Output),
     {
         Inspect::new(self, inspector)
@@ -1568,7 +1522,7 @@ pub trait GeneratorExt: Sealed + Generator + Sized {
     #[inline]
     fn rev(self) -> Reverse<Self>
     where
-        Self: Sized + ReverseGenerator,
+        Self: ReverseGenerator,
     {
         Reverse::new(self)
     }
@@ -1646,7 +1600,6 @@ pub trait GeneratorExt: Sealed + Generator + Sized {
     #[inline]
     fn position<P>(&mut self, mut predicate: P) -> Option<usize>
     where
-        Self: Sized,
         P: FnMut(Self::Output) -> bool,
     {
         self.try_fold(0, |index, value| {
@@ -1703,7 +1656,6 @@ pub trait GeneratorExt: Sealed + Generator + Sized {
     #[inline]
     fn find<P>(&mut self, mut predicate: P) -> Option<Self::Output>
     where
-        Self: Sized,
         P: FnMut(&Self::Output) -> bool,
     {
         self.try_fold((), |_, value| {
@@ -1739,7 +1691,6 @@ pub trait GeneratorExt: Sealed + Generator + Sized {
     #[inline]
     fn find_map<B, F>(&mut self, mut f: F) -> Option<B>
     where
-        Self: Sized,
         F: FnMut(Self::Output) -> Option<B>,
     {
         self.try_fold((), |_, value| match f(value) {
