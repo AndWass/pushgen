@@ -255,7 +255,7 @@
     <span class="doccomment">/// as long as the closure returns [`ValueResult::MoreValues`](crate::ValueResult::MoreValues).</span>
     <span class="doccomment">/// If the closure returns [`ValueResult::Stop`](crate::ValueResult::Stop) the generator **must**</span>
     <span class="doccomment">/// return [`GeneratorResult::Stopped`](crate::GeneratorResult::Stopped).</span>
-    <span class="kw">fn</span> <span class="ident">run</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">output</span>: <span class="kw">impl</span> <span class="ident">FnMut</span>(<span class="self">Self</span><span class="ident">::Output</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">ValueResult</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">GeneratorResult</span>;
+    <span class="kw">fn</span> <span class="ident">run</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">output</span>: <span class="kw">impl</span> <span class="ident">FnMut</span>(<span class="ident"><span class="self">Self</span>::Output</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">ValueResult</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">GeneratorResult</span>;
 
     <span class="doccomment">/// Try to advance the generator `n` values, ignoring them.</span>
     <span class="doccomment">///</span>
@@ -322,7 +322,7 @@
 <span class="doccomment">/// ```</span>
 <span class="kw">pub</span> <span class="kw">trait</span> <span class="ident">ReverseGenerator</span>: <span class="ident">Generator</span> {
     <span class="doccomment">/// Run a generator backwards, producing values from the end to the beginning.</span>
-    <span class="kw">fn</span> <span class="ident">run_back</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">output</span>: <span class="kw">impl</span> <span class="ident">FnMut</span>(<span class="self">Self</span><span class="ident">::Output</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">ValueResult</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">GeneratorResult</span>;
+    <span class="kw">fn</span> <span class="ident">run_back</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">output</span>: <span class="kw">impl</span> <span class="ident">FnMut</span>(<span class="ident"><span class="self">Self</span>::Output</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">ValueResult</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">GeneratorResult</span>;
 
     <span class="doccomment">/// Tries to advance the generator from the back by `n` values.</span>
     <span class="attribute">#[<span class="ident">inline</span>]</span>
@@ -350,7 +350,7 @@
     <span class="kw">type</span> <span class="ident">Output</span> <span class="op">=</span> <span class="ident">L::Output</span>;
 
     <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">fn</span> <span class="ident">run</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">output</span>: <span class="kw">impl</span> <span class="ident">FnMut</span>(<span class="self">Self</span><span class="ident">::Output</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">ValueResult</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">GeneratorResult</span> {
+    <span class="kw">fn</span> <span class="ident">run</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">output</span>: <span class="kw">impl</span> <span class="ident">FnMut</span>(<span class="ident"><span class="self">Self</span>::Output</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">ValueResult</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">GeneratorResult</span> {
         <span class="kw">match</span> <span class="self">self</span> {
             <span class="ident">Either::Left</span>(<span class="ident">left</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">left</span>.<span class="ident">run</span>(<span class="ident">output</span>),
             <span class="ident">Either::Right</span>(<span class="ident">right</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">right</span>.<span class="ident">run</span>(<span class="ident">output</span>),
@@ -372,7 +372,7 @@
     <span class="ident">R</span>: <span class="ident">ReverseGenerator</span><span class="op">&lt;</span><span class="ident">Output</span> <span class="op">=</span> <span class="ident">L::Output</span><span class="op">&gt;</span>,
 {
     <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">fn</span> <span class="ident">run_back</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">output</span>: <span class="kw">impl</span> <span class="ident">FnMut</span>(<span class="self">Self</span><span class="ident">::Output</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">ValueResult</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">GeneratorResult</span> {
+    <span class="kw">fn</span> <span class="ident">run_back</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">output</span>: <span class="kw">impl</span> <span class="ident">FnMut</span>(<span class="ident"><span class="self">Self</span>::Output</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">ValueResult</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">GeneratorResult</span> {
         <span class="kw">match</span> <span class="self">self</span> {
             <span class="ident">Either::Left</span>(<span class="ident">left</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">left</span>.<span class="ident">run_back</span>(<span class="ident">output</span>),
             <span class="ident">Either::Right</span>(<span class="ident">right</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">right</span>.<span class="ident">run_back</span>(<span class="ident">output</span>),
@@ -392,7 +392,7 @@
     <span class="kw">type</span> <span class="ident">Output</span> <span class="op">=</span> <span class="ident">T::Output</span>;
 
     <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">fn</span> <span class="ident">run</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">output</span>: <span class="kw">impl</span> <span class="ident">FnMut</span>(<span class="self">Self</span><span class="ident">::Output</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">ValueResult</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">GeneratorResult</span> {
+    <span class="kw">fn</span> <span class="ident">run</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">output</span>: <span class="kw">impl</span> <span class="ident">FnMut</span>(<span class="ident"><span class="self">Self</span>::Output</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">ValueResult</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">GeneratorResult</span> {
         (<span class="kw-2">*</span><span class="kw-2">*</span><span class="self">self</span>).<span class="ident">run</span>(<span class="ident">output</span>)
     }
 

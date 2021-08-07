@@ -126,7 +126,7 @@
     <span class="kw">type</span> <span class="ident">Output</span> <span class="op">=</span> <span class="ident">Out</span>;
 
     <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">fn</span> <span class="ident">run</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="kw-2">mut</span> <span class="ident">output</span>: <span class="kw">impl</span> <span class="ident">FnMut</span>(<span class="self">Self</span><span class="ident">::Output</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">ValueResult</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">GeneratorResult</span> {
+    <span class="kw">fn</span> <span class="ident">run</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="kw-2">mut</span> <span class="ident">output</span>: <span class="kw">impl</span> <span class="ident">FnMut</span>(<span class="ident"><span class="self">Self</span>::Output</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">ValueResult</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">GeneratorResult</span> {
         <span class="kw">let</span> <span class="ident">transform</span> <span class="op">=</span> <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>.<span class="ident">transform</span>;
         <span class="self">self</span>.<span class="ident">source</span>.<span class="ident">run</span>(<span class="kw">move</span> <span class="op">|</span><span class="ident">value</span><span class="op">|</span> <span class="ident">output</span>(<span class="ident">transform</span>(<span class="ident">value</span>)))
     }
@@ -143,7 +143,7 @@
     <span class="ident">Func</span>: <span class="ident">FnMut</span>(<span class="ident">Gen::Output</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Out</span>,
 {
     <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">fn</span> <span class="ident">run_back</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="kw-2">mut</span> <span class="ident">output</span>: <span class="kw">impl</span> <span class="ident">FnMut</span>(<span class="self">Self</span><span class="ident">::Output</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">ValueResult</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">GeneratorResult</span> {
+    <span class="kw">fn</span> <span class="ident">run_back</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="kw-2">mut</span> <span class="ident">output</span>: <span class="kw">impl</span> <span class="ident">FnMut</span>(<span class="ident"><span class="self">Self</span>::Output</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">ValueResult</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">GeneratorResult</span> {
         <span class="kw">let</span> <span class="ident">transform</span> <span class="op">=</span> <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>.<span class="ident">transform</span>;
         <span class="self">self</span>.<span class="ident">source</span>.<span class="ident">run_back</span>(<span class="kw">move</span> <span class="op">|</span><span class="ident">v</span><span class="op">|</span> <span class="ident">output</span>(<span class="ident">transform</span>(<span class="ident">v</span>)))
     }
@@ -156,7 +156,7 @@
 
 <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">test</span>)]</span>
 <span class="kw">mod</span> <span class="ident">tests</span> {
-    <span class="kw">use</span> <span class="kw">crate</span><span class="ident">::test::StoppingGen</span>;
+    <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::test::StoppingGen</span>;
     <span class="kw">use</span> <span class="kw">crate</span>::{<span class="ident">GeneratorExt</span>, <span class="ident">GeneratorResult</span>, <span class="ident">ReverseGenerator</span>, <span class="ident">SliceGenerator</span>};
     <span class="kw">use</span> <span class="ident">std::num::NonZeroUsize</span>;
 

@@ -126,8 +126,8 @@
 <span id="126">126</span>
 <span id="127">127</span>
 </pre><pre class="rust">
-<span class="kw">use</span> <span class="kw">crate</span><span class="ident">::GeneratorExt</span>;
-<span class="kw">use</span> <span class="kw">crate</span><span class="ident">::IntoGenerator</span>;
+<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::GeneratorExt</span>;
+<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::IntoGenerator</span>;
 
 <span class="doccomment">/// Conversion from a [`Generator`].</span>
 <span class="doccomment">///</span>
@@ -220,7 +220,7 @@
     <span class="kw">where</span>
         <span class="ident">G</span>: <span class="ident">IntoGenerator</span><span class="op">&lt;</span><span class="ident">Output</span> <span class="op">=</span> <span class="ident">T</span><span class="op">&gt;</span>,
     {
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">ret</span> <span class="op">=</span> <span class="self">Self</span><span class="ident">::new</span>();
+        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">ret</span> <span class="op">=</span> <span class="ident"><span class="self">Self</span>::new</span>();
         <span class="ident">gen</span>.<span class="ident">into_gen</span>().<span class="ident">for_each</span>(<span class="op">|</span><span class="ident">x</span><span class="op">|</span> <span class="ident">ret</span>.<span class="ident">push</span>(<span class="ident">x</span>));
         <span class="ident">ret</span>
     }
@@ -234,7 +234,7 @@
     <span class="kw">where</span>
         <span class="ident">G</span>: <span class="ident">IntoGenerator</span><span class="op">&lt;</span><span class="ident">Output</span> <span class="op">=</span> <span class="ident">char</span><span class="op">&gt;</span>,
     {
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">ret</span> <span class="op">=</span> <span class="self">Self</span><span class="ident">::new</span>();
+        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">ret</span> <span class="op">=</span> <span class="ident"><span class="self">Self</span>::new</span>();
         <span class="ident">gen</span>.<span class="ident">into_gen</span>().<span class="ident">for_each</span>(<span class="op">|</span><span class="ident">x</span><span class="op">|</span> <span class="ident">ret</span>.<span class="ident">push</span>(<span class="ident">x</span>));
         <span class="ident">ret</span>
     }
@@ -248,7 +248,7 @@
     <span class="kw">where</span>
         <span class="ident">G</span>: <span class="ident">IntoGenerator</span><span class="op">&lt;</span><span class="ident">Output</span> <span class="op">=</span> <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">char</span><span class="op">&gt;</span>,
     {
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">ret</span> <span class="op">=</span> <span class="self">Self</span><span class="ident">::new</span>();
+        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">ret</span> <span class="op">=</span> <span class="ident"><span class="self">Self</span>::new</span>();
         <span class="ident">gen</span>.<span class="ident">into_gen</span>().<span class="ident">for_each</span>(<span class="op">|</span><span class="ident">x</span><span class="op">|</span> <span class="ident">ret</span>.<span class="ident">push</span>(<span class="kw-2">*</span><span class="ident">x</span>));
         <span class="ident">ret</span>
     }

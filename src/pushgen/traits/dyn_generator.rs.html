@@ -26,7 +26,7 @@
 <span id="26">26</span>
 <span id="27">27</span>
 </pre><pre class="rust">
-<span class="kw">use</span> <span class="kw">crate</span><span class="ident">::traits::generator_ext::Sealed</span>;
+<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::traits::generator_ext::Sealed</span>;
 <span class="kw">use</span> <span class="kw">crate</span>::{<span class="ident">Generator</span>, <span class="ident">GeneratorResult</span>, <span class="ident">ValueResult</span>};
 
 <span class="doccomment">/// Sealed trait to enable boxed generators. See [`.boxed()`](crate::GeneratorExt::boxed) for details.</span>
@@ -39,7 +39,7 @@
     <span class="doccomment">/// The output type of this generator.</span>
     <span class="kw">type</span> <span class="ident">Output</span>;
     <span class="doccomment">/// Run the generator using a `&amp;mut dyn FnMut` instead of `impl FnMut`. This</span>
-    <span class="kw">fn</span> <span class="ident">run_dyn</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">output</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="kw">dyn</span> <span class="ident">FnMut</span>(<span class="self">Self</span><span class="ident">::Output</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">ValueResult</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">GeneratorResult</span>;
+    <span class="kw">fn</span> <span class="ident">run_dyn</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">output</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="kw">dyn</span> <span class="ident">FnMut</span>(<span class="ident"><span class="self">Self</span>::Output</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">ValueResult</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">GeneratorResult</span>;
 }
 
 <span class="kw">impl</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span> <span class="ident">DynGenerator</span> <span class="kw">for</span> <span class="ident">T</span>
@@ -49,7 +49,7 @@
     <span class="kw">type</span> <span class="ident">Output</span> <span class="op">=</span> <span class="ident">T::Output</span>;
 
     <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">fn</span> <span class="ident">run_dyn</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">output</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="kw">dyn</span> <span class="ident">FnMut</span>(<span class="self">Self</span><span class="ident">::Output</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">ValueResult</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">GeneratorResult</span> {
+    <span class="kw">fn</span> <span class="ident">run_dyn</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">output</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="kw">dyn</span> <span class="ident">FnMut</span>(<span class="ident"><span class="self">Self</span>::Output</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">ValueResult</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">GeneratorResult</span> {
         <span class="self">self</span>.<span class="ident">run</span>(<span class="ident">output</span>)
     }
 }
