@@ -113,7 +113,7 @@
     <span class="ident">Func</span>: <span class="ident">FnMut</span>(<span class="ident">Gen::Output</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Out</span>,
 {
     <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new</span>(<span class="ident">source</span>: <span class="ident">Gen</span>, <span class="ident">transform</span>: <span class="ident">Func</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {
+    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">new</span>(<span class="ident">source</span>: <span class="ident">Gen</span>, <span class="ident">transform</span>: <span class="ident">Func</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {
         <span class="self">Self</span> { <span class="ident">source</span>, <span class="ident">transform</span> }
     }
 }

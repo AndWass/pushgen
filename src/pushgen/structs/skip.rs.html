@@ -223,6 +223,7 @@
 <span id="223">223</span>
 <span id="224">224</span>
 <span id="225">225</span>
+<span id="226">226</span>
 </pre><pre class="rust">
 <span class="kw">use</span> <span class="kw">crate</span>::{<span class="ident">Generator</span>, <span class="ident">GeneratorResult</span>, <span class="ident">ValueResult</span>};
 <span class="kw">use</span> <span class="ident">core::num::NonZeroUsize</span>;
@@ -295,6 +296,7 @@
     }
 }
 
+<span class="doccomment">/// Skip over of values based on a closure. See [`.skip()`](crate::GeneratorExt::skip_while) for more details.</span>
 <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>)]</span>
 <span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">SkipWhile</span><span class="op">&lt;</span><span class="ident">Src</span>, <span class="ident">P</span><span class="op">&gt;</span> {
     <span class="ident">source</span>: <span class="ident">Src</span>,

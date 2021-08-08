@@ -1,1 +1,1 @@
-initSidebarItems({"struct":[["MultiStoppingGen",""],["StoppingGen",""]]});
+initSidebarItems({"struct":[["MultiStoppingGen","A spuriously stopping generator that can stop multiple times."],["StoppingGen","A spuriously stopping generator that will stop once."]]});

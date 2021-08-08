@@ -2047,6 +2047,23 @@
 <span id="2047">2047</span>
 <span id="2048">2048</span>
 <span id="2049">2049</span>
+<span id="2050">2050</span>
+<span id="2051">2051</span>
+<span id="2052">2052</span>
+<span id="2053">2053</span>
+<span id="2054">2054</span>
+<span id="2055">2055</span>
+<span id="2056">2056</span>
+<span id="2057">2057</span>
+<span id="2058">2058</span>
+<span id="2059">2059</span>
+<span id="2060">2060</span>
+<span id="2061">2061</span>
+<span id="2062">2062</span>
+<span id="2063">2063</span>
+<span id="2064">2064</span>
+<span id="2065">2065</span>
+<span id="2066">2066</span>
 </pre><pre class="rust">
 <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::structs::utility::InplaceUpdatable</span>;
 <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::structs</span>::{
@@ -2207,6 +2224,23 @@
         }
     }
 
+    <span class="doccomment">/// Get an element from the back of the generator.</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// This is analogous to [`next()`](GeneratorExt::next) but gets values from the end.</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// ## Examples</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// Basic usage:</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// ```</span>
+    <span class="doccomment">/// use pushgen::{SliceGenerator, GeneratorExt, GeneratorResult};</span>
+    <span class="doccomment">/// let data = [1, 2, 3];</span>
+    <span class="doccomment">/// let mut gen = SliceGenerator::new(&amp;data);</span>
+    <span class="doccomment">/// assert_eq!(gen.next_back(), Ok(&amp;3));</span>
+    <span class="doccomment">/// assert_eq!(gen.next_back(), Ok(&amp;2));</span>
+    <span class="doccomment">/// assert_eq!(gen.next_back(), Ok(&amp;1));</span>
+    <span class="doccomment">/// assert_eq!(gen.next_back(), Err(GeneratorResult::Complete));</span>
+    <span class="doccomment">/// ```</span>
     <span class="attribute">#[<span class="ident">inline</span>]</span>
     <span class="kw">fn</span> <span class="ident">next_back</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident"><span class="self">Self</span>::Output</span>, <span class="ident">GeneratorResult</span><span class="op">&gt;</span>
     <span class="kw">where</span>

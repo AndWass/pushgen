@@ -116,6 +116,9 @@
 <span id="116">116</span>
 <span id="117">117</span>
 <span id="118">118</span>
+<span id="119">119</span>
+<span id="120">120</span>
+<span id="121">121</span>
 </pre><pre class="rust">
 <span class="doccomment">/// Value-consumption result.</span>
 <span class="doccomment">///</span>
@@ -175,7 +178,10 @@
 <span class="doccomment">///</span>
 <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Copy</span>, <span class="ident">Clone</span>, <span class="ident">Debug</span>, <span class="ident">Ord</span>, <span class="ident">PartialOrd</span>, <span class="ident">Eq</span>, <span class="ident">PartialEq</span>)]</span>
 <span class="kw">pub</span> <span class="kw">enum</span> <span class="ident">TryReduction</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span> {
+    <span class="doccomment">/// The reduction has completed, with the associated result.</span>
     <span class="ident">Complete</span>(<span class="ident">T</span>),
+    <span class="doccomment">/// The reduction is only partially completed. The associated value should be used when trying</span>
+    <span class="doccomment">/// to complete the reduction in the future.</span>
     <span class="ident">Partial</span>(<span class="ident">T</span>),
 }
 
