@@ -93,10 +93,7 @@ pub struct MultiStoppingGen<'a, T> {
 impl<'a, T> MultiStoppingGen<'a, T> {
     /// Create a new multistopping generator
     pub fn new(data: &'a [Option<T>]) -> Self {
-        Self {
-            index: 0,
-            data,
-        }
+        Self { index: 0, data }
     }
 }
 
