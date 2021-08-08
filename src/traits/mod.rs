@@ -1,3 +1,5 @@
+//! Module containing the various traits used by `pushgen`.
+
 pub use accum::Product;
 pub use accum::Sum;
 pub use dyn_generator::DynGenerator;

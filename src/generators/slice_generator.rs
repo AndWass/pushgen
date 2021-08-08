@@ -22,6 +22,17 @@ pub struct SliceGenerator<'a, T> {
 }
 
 impl<'a, T> SliceGenerator<'a, T> {
+    /// Create a new slice generator.
+    ///
+    /// ## Examples
+    ///
+    /// Basic usage:
+    ///
+    /// ```
+    /// use pushgen::SliceGenerator;
+    /// let data = [1, 2, 3];
+    /// let mut gen = SliceGenerator::new(&data);
+    /// ```
     #[inline]
     pub fn new(slice: &'a [T]) -> Self {
         Self {

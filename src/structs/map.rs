@@ -14,7 +14,7 @@ where
     Func: FnMut(Gen::Output) -> Out,
 {
     #[inline]
-    pub fn new(source: Gen, transform: Func) -> Self {
+    pub(crate) fn new(source: Gen, transform: Func) -> Self {
         Self { source, transform }
     }
 }

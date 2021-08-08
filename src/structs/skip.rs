@@ -69,6 +69,7 @@ where
     }
 }
 
+/// Skip over of values based on a closure. See [`.skip()`](crate::GeneratorExt::skip_while) for more details.
 #[derive(Clone)]
 pub struct SkipWhile<Src, P> {
     source: Src,

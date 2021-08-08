@@ -11,6 +11,7 @@ use core::num::Wrapping;
 /// [`sum()`]: crate::traits::Sum::sum
 ///
 pub trait Sum<A = Self>: Sized {
+    /// Calculate the sum from a given generator.
     fn sum<G>(gen: G) -> Self
     where
         G: Generator<Output = A>;
@@ -26,6 +27,7 @@ pub trait Sum<A = Self>: Sized {
 /// [`product()`]: crate::traits::Product::product
 ///
 pub trait Product<A = Self>: Sized {
+    /// Calculate the product using the given generator.
     fn product<G>(gen: G) -> Self
     where
         G: Generator<Output = A>;

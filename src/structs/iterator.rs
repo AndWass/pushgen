@@ -16,7 +16,7 @@ where
     Src: Generator,
 {
     #[inline]
-    pub fn new(source: Src) -> Self {
+    pub(crate) fn new(source: Src) -> Self {
         Self { source }
     }
 }

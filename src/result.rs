@@ -56,7 +56,10 @@ impl From<bool> for GeneratorResult {
 ///
 #[derive(Copy, Clone, Debug, Ord, PartialOrd, Eq, PartialEq)]
 pub enum TryReduction<T> {
+    /// The reduction has completed, with the associated result.
     Complete(T),
+    /// The reduction is only partially completed. The associated value should be used when trying
+    /// to complete the reduction in the future.
     Partial(T),
 }
 

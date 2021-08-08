@@ -1,6 +1,7 @@
 use crate::{Generator, GeneratorExt, GeneratorResult, ValueResult};
 use core::num::NonZeroUsize;
 
+/// Create a stepping generator. See [`step_by()`](crate::GeneratorExt::step_by) for details.
 pub struct StepBy<Src> {
     source: Src,
     // Always step size - 1
@@ -116,10 +117,9 @@ mod tests {
 
     #[test]
     fn spuriously_multi_stopping() {
-        let stop_at = [0, 1, 3, 5];
-        let data = [0, 1, 2, 3, 4, 5, 6];
+        let data = [None, None, Some(0), None, Some(1), None, Some(2), Some(3), Some(4), Some(5), Some(6)];
         let mut output = Vec::new();
-        let mut gen = StepBy::new(MultiStoppingGen::new(&stop_at, &data), 3);
+        let mut gen = StepBy::new(MultiStoppingGen::new(&data), 3);
 
         let result = gen.for_each(|x| output.push(x));
         assert_eq!(result, GeneratorResult::Stopped);

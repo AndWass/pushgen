@@ -157,6 +157,23 @@ pub trait GeneratorExt: Sealed + Generator + Sized {
         }
     }
 
+    /// Get an element from the back of the generator.
+    ///
+    /// This is analogous to [`next()`](GeneratorExt::next) but gets values from the end.
+    ///
+    /// ## Examples
+    ///
+    /// Basic usage:
+    ///
+    /// ```
+    /// use pushgen::{SliceGenerator, GeneratorExt, GeneratorResult};
+    /// let data = [1, 2, 3];
+    /// let mut gen = SliceGenerator::new(&data);
+    /// assert_eq!(gen.next_back(), Ok(&3));
+    /// assert_eq!(gen.next_back(), Ok(&2));
+    /// assert_eq!(gen.next_back(), Ok(&1));
+    /// assert_eq!(gen.next_back(), Err(GeneratorResult::Complete));
+    /// ```
     #[inline]
     fn next_back(&mut self) -> Result<Self::Output, GeneratorResult>
     where
