@@ -1847,6 +1847,67 @@ pub trait GeneratorExt: Sealed + Generator + Sized {
         // substitute for now.
         self.iter().partition(partitioner)
     }
+
+    /// Converts an iterator of pairs into a pair of containers.
+    ///
+    /// `unzip()` consumes a generator of pairs, producing two collections: one from the
+    /// left elements of the pairs, and one from the right elements.
+    ///
+    /// ## Spuriously stopping generators
+    ///
+    /// `unzip()` will immediately stop once the generator has stopped. It doesn't matter if the
+    /// generator completed or was stopped early.
+    ///
+    /// ## Examples
+    ///
+    /// Basic usage:
+    ///
+    /// ```
+    /// use pushgen::{IntoGenerator, GeneratorExt};
+    /// let a = [(1, 2), (3, 4)];
+    /// let (left, right): (Vec<_>, Vec<_>) = a.into_gen().copied().unzip();
+    ///
+    /// assert_eq!(left, [1, 3]);
+    /// assert_eq!(right, [2, 4]);
+    /// ```
+    ///
+    /// Spuriously stopping generator:
+    ///
+    /// ```
+    /// use pushgen::{IntoGenerator, GeneratorExt};
+    /// let a = [(1, 2), (3, 4), (5, 6), (7, 8)];
+    /// // Use scan to create a "spuriously" stopping generator.
+    /// fn scan_fn(_: &mut (), val: (i32, i32)) -> Option<(i32, i32)> {
+    ///     if val.0 == 5 {
+    ///         None
+    ///     }
+    ///     else {
+    ///         Some(val)
+    ///     }
+    /// }
+    /// let (left, right): (Vec<_>, Vec<_>) = a.into_gen().copied().scan((), scan_fn).unzip();
+    ///
+    /// assert_eq!(left, [1, 3]); // missing 5 and 7
+    /// assert_eq!(right, [2, 4]); // missing 6 and 8
+    ///
+    /// // Behaviour consistent with iterator behaviour
+    /// let (left, right): (Vec<_>, Vec<_>) = a.iter().copied().scan((), scan_fn).unzip();
+    /// assert_eq!(left, [1, 3]); // missing 5 and 7
+    /// assert_eq!(right, [2, 4]); // missing 6 and 8
+    /// ```
+    ///
+    #[inline]
+    fn unzip<A, B, FromA, FromB>(self) -> (FromA, FromB)
+    where
+        Self: Generator<Output = (A, B)>,
+        FromA: Default + Extend<A>,
+        FromB: Default + Extend<B>,
+    {
+        // Extend::extend_one is unstable, but iterator version of unzip will use `fold` which
+        // the iterator adaptor implements with `Generator::run` anyway, so this is a good enough
+        // substitute for now.
+        self.iter().unzip()
+    }
 }
 
 impl<T: Generator> GeneratorExt for T {}
