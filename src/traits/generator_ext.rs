@@ -1810,6 +1810,43 @@ pub trait GeneratorExt: Sealed + Generator + Sized {
     fn count(self) -> usize {
         self.fold(0, |acc, _| acc + 1)
     }
+
+    /// Consumes a generator, creating two collections from it.
+    ///
+    /// The predicate passed to `partition()` can return true, or false.
+    /// `partition()` returns a pair: `(<true values>, <false values>).
+    ///
+    /// ## Spuriously stopping generators
+    ///
+    /// Partition will immediately stop once the generator has stopped. It doesn't matter if the
+    /// generator completes or spuriously stops.
+    ///
+    /// ## Examples
+    ///
+    /// Basic usage:
+    ///
+    /// ```
+    /// use pushgen::{IntoGenerator, GeneratorExt};
+    /// let a = [1, 2, 3];
+    ///
+    /// let (even, odd): (Vec<i32>, Vec<i32>) = a
+    ///     .into_gen()
+    ///     .partition(|&n| n % 2 == 0);
+    ///
+    /// assert_eq!(even, vec![2]);
+    /// assert_eq!(odd, vec![1, 3]);
+    /// ```
+    #[inline]
+    fn partition<Out, P>(self, partitioner: P) -> (Out, Out)
+    where
+        Out: Default + Extend<Self::Output>,
+        P: FnMut(&Self::Output) -> bool,
+    {
+        // Extend::extend_one is unstable, but iterator version of partition will use `fold` which
+        // the iterator adaptor implements with `Generator::run` anyway, so this is a good enough
+        // substitute for now.
+        self.iter().partition(partitioner)
+    }
 }
 
 impl<T: Generator> GeneratorExt for T {}
