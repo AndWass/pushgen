@@ -2101,6 +2101,67 @@
 <span id="2101">2101</span>
 <span id="2102">2102</span>
 <span id="2103">2103</span>
+<span id="2104">2104</span>
+<span id="2105">2105</span>
+<span id="2106">2106</span>
+<span id="2107">2107</span>
+<span id="2108">2108</span>
+<span id="2109">2109</span>
+<span id="2110">2110</span>
+<span id="2111">2111</span>
+<span id="2112">2112</span>
+<span id="2113">2113</span>
+<span id="2114">2114</span>
+<span id="2115">2115</span>
+<span id="2116">2116</span>
+<span id="2117">2117</span>
+<span id="2118">2118</span>
+<span id="2119">2119</span>
+<span id="2120">2120</span>
+<span id="2121">2121</span>
+<span id="2122">2122</span>
+<span id="2123">2123</span>
+<span id="2124">2124</span>
+<span id="2125">2125</span>
+<span id="2126">2126</span>
+<span id="2127">2127</span>
+<span id="2128">2128</span>
+<span id="2129">2129</span>
+<span id="2130">2130</span>
+<span id="2131">2131</span>
+<span id="2132">2132</span>
+<span id="2133">2133</span>
+<span id="2134">2134</span>
+<span id="2135">2135</span>
+<span id="2136">2136</span>
+<span id="2137">2137</span>
+<span id="2138">2138</span>
+<span id="2139">2139</span>
+<span id="2140">2140</span>
+<span id="2141">2141</span>
+<span id="2142">2142</span>
+<span id="2143">2143</span>
+<span id="2144">2144</span>
+<span id="2145">2145</span>
+<span id="2146">2146</span>
+<span id="2147">2147</span>
+<span id="2148">2148</span>
+<span id="2149">2149</span>
+<span id="2150">2150</span>
+<span id="2151">2151</span>
+<span id="2152">2152</span>
+<span id="2153">2153</span>
+<span id="2154">2154</span>
+<span id="2155">2155</span>
+<span id="2156">2156</span>
+<span id="2157">2157</span>
+<span id="2158">2158</span>
+<span id="2159">2159</span>
+<span id="2160">2160</span>
+<span id="2161">2161</span>
+<span id="2162">2162</span>
+<span id="2163">2163</span>
+<span id="2164">2164</span>
 </pre><pre class="rust">
 <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::structs::utility::InplaceUpdatable</span>;
 <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::structs</span>::{
@@ -3950,6 +4011,67 @@
         <span class="comment">// the iterator adaptor implements with `Generator::run` anyway, so this is a good enough</span>
         <span class="comment">// substitute for now.</span>
         <span class="self">self</span>.<span class="ident">iter</span>().<span class="ident">partition</span>(<span class="ident">partitioner</span>)
+    }
+
+    <span class="doccomment">/// Converts an iterator of pairs into a pair of containers.</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// `unzip()` consumes a generator of pairs, producing two collections: one from the</span>
+    <span class="doccomment">/// left elements of the pairs, and one from the right elements.</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// ## Spuriously stopping generators</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// `unzip()` will immediately stop once the generator has stopped. It doesn&#39;t matter if the</span>
+    <span class="doccomment">/// generator completed or was stopped early.</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// ## Examples</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// Basic usage:</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// ```</span>
+    <span class="doccomment">/// use pushgen::{IntoGenerator, GeneratorExt};</span>
+    <span class="doccomment">/// let a = [(1, 2), (3, 4)];</span>
+    <span class="doccomment">/// let (left, right): (Vec&lt;_&gt;, Vec&lt;_&gt;) = a.into_gen().copied().unzip();</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// assert_eq!(left, [1, 3]);</span>
+    <span class="doccomment">/// assert_eq!(right, [2, 4]);</span>
+    <span class="doccomment">/// ```</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// Spuriously stopping generator:</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// ```</span>
+    <span class="doccomment">/// use pushgen::{IntoGenerator, GeneratorExt};</span>
+    <span class="doccomment">/// let a = [(1, 2), (3, 4), (5, 6), (7, 8)];</span>
+    <span class="doccomment">/// // Use scan to create a &quot;spuriously&quot; stopping generator.</span>
+    <span class="doccomment">/// fn scan_fn(_: &amp;mut (), val: (i32, i32)) -&gt; Option&lt;(i32, i32)&gt; {</span>
+    <span class="doccomment">///     if val.0 == 5 {</span>
+    <span class="doccomment">///         None</span>
+    <span class="doccomment">///     }</span>
+    <span class="doccomment">///     else {</span>
+    <span class="doccomment">///         Some(val)</span>
+    <span class="doccomment">///     }</span>
+    <span class="doccomment">/// }</span>
+    <span class="doccomment">/// let (left, right): (Vec&lt;_&gt;, Vec&lt;_&gt;) = a.into_gen().copied().scan((), scan_fn).unzip();</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// assert_eq!(left, [1, 3]); // missing 5 and 7</span>
+    <span class="doccomment">/// assert_eq!(right, [2, 4]); // missing 6 and 8</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// // Behaviour consistent with iterator behaviour</span>
+    <span class="doccomment">/// let (left, right): (Vec&lt;_&gt;, Vec&lt;_&gt;) = a.iter().copied().scan((), scan_fn).unzip();</span>
+    <span class="doccomment">/// assert_eq!(left, [1, 3]); // missing 5 and 7</span>
+    <span class="doccomment">/// assert_eq!(right, [2, 4]); // missing 6 and 8</span>
+    <span class="doccomment">/// ```</span>
+    <span class="doccomment">///</span>
+    <span class="attribute">#[<span class="ident">inline</span>]</span>
+    <span class="kw">fn</span> <span class="ident">unzip</span><span class="op">&lt;</span><span class="ident">A</span>, <span class="ident">B</span>, <span class="ident">FromA</span>, <span class="ident">FromB</span><span class="op">&gt;</span>(<span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> (<span class="ident">FromA</span>, <span class="ident">FromB</span>)
+    <span class="kw">where</span>
+        <span class="self">Self</span>: <span class="ident">Generator</span><span class="op">&lt;</span><span class="ident">Output</span> <span class="op">=</span> (<span class="ident">A</span>, <span class="ident">B</span>)<span class="op">&gt;</span>,
+        <span class="ident">FromA</span>: <span class="ident">Default</span> <span class="op">+</span> <span class="ident">Extend</span><span class="op">&lt;</span><span class="ident">A</span><span class="op">&gt;</span>,
+        <span class="ident">FromB</span>: <span class="ident">Default</span> <span class="op">+</span> <span class="ident">Extend</span><span class="op">&lt;</span><span class="ident">B</span><span class="op">&gt;</span>,
+    {
+        <span class="comment">// Extend::extend_one is unstable, but iterator version of unzip will use `fold` which</span>
+        <span class="comment">// the iterator adaptor implements with `Generator::run` anyway, so this is a good enough</span>
+        <span class="comment">// substitute for now.</span>
+        <span class="self">self</span>.<span class="ident">iter</span>().<span class="ident">unzip</span>()
     }
 }
 
