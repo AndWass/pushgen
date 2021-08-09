@@ -1827,14 +1827,37 @@ pub trait GeneratorExt: Sealed + Generator + Sized {
     ///
     /// ```
     /// use pushgen::{IntoGenerator, GeneratorExt};
-    /// let a = [1, 2, 3];
+    /// let a = [1, 2, 3, 4];
     ///
     /// let (even, odd): (Vec<i32>, Vec<i32>) = a
     ///     .into_gen()
     ///     .partition(|&n| n % 2 == 0);
     ///
-    /// assert_eq!(even, vec![2]);
+    /// assert_eq!(even, vec![2, 4]);
     /// assert_eq!(odd, vec![1, 3]);
+    /// ```
+    ///
+    /// Usage with spuriously stopping generator
+    ///
+    /// ```
+    /// use pushgen::{IntoGenerator, GeneratorExt};
+    ///
+    /// let a = [1, 2, 3, 4];
+    ///
+    /// // Use scan to create a "spuriously" stopping generator.
+    /// // Will generate the sequence [1, 2, *Stop*, 4].
+    /// let gen = a.into_gen().scan((), |_, value| {
+    ///     if *value == 3 {
+    ///         None
+    ///     }
+    ///     else {
+    ///         Some(value)
+    ///     }
+    /// });
+    ///
+    /// let (even, odd): (Vec<i32>, Vec<i32>) = gen.partition(|&x| x % 2 == 0);
+    /// assert_eq!(even, [2]); // Missing 4
+    /// assert_eq!(odd, [1]); // Missing 3
     /// ```
     #[inline]
     fn partition<Out, P>(self, partitioner: P) -> (Out, Out)
