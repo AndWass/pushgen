@@ -2057,19 +2057,19 @@ pub trait GeneratorExt: Sealed + Generator + Sized {
     }
 
     /// Lexicographically compares the values of this generator with those of another.
-    /// 
+    ///
     /// ## Spuriously stopping generators
-    /// 
+    ///
     /// `cmp()` does not work correctly with spuriously stopping generators.
-    /// 
+    ///
     /// ## Examples
-    /// 
+    ///
     /// ```
     /// use pushgen::{GeneratorExt, IntoGenerator};
     /// use std::cmp::Ordering;
-    /// assert_eq!([1].into_gen().cmp([1]), Ordering::Equal);
-    /// assert_eq!([1].into_gen().cmp([1, 2]), Ordering::Less);
-    /// assert_eq!([1, 2].into_gen().cmp([1]), Ordering::Greater);
+    /// assert_eq!((&[1]).into_gen().cmp(&[1]), Ordering::Equal);
+    /// assert_eq!(&([1]).into_gen().cmp(&[1, 2]), Ordering::Less);
+    /// assert_eq!(&([1, 2]).into_gen().cmp(&[1]), Ordering::Greater);
     /// ```
     #[inline]
     fn cmp<Rhs>(self, rhs: Rhs) -> Ordering
@@ -2123,10 +2123,10 @@ pub trait GeneratorExt: Sealed + Generator + Sized {
     ///
     /// ```
     /// use pushgen::{GeneratorExt, IntoGenerator};
-    /// assert_eq!([1].into_gen().lt(&[1]), false);
-    /// assert_eq!([1].into_gen().lt(&[1, 2]), true);
-    /// assert_eq!([1, 2].into_gen().lt(&[1]), false);
-    /// assert_eq!([1, 2].into_gen().lt(&[1, 2]), false);
+    /// assert_eq!([1].into_gen().lt([1]), false);
+    /// assert_eq!([1].into_gen().lt([1, 2]), true);
+    /// assert_eq!([1, 2].into_gen().lt([1]), false);
+    /// assert_eq!([1, 2].into_gen().lt([1, 2]), false);
     /// ```
     #[inline]
     fn lt<Rhs>(self, rhs: Rhs) -> bool
@@ -2149,10 +2149,10 @@ pub trait GeneratorExt: Sealed + Generator + Sized {
     ///
     /// ```
     /// use pushgen::{GeneratorExt, IntoGenerator};
-    /// assert_eq!([1].into_gen().le(&[1]), true);
-    /// assert_eq!([1].into_gen().le(&[1, 2]), true);
-    /// assert_eq!([1, 2].into_gen().le(&[1]), false);
-    /// assert_eq!([1, 2].into_gen().le(&[1, 2]), true);
+    /// assert_eq!([1].into_gen().le([1]), true);
+    /// assert_eq!([1].into_gen().le([1, 2]), true);
+    /// assert_eq!([1, 2].into_gen().le([1]), false);
+    /// assert_eq!([1, 2].into_gen().le([1, 2]), true);
     /// ```
     #[inline]
     fn le<Rhs>(self, rhs: Rhs) -> bool
@@ -2178,10 +2178,12 @@ pub trait GeneratorExt: Sealed + Generator + Sized {
     ///
     /// ```
     /// use pushgen::{GeneratorExt, IntoGenerator};
-    /// assert_eq!([1].into_gen().ge(&[1]), true);
-    /// assert_eq!([1].into_gen().ge(&[1, 2]), false);
-    /// assert_eq!([1, 2].into_gen().ge(&[1]), true);
-    /// assert_eq!([1, 2].into_gen().ge(&[1, 2]), true);
+    /// let one = &[1];
+    /// let two = &[1, 2];
+    /// assert_eq!(one.into_gen().ge(one.into_gen()), true);
+    /// assert_eq!(one.into_gen().ge(two.into_gen()), false);
+    /// assert_eq!(two.into_gen().ge(one.into_gen()), true);
+    /// assert_eq!(two.into_gen().ge(two.into_gen()), true);
     /// ```
     #[inline]
     fn ge<Rhs>(self, rhs: Rhs) -> bool
@@ -2207,10 +2209,10 @@ pub trait GeneratorExt: Sealed + Generator + Sized {
     ///
     /// ```
     /// use pushgen::{GeneratorExt, IntoGenerator};
-    /// assert_eq!([1].into_gen().gt(&[1]), false);
-    /// assert_eq!([1].into_gen().gt(&[1, 2]), false);
-    /// assert_eq!([1, 2].into_gen().gt(&[1]), true);
-    /// assert_eq!([1, 2].into_gen().gt(&[1, 2]), false);
+    /// assert_eq!([1].into_gen().gt([1]), false);
+    /// assert_eq!([1].into_gen().gt([1, 2]), false);
+    /// assert_eq!([1, 2].into_gen().gt([1]), true);
+    /// assert_eq!([1, 2].into_gen().gt([1, 2]), false);
     /// ```
     #[inline]
     fn gt<Rhs>(self, rhs: Rhs) -> bool
@@ -2233,8 +2235,8 @@ pub trait GeneratorExt: Sealed + Generator + Sized {
     ///
     /// ```
     /// use pushgen::{GeneratorExt, IntoGenerator};
-    /// assert_eq!([1].into_gen().eq(&[1]), true);
-    /// assert_eq!([1].into_gen().eq(&[1, 2]), false);
+    /// assert_eq!([1].into_gen().eq([1]), true);
+    /// assert_eq!([1].into_gen().eq([1, 2]), false);
     /// ```
     #[inline]
     fn eq<Rhs>(self, rhs: Rhs) -> bool
@@ -2263,8 +2265,8 @@ pub trait GeneratorExt: Sealed + Generator + Sized {
     ///
     /// ```
     /// use pushgen::{GeneratorExt, IntoGenerator};
-    /// assert_eq!([1].into_gen().ne(&[1]), false);
-    /// assert_eq!([1].into_gen().ne(&[1, 2]), true);
+    /// assert_eq!([1].into_gen().ne([1]), false);
+    /// assert_eq!([1].into_gen().ne([1, 2]), true);
     /// ```
     #[inline]
     fn ne<Rhs>(self, rhs: Rhs) -> bool
@@ -2348,16 +2350,16 @@ mod tests {
     #[test]
     fn basic_all() {
         let data = [1, 2, 2];
-        assert!(data.into_gen().all(|&x| x > 0));
-        assert!(!data.into_gen().all(|&x| x > 2));
+        assert!(data.into_gen().all(|x| x > 0));
+        assert!(!data.into_gen().all(|x| x > 2));
     }
 
     #[test]
     fn shortcircuit_all() {
         let data = [1, 2, 3];
         let mut gen = data.into_gen();
-        assert!(!gen.all(|&x| x != 2));
-        assert_eq!(gen.iter().next(), Some(&3));
+        assert!(!gen.all(|x| x != 2));
+        assert_eq!(gen.iter().next(), Some(3));
     }
 
     #[test]
@@ -2375,7 +2377,7 @@ mod tests {
 
         assert_eq!(
             x.iter().copied().reduce(reducer),
-            x.into_gen().copied().reduce(reducer)
+            x.into_gen().reduce(reducer)
         );
     }
 
@@ -2388,7 +2390,7 @@ mod tests {
 
         assert_eq!(
             x.iter().copied().reduce(reducer),
-            x.into_gen().copied().reduce(reducer)
+            x.into_gen().reduce(reducer)
         );
     }
 
@@ -2401,7 +2403,7 @@ mod tests {
 
         assert_eq!(
             x.iter().copied().reduce(reducer),
-            x.into_gen().copied().reduce(reducer)
+            x.into_gen().reduce(reducer)
         );
     }
 
@@ -2413,7 +2415,7 @@ mod tests {
         }
 
         assert_eq!(
-            x.into_gen().copied().try_reduce(None, reducer),
+            x.into_gen().try_reduce(None, reducer),
             TryReduction::Complete(None)
         );
     }
@@ -2426,7 +2428,7 @@ mod tests {
         }
 
         assert_eq!(
-            x.into_gen().copied().try_reduce(None, reducer),
+            x.into_gen().try_reduce(None, reducer),
             TryReduction::Complete(Some(1))
         );
     }
@@ -2439,7 +2441,7 @@ mod tests {
         }
 
         assert_eq!(
-            x.into_gen().copied().try_reduce(None, reducer),
+            x.into_gen().try_reduce(None, reducer),
             TryReduction::Complete(Some(3))
         );
     }
@@ -2541,18 +2543,14 @@ mod tests {
     #[test]
     fn collect_vec() {
         let data = [0, 1, 2, 3, 4];
-        let out: Vec<i32> = data.into_gen().filter(|x| *x % 2 == 0).copied().collect();
+        let out: Vec<i32> = data.into_gen().filter(|x| x % 2 == 0).collect();
         assert_eq!(out, [0, 2, 4]);
     }
 
     #[test]
     fn collect_string() {
         let data = ['a', 'B', 'c', 'D'];
-        let out: String = data
-            .into_gen()
-            .filter(|x| x.is_uppercase())
-            .copied()
-            .collect();
+        let out: String = data.into_gen().filter(|x| x.is_uppercase()).collect();
         assert_eq!(out, "BD");
 
         let data = ['f', 'G', 'H', 'i'];
