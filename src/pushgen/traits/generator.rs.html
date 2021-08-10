@@ -275,8 +275,8 @@
     <span class="doccomment">/// let mut gen = data.into_gen();</span>
     <span class="doccomment">/// let advance_result = gen.try_advance(NonZeroUsize::new(3).unwrap());</span>
     <span class="doccomment">/// assert_eq!(advance_result, (3, GeneratorResult::Stopped));</span>
-    <span class="doccomment">/// assert_eq!(gen.next(), Ok(&amp;4));</span>
-    <span class="doccomment">/// assert_eq!(gen.next(), Ok(&amp;5));</span>
+    <span class="doccomment">/// assert_eq!(gen.next(), Ok(4));</span>
+    <span class="doccomment">/// assert_eq!(gen.next(), Ok(5));</span>
     <span class="doccomment">/// ```</span>
     <span class="attribute">#[<span class="ident">inline</span>]</span>
     <span class="kw">fn</span> <span class="ident">try_advance</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">n</span>: <span class="ident">NonZeroUsize</span>) <span class="op">-</span><span class="op">&gt;</span> (<span class="ident">usize</span>, <span class="ident">GeneratorResult</span>) {

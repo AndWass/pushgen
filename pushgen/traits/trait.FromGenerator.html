@@ -9,13 +9,13 @@ This is common for types which describe a collection of some kind.</p>
 
 <div class="example-wrap"><pre class="rust rust-example-rendered">
 <span class="kw">use</span> <span class="ident">pushgen</span>::{<span class="ident">FromGenerator</span>, <span class="ident">IntoGenerator</span>, <span class="ident">GeneratorExt</span>};
-<span class="kw">let</span> <span class="ident">v</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">i32</span><span class="op">&gt;</span> <span class="op">=</span> <span class="ident">FromGenerator::from_gen</span>([<span class="number">1</span>, <span class="number">2</span>, <span class="number">3</span>, <span class="number">4</span>].<span class="ident">into_gen</span>().<span class="ident">copied</span>());
+<span class="kw">let</span> <span class="ident">v</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">i32</span><span class="op">&gt;</span> <span class="op">=</span> <span class="ident">FromGenerator::from_gen</span>([<span class="number">1</span>, <span class="number">2</span>, <span class="number">3</span>, <span class="number">4</span>].<span class="ident">into_gen</span>());
 <span class="macro">assert_eq!</span>(<span class="ident">v</span>, [<span class="number">1</span>, <span class="number">2</span>, <span class="number">3</span>, <span class="number">4</span>]);</pre></div>
 <p>Using <a href="trait.GeneratorExt.html#method.collect"><code>GeneratorExt::collect()</code></a> to implicitly use <code>FromGenerator</code>:</p>
 
 <div class="example-wrap"><pre class="rust rust-example-rendered">
 <span class="kw">use</span> <span class="ident">pushgen</span>::{<span class="ident">FromGenerator</span>, <span class="ident">IntoGenerator</span>, <span class="ident">GeneratorExt</span>};
-<span class="kw">let</span> <span class="ident">v</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">i32</span><span class="op">&gt;</span> <span class="op">=</span> [<span class="number">1</span>, <span class="number">2</span>, <span class="number">3</span>, <span class="number">4</span>].<span class="ident">into_gen</span>().<span class="ident">copied</span>().<span class="ident">collect</span>();
+<span class="kw">let</span> <span class="ident">v</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">i32</span><span class="op">&gt;</span> <span class="op">=</span> [<span class="number">1</span>, <span class="number">2</span>, <span class="number">3</span>, <span class="number">4</span>].<span class="ident">into_gen</span>().<span class="ident">collect</span>();
 <span class="macro">assert_eq!</span>(<span class="ident">v</span>, [<span class="number">1</span>, <span class="number">2</span>, <span class="number">3</span>, <span class="number">4</span>]);</pre></div>
 <p>Implementing <code>FromGenerator</code> for your type:</p>
 
@@ -50,7 +50,7 @@ This is common for types which describe a collection of some kind.</p>
 }
 
 <span class="comment">// Now we can make a new iterator...</span>
-<span class="kw">let</span> <span class="ident">gen</span> <span class="op">=</span> [<span class="number">0</span>, <span class="number">1</span>, <span class="number">2</span>, <span class="number">3</span>, <span class="number">4</span>].<span class="ident">into_gen</span>().<span class="ident">copied</span>();
+<span class="kw">let</span> <span class="ident">gen</span> <span class="op">=</span> [<span class="number">0</span>, <span class="number">1</span>, <span class="number">2</span>, <span class="number">3</span>, <span class="number">4</span>].<span class="ident">into_gen</span>();
 
 <span class="comment">// ... and make a MyCollection out of it</span>
 <span class="kw">let</span> <span class="ident">c</span> <span class="op">=</span> <span class="ident">MyCollection::from_gen</span>(<span class="ident">gen</span>);
@@ -59,7 +59,7 @@ This is common for types which describe a collection of some kind.</p>
 
 <span class="comment">// collect works too!</span>
 
-<span class="kw">let</span> <span class="ident">gen</span> <span class="op">=</span> [<span class="number">0</span>, <span class="number">1</span>, <span class="number">2</span>, <span class="number">3</span>, <span class="number">4</span>].<span class="ident">into_gen</span>().<span class="ident">copied</span>();
+<span class="kw">let</span> <span class="ident">gen</span> <span class="op">=</span> [<span class="number">0</span>, <span class="number">1</span>, <span class="number">2</span>, <span class="number">3</span>, <span class="number">4</span>].<span class="ident">into_gen</span>();
 <span class="kw">let</span> <span class="ident">c</span>: <span class="ident">MyCollection</span> <span class="op">=</span> <span class="ident">gen</span>.<span class="ident">collect</span>();
 
 <span class="macro">assert_eq!</span>(<span class="ident">c</span>.<span class="number">0</span>, <span class="macro">vec!</span>[<span class="number">0</span>, <span class="number">1</span>, <span class="number">2</span>, <span class="number">3</span>, <span class="number">4</span>]);</pre></div>

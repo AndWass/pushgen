@@ -145,7 +145,7 @@
 <span class="doccomment">///</span>
 <span class="doccomment">/// ```</span>
 <span class="doccomment">/// use pushgen::{FromGenerator, IntoGenerator, GeneratorExt};</span>
-<span class="doccomment">/// let v: Vec&lt;i32&gt; = FromGenerator::from_gen([1, 2, 3, 4].into_gen().copied());</span>
+<span class="doccomment">/// let v: Vec&lt;i32&gt; = FromGenerator::from_gen([1, 2, 3, 4].into_gen());</span>
 <span class="doccomment">/// assert_eq!(v, [1, 2, 3, 4]);</span>
 <span class="doccomment">/// ```</span>
 <span class="doccomment">///</span>
@@ -153,7 +153,7 @@
 <span class="doccomment">///</span>
 <span class="doccomment">/// ```</span>
 <span class="doccomment">/// use pushgen::{FromGenerator, IntoGenerator, GeneratorExt};</span>
-<span class="doccomment">/// let v: Vec&lt;i32&gt; = [1, 2, 3, 4].into_gen().copied().collect();</span>
+<span class="doccomment">/// let v: Vec&lt;i32&gt; = [1, 2, 3, 4].into_gen().collect();</span>
 <span class="doccomment">/// assert_eq!(v, [1, 2, 3, 4]);</span>
 <span class="doccomment">/// ```</span>
 <span class="doccomment">///</span>
@@ -190,7 +190,7 @@
 <span class="doccomment">/// }</span>
 <span class="doccomment">///</span>
 <span class="doccomment">/// // Now we can make a new iterator...</span>
-<span class="doccomment">/// let gen = [0, 1, 2, 3, 4].into_gen().copied();</span>
+<span class="doccomment">/// let gen = [0, 1, 2, 3, 4].into_gen();</span>
 <span class="doccomment">///</span>
 <span class="doccomment">/// // ... and make a MyCollection out of it</span>
 <span class="doccomment">/// let c = MyCollection::from_gen(gen);</span>
@@ -199,7 +199,7 @@
 <span class="doccomment">///</span>
 <span class="doccomment">/// // collect works too!</span>
 <span class="doccomment">///</span>
-<span class="doccomment">/// let gen = [0, 1, 2, 3, 4].into_gen().copied();</span>
+<span class="doccomment">/// let gen = [0, 1, 2, 3, 4].into_gen();</span>
 <span class="doccomment">/// let c: MyCollection = gen.collect();</span>
 <span class="doccomment">///</span>
 <span class="doccomment">/// assert_eq!(c.0, vec![0, 1, 2, 3, 4]);</span>

@@ -276,7 +276,7 @@
         });
 
         <span class="macro">assert_eq!</span>(<span class="ident">result</span>, <span class="ident">GeneratorResult::Complete</span>);
-        <span class="macro">assert_eq!</span>(<span class="ident">output</span>, [<span class="kw-2">&amp;</span><span class="number">0</span>, <span class="kw-2">&amp;</span><span class="number">2</span>, <span class="kw-2">&amp;</span><span class="number">4</span>]);
+        <span class="macro">assert_eq!</span>(<span class="ident">output</span>, [<span class="number">0</span>, <span class="number">2</span>, <span class="number">4</span>]);
     }
 
     <span class="attribute">#[<span class="ident">test</span>]</span>
@@ -335,7 +335,7 @@
         });
 
         <span class="macro">assert_eq!</span>(<span class="ident">result</span>, <span class="ident">GeneratorResult::Complete</span>);
-        <span class="macro">assert_eq!</span>(<span class="ident">output</span>, [<span class="kw-2">&amp;</span><span class="number">0</span>, <span class="kw-2">&amp;</span><span class="number">1</span>, <span class="kw-2">&amp;</span><span class="number">2</span>, <span class="kw-2">&amp;</span><span class="number">3</span>, <span class="kw-2">&amp;</span><span class="number">4</span>, <span class="kw-2">&amp;</span><span class="number">5</span>]);
+        <span class="macro">assert_eq!</span>(<span class="ident">output</span>, [<span class="number">0</span>, <span class="number">1</span>, <span class="number">2</span>, <span class="number">3</span>, <span class="number">4</span>, <span class="number">5</span>]);
     }
 
     <span class="attribute">#[<span class="ident">test</span>]</span>
@@ -343,9 +343,9 @@
         <span class="kw">let</span> <span class="ident">data</span> <span class="op">=</span> [<span class="number">0</span>, <span class="number">1</span>, <span class="number">2</span>, <span class="number">3</span>, <span class="number">4</span>, <span class="number">5</span>];
 
         <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">gen</span> <span class="op">=</span> <span class="ident">data</span>.<span class="ident">into_gen</span>().<span class="ident">step_by</span>(<span class="number">2</span>);
-        <span class="macro">assert_eq!</span>(<span class="ident">gen</span>.<span class="ident">next</span>(), <span class="prelude-val">Ok</span>(<span class="kw-2">&amp;</span><span class="number">0</span>));
-        <span class="macro">assert_eq!</span>(<span class="ident">gen</span>.<span class="ident">next</span>(), <span class="prelude-val">Ok</span>(<span class="kw-2">&amp;</span><span class="number">2</span>));
-        <span class="macro">assert_eq!</span>(<span class="ident">gen</span>.<span class="ident">next</span>(), <span class="prelude-val">Ok</span>(<span class="kw-2">&amp;</span><span class="number">4</span>));
+        <span class="macro">assert_eq!</span>(<span class="ident">gen</span>.<span class="ident">next</span>(), <span class="prelude-val">Ok</span>(<span class="number">0</span>));
+        <span class="macro">assert_eq!</span>(<span class="ident">gen</span>.<span class="ident">next</span>(), <span class="prelude-val">Ok</span>(<span class="number">2</span>));
+        <span class="macro">assert_eq!</span>(<span class="ident">gen</span>.<span class="ident">next</span>(), <span class="prelude-val">Ok</span>(<span class="number">4</span>));
     }
 
     <span class="attribute">#[<span class="ident">test</span>]</span>

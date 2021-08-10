@@ -2570,8 +2570,6 @@
 <span id="2570">2570</span>
 <span id="2571">2571</span>
 <span id="2572">2572</span>
-<span id="2573">2573</span>
-<span id="2574">2574</span>
 </pre><pre class="rust">
 <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::structs::utility::InplaceUpdatable</span>;
 <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::structs</span>::{
@@ -2618,8 +2616,8 @@
     <span class="doccomment">/// ```</span>
     <span class="doccomment">/// use pushgen::{IntoGenerator, GeneratorExt};</span>
     <span class="doccomment">/// let a = [1, 2, 3];</span>
-    <span class="doccomment">/// assert!(a.into_gen().all(|&amp;x| x &gt; 0));</span>
-    <span class="doccomment">/// assert!(!a.into_gen().all(|&amp;x| x &gt; 2));</span>
+    <span class="doccomment">/// assert!(a.into_gen().all(|x| x &gt; 0));</span>
+    <span class="doccomment">/// assert!(!a.into_gen().all(|x| x &gt; 2));</span>
     <span class="doccomment">/// ```</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// Stopping at first false:</span>
@@ -2628,8 +2626,8 @@
     <span class="doccomment">/// use pushgen::{IntoGenerator, GeneratorExt};</span>
     <span class="doccomment">/// let a = [1, 2, 3];</span>
     <span class="doccomment">/// let mut gen = a.into_gen();</span>
-    <span class="doccomment">/// assert!(!gen.all(|&amp;x| x != 2));</span>
-    <span class="doccomment">/// assert_eq!(gen.iter().next(), Some(&amp;3));</span>
+    <span class="doccomment">/// assert!(!gen.all(|x| x != 2));</span>
+    <span class="doccomment">/// assert_eq!(gen.iter().next(), Some(3));</span>
     <span class="doccomment">/// ```</span>
     <span class="attribute">#[<span class="ident">inline</span>]</span>
     <span class="kw">fn</span> <span class="ident">all</span><span class="op">&lt;</span><span class="ident">F</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="kw-2">mut</span> <span class="ident">predicate</span>: <span class="ident">F</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">bool</span>
@@ -2670,9 +2668,9 @@
     <span class="doccomment">/// use pushgen::{IntoGenerator, GeneratorExt};</span>
     <span class="doccomment">/// let a = [1, 2, 3];</span>
     <span class="doccomment">///</span>
-    <span class="doccomment">/// assert!(a.into_gen().any(|&amp;x| x &gt; 0));</span>
+    <span class="doccomment">/// assert!(a.into_gen().any(|x| x &gt; 0));</span>
     <span class="doccomment">///</span>
-    <span class="doccomment">/// assert!(!a.into_gen().any(|&amp;x| x &gt; 5));</span>
+    <span class="doccomment">/// assert!(!a.into_gen().any(|x| x &gt; 5));</span>
     <span class="doccomment">/// ```</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// Stopping at the first `true`:</span>
@@ -2683,10 +2681,10 @@
     <span class="doccomment">///</span>
     <span class="doccomment">/// let mut gen = a.into_gen();</span>
     <span class="doccomment">///</span>
-    <span class="doccomment">/// assert!(gen.any(|&amp;x| x != 2));</span>
+    <span class="doccomment">/// assert!(gen.any(|x| x != 2));</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// // we can still use `gen`, as there are more elements.</span>
-    <span class="doccomment">/// assert_eq!(gen.iter().next(), Some(&amp;2));</span>
+    <span class="doccomment">/// assert_eq!(gen.iter().next(), Some(2));</span>
     <span class="doccomment">/// ```</span>
     <span class="attribute">#[<span class="ident">inline</span>]</span>
     <span class="kw">fn</span> <span class="ident">any</span><span class="op">&lt;</span><span class="ident">F</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="kw-2">mut</span> <span class="ident">predicate</span>: <span class="ident">F</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">bool</span>
@@ -2781,10 +2779,10 @@
     <span class="doccomment">/// use pushgen::GeneratorExt;</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// let a = [1, 2, 3];</span>
-    <span class="doccomment">/// assert_eq!(a.into_gen().last(), Some(&amp;3));</span>
+    <span class="doccomment">/// assert_eq!(a.into_gen().last(), Some(3));</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// let a = [1, 2, 3, 4, 5];</span>
-    <span class="doccomment">/// assert_eq!(a.into_gen().last(), Some(&amp;5));</span>
+    <span class="doccomment">/// assert_eq!(a.into_gen().last(), Some(5));</span>
     <span class="doccomment">/// ```</span>
     <span class="attribute">#[<span class="ident">inline</span>]</span>
     <span class="kw">fn</span> <span class="ident">last</span>(<span class="kw-2">mut</span> <span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident"><span class="self">Self</span>::Output</span><span class="op">&gt;</span> {
@@ -2982,7 +2980,7 @@
     <span class="doccomment">/// let a = [-1i32, 0, 1];</span>
     <span class="doccomment">/// let mut output = Vec::new();</span>
     <span class="doccomment">/// a.into_gen().skip_while(|x| x.is_negative()).for_each(|x| output.push(x));</span>
-    <span class="doccomment">/// assert_eq!(output, [&amp;0, &amp;1]);</span>
+    <span class="doccomment">/// assert_eq!(output, [0, 1]);</span>
     <span class="doccomment">/// ```</span>
     <span class="attribute">#[<span class="ident">inline</span>]</span>
     <span class="kw">fn</span> <span class="ident">skip_while</span><span class="op">&lt;</span><span class="ident">P</span><span class="op">&gt;</span>(<span class="self">self</span>, <span class="ident">predicate</span>: <span class="ident">P</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">SkipWhile</span><span class="op">&lt;</span><span class="self">Self</span>, <span class="ident">P</span><span class="op">&gt;</span>
@@ -3023,7 +3021,7 @@
     <span class="doccomment">///</span>
     <span class="doccomment">/// let mut gen_as_iter = a.into_gen().take_while(|x| x.is_negative()).iter();</span>
     <span class="doccomment">///</span>
-    <span class="doccomment">/// assert_eq!(gen_as_iter.next(), Some(&amp;-1));</span>
+    <span class="doccomment">/// assert_eq!(gen_as_iter.next(), Some(-1));</span>
     <span class="doccomment">/// assert_eq!(gen_as_iter.next(), None);</span>
     <span class="doccomment">/// ```</span>
     <span class="attribute">#[<span class="ident">inline</span>]</span>
@@ -3285,9 +3283,9 @@
     <span class="doccomment">/// let a = [0, 1, 2, 3, 4, 5];</span>
     <span class="doccomment">/// let mut gen = a.into_gen().step_by(2);</span>
     <span class="doccomment">///</span>
-    <span class="doccomment">/// assert_eq!(gen.next(), Ok(&amp;0));</span>
-    <span class="doccomment">/// assert_eq!(gen.next(), Ok(&amp;2));</span>
-    <span class="doccomment">/// assert_eq!(gen.next(), Ok(&amp;4));</span>
+    <span class="doccomment">/// assert_eq!(gen.next(), Ok(0));</span>
+    <span class="doccomment">/// assert_eq!(gen.next(), Ok(2));</span>
+    <span class="doccomment">/// assert_eq!(gen.next(), Ok(4));</span>
     <span class="doccomment">/// assert_eq!(gen.next(), Err(GeneratorResult::Complete));</span>
     <span class="doccomment">/// ```</span>
     <span class="attribute">#[<span class="ident">inline</span>]</span>
@@ -3420,7 +3418,7 @@
     <span class="doccomment">/// let a = [1, 2, 3];</span>
     <span class="doccomment">/// let b: Vec&lt;u32&gt; = Vec::new();</span>
     <span class="doccomment">///</span>
-    <span class="doccomment">/// assert_eq!(a.into_gen().min(), Some(&amp;1));</span>
+    <span class="doccomment">/// assert_eq!(a.into_gen().min(), Some(1));</span>
     <span class="doccomment">/// assert_eq!(b.into_gen().min(), None);</span>
     <span class="doccomment">/// ```</span>
     <span class="attribute">#[<span class="ident">inline</span>]</span>
@@ -3451,7 +3449,7 @@
     <span class="doccomment">/// ```</span>
     <span class="doccomment">/// use pushgen::{GeneratorExt, IntoGenerator};</span>
     <span class="doccomment">/// let a = [-3_i32, 0, 1, 5, -10];</span>
-    <span class="doccomment">/// assert_eq!(*a.into_gen().min_by(|x, y| x.cmp(y)).unwrap(), -10);</span>
+    <span class="doccomment">/// assert_eq!(a.into_gen().min_by(|x, y| x.cmp(y)).unwrap(), -10);</span>
     <span class="doccomment">/// ```</span>
     <span class="attribute">#[<span class="ident">inline</span>]</span>
     <span class="kw">fn</span> <span class="ident">min_by</span><span class="op">&lt;</span><span class="ident">F</span><span class="op">&gt;</span>(<span class="self">self</span>, <span class="kw-2">mut</span> <span class="ident">compare</span>: <span class="ident">F</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident"><span class="self">Self</span>::Output</span><span class="op">&gt;</span>
@@ -3476,7 +3474,7 @@
     <span class="doccomment">/// ```</span>
     <span class="doccomment">/// use pushgen::{GeneratorExt, IntoGenerator};</span>
     <span class="doccomment">/// let a = [-3_i32, 0, 1, 5, -10];</span>
-    <span class="doccomment">/// assert_eq!(a.into_gen().try_min_by(None, |x, y| x.cmp(y)).unwrap(), Some(&amp;-10));</span>
+    <span class="doccomment">/// assert_eq!(a.into_gen().try_min_by(None, |x, y| x.cmp(y)).unwrap(), Some(-10));</span>
     <span class="doccomment">/// ```</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// Stopping generator:</span>
@@ -3527,7 +3525,7 @@
     <span class="doccomment">/// ```</span>
     <span class="doccomment">/// use pushgen::{GeneratorExt, IntoGenerator};</span>
     <span class="doccomment">/// let a = [-3_i32, 0, 1, 5, -10];</span>
-    <span class="doccomment">/// assert_eq!(*a.into_gen().min_by_key(|x| x.abs()).unwrap(), 0);</span>
+    <span class="doccomment">/// assert_eq!(a.into_gen().min_by_key(|x| x.abs()).unwrap(), 0);</span>
     <span class="doccomment">/// ```</span>
     <span class="attribute">#[<span class="ident">inline</span>]</span>
     <span class="kw">fn</span> <span class="ident">min_by_key</span><span class="op">&lt;</span><span class="ident">F</span>, <span class="ident">B</span><span class="op">&gt;</span>(<span class="self">self</span>, <span class="ident">f</span>: <span class="ident">F</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident"><span class="self">Self</span>::Output</span><span class="op">&gt;</span>
@@ -3572,7 +3570,7 @@
     <span class="doccomment">/// let a = [1, 2, 3];</span>
     <span class="doccomment">/// let b: Vec&lt;u32&gt; = Vec::new();</span>
     <span class="doccomment">///</span>
-    <span class="doccomment">/// assert_eq!(a.into_gen().max(), Some(&amp;3));</span>
+    <span class="doccomment">/// assert_eq!(a.into_gen().max(), Some(3));</span>
     <span class="doccomment">/// assert_eq!(b.into_gen().max(), None);</span>
     <span class="doccomment">/// ```</span>
     <span class="attribute">#[<span class="ident">inline</span>]</span>
@@ -3603,7 +3601,7 @@
     <span class="doccomment">/// ```</span>
     <span class="doccomment">/// use pushgen::{GeneratorExt, IntoGenerator};</span>
     <span class="doccomment">/// let a = [-3_i32, 0, 1, 5, -10];</span>
-    <span class="doccomment">/// assert_eq!(*a.into_gen().max_by(|x, y| x.cmp(y)).unwrap(), 5);</span>
+    <span class="doccomment">/// assert_eq!(a.into_gen().max_by(|x, y| x.cmp(y)).unwrap(), 5);</span>
     <span class="doccomment">/// ```</span>
     <span class="attribute">#[<span class="ident">inline</span>]</span>
     <span class="kw">fn</span> <span class="ident">max_by</span><span class="op">&lt;</span><span class="ident">F</span><span class="op">&gt;</span>(<span class="self">self</span>, <span class="kw-2">mut</span> <span class="ident">compare</span>: <span class="ident">F</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident"><span class="self">Self</span>::Output</span><span class="op">&gt;</span>
@@ -3628,7 +3626,7 @@
     <span class="doccomment">/// ```</span>
     <span class="doccomment">/// use pushgen::{GeneratorExt, IntoGenerator};</span>
     <span class="doccomment">/// let a = [-3_i32, 0, 1, 5, -10];</span>
-    <span class="doccomment">/// assert_eq!(a.into_gen().try_min_by(None, |x, y| x.cmp(y)).unwrap(), Some(&amp;-10));</span>
+    <span class="doccomment">/// assert_eq!(a.into_gen().try_min_by(None, |x, y| x.cmp(y)).unwrap(), Some(-10));</span>
     <span class="doccomment">/// ```</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// Stopping generator:</span>
@@ -3679,7 +3677,7 @@
     <span class="doccomment">/// ```</span>
     <span class="doccomment">/// use pushgen::{GeneratorExt, IntoGenerator};</span>
     <span class="doccomment">/// let a = [-3_i32, 0, 1, 5, -10];</span>
-    <span class="doccomment">/// assert_eq!(*a.into_gen().max_by_key(|x| x.abs()).unwrap(), -10);</span>
+    <span class="doccomment">/// assert_eq!(a.into_gen().max_by_key(|x| x.abs()).unwrap(), -10);</span>
     <span class="doccomment">/// ```</span>
     <span class="attribute">#[<span class="ident">inline</span>]</span>
     <span class="kw">fn</span> <span class="ident">max_by_key</span><span class="op">&lt;</span><span class="ident">F</span>, <span class="ident">B</span><span class="op">&gt;</span>(<span class="self">self</span>, <span class="ident">f</span>: <span class="ident">F</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident"><span class="self">Self</span>::Output</span><span class="op">&gt;</span>
@@ -3776,7 +3774,7 @@
     <span class="doccomment">/// let a = [1, 2, 3];</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// // the checked sum of all of the elements of the array</span>
-    <span class="doccomment">/// let sum = a.into_gen().try_fold(0i8, |acc, &amp;x| acc.checked_add(x).ok_or(()));</span>
+    <span class="doccomment">/// let sum = a.into_gen().try_fold(0i8, |acc, x| acc.checked_add(x).ok_or(()));</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// assert_eq!(sum, Ok(TryReduction::Complete(6)));</span>
     <span class="doccomment">/// ```</span>
@@ -3789,13 +3787,13 @@
     <span class="doccomment">/// let mut gen = a.into_gen();</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// // This sum overflows when adding the 100 element</span>
-    <span class="doccomment">/// let sum = gen.try_fold(0i8, |acc, &amp;x| acc.checked_add(x).ok_or(()));</span>
+    <span class="doccomment">/// let sum = gen.try_fold(0i8, |acc, x| acc.checked_add(x).ok_or(()));</span>
     <span class="doccomment">/// assert_eq!(sum, Err(()));</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// // Because it short-circuited, the remaining elements are still</span>
     <span class="doccomment">/// // available through the iterator.</span>
-    <span class="doccomment">/// assert_eq!(gen.next(), Ok(&amp;40));</span>
-    <span class="doccomment">/// assert_eq!(gen.next(), Ok(&amp;50));</span>
+    <span class="doccomment">/// assert_eq!(gen.next(), Ok(40));</span>
+    <span class="doccomment">/// assert_eq!(gen.next(), Ok(50));</span>
     <span class="doccomment">/// assert_eq!(gen.next(), Err(GeneratorResult::Complete));</span>
     <span class="doccomment">/// ```</span>
     <span class="doccomment">///</span>
@@ -3844,7 +3842,7 @@
     <span class="doccomment">/// use pushgen::{GeneratorResult, IntoGenerator, GeneratorExt};</span>
     <span class="doccomment">/// let a = [1, 2, 3];</span>
     <span class="doccomment">///</span>
-    <span class="doccomment">/// let mut gen = a.into_gen().scan(1, |state, &amp;x| {</span>
+    <span class="doccomment">/// let mut gen = a.into_gen().scan(1, |state, x| {</span>
     <span class="doccomment">///     *state = *state * x;</span>
     <span class="doccomment">///</span>
     <span class="doccomment">///     // yield negation of the state.</span>
@@ -3863,7 +3861,7 @@
     <span class="doccomment">/// use pushgen::{IntoGenerator, GeneratorExt, GeneratorResult};</span>
     <span class="doccomment">/// let a = [1, 2, 3];</span>
     <span class="doccomment">///</span>
-    <span class="doccomment">/// let mut gen = a.into_gen().scan(1, |state, &amp;x| {</span>
+    <span class="doccomment">/// let mut gen = a.into_gen().scan(1, |state, x| {</span>
     <span class="doccomment">///     *state = *state * x;</span>
     <span class="doccomment">///     if x == 2 {</span>
     <span class="doccomment">///         None  // Will cause the generator to stop here!</span>
@@ -3918,7 +3916,7 @@
     <span class="doccomment">/// let a = [10, 20, 5, -23, 0];</span>
     <span class="doccomment">/// let b: [u32; 0] = [];</span>
     <span class="doccomment">///</span>
-    <span class="doccomment">/// assert_eq!(find_max(a.into_gen()), Some(&amp;20));</span>
+    <span class="doccomment">/// assert_eq!(find_max(a.into_gen()), Some(20));</span>
     <span class="doccomment">/// assert_eq!(find_max(b.into_gen()), None);</span>
     <span class="doccomment">/// ```</span>
     <span class="doccomment">///</span>
@@ -3977,7 +3975,7 @@
     <span class="doccomment">/// let a = [10, 20, 5, -23, 0];</span>
     <span class="doccomment">/// let b: [u32; 0] = [];</span>
     <span class="doccomment">///</span>
-    <span class="doccomment">/// assert_eq!(find_max(&amp;mut a.into_gen()).unwrap(), Some(&amp;20));</span>
+    <span class="doccomment">/// assert_eq!(find_max(&amp;mut a.into_gen()).unwrap(), Some(20));</span>
     <span class="doccomment">/// assert_eq!(find_max(&amp;mut b.into_gen()).unwrap(), None);</span>
     <span class="doccomment">/// ```</span>
     <span class="doccomment">///</span>
@@ -4056,7 +4054,7 @@
     <span class="doccomment">/// let a = [1, 2, 3];</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// let doubled: Vec&lt;i32&gt; = a.into_gen()</span>
-    <span class="doccomment">///                          .map(|&amp;x| x * 2)</span>
+    <span class="doccomment">///                          .map(|x| x * 2)</span>
     <span class="doccomment">///                          .collect();</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// assert_eq!(vec![2, 4, 6], doubled);</span>
@@ -4118,7 +4116,6 @@
     <span class="doccomment">///</span>
     <span class="doccomment">/// // this iterator sequence is complex.</span>
     <span class="doccomment">/// let sum = a.into_gen()</span>
-    <span class="doccomment">///     .cloned()</span>
     <span class="doccomment">///     .filter(|x| x % 2 == 0)</span>
     <span class="doccomment">///     .fold(0, |sum, i| sum + i);</span>
     <span class="doccomment">///</span>
@@ -4126,7 +4123,6 @@
     <span class="doccomment">///</span>
     <span class="doccomment">/// // let&#39;s add some inspect() calls to investigate what&#39;s happening</span>
     <span class="doccomment">/// let sum = a.into_gen()</span>
-    <span class="doccomment">///     .cloned()</span>
     <span class="doccomment">///     .inspect(|x| println!(&quot;about to filter: {}&quot;, x))</span>
     <span class="doccomment">///     .filter(|x| x % 2 == 0)</span>
     <span class="doccomment">///     .inspect(|x| println!(&quot;made it through filter: {}&quot;, x))</span>
@@ -4167,9 +4163,9 @@
     <span class="doccomment">///</span>
     <span class="doccomment">/// let mut gen = a.into_gen().rev();</span>
     <span class="doccomment">///</span>
-    <span class="doccomment">/// assert_eq!(gen.next(), Ok(&amp;3));</span>
-    <span class="doccomment">/// assert_eq!(gen.next(), Ok(&amp;2));</span>
-    <span class="doccomment">/// assert_eq!(gen.next(), Ok(&amp;1));</span>
+    <span class="doccomment">/// assert_eq!(gen.next(), Ok(3));</span>
+    <span class="doccomment">/// assert_eq!(gen.next(), Ok(2));</span>
+    <span class="doccomment">/// assert_eq!(gen.next(), Ok(1));</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// assert_eq!(gen.next(), Err(GeneratorResult::Complete));</span>
     <span class="doccomment">/// ```</span>
@@ -4195,10 +4191,10 @@
     <span class="doccomment">/// let mut words = [&quot;hello&quot;, &quot;world&quot;, &quot;of&quot;, &quot;rust&quot;].into_gen();</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// let hello_world: Vec&lt;_&gt; = words.by_ref().take(2).collect();</span>
-    <span class="doccomment">/// assert_eq!(hello_world, [&amp;&quot;hello&quot;, &amp;&quot;world&quot;]);</span>
+    <span class="doccomment">/// assert_eq!(hello_world, [&quot;hello&quot;, &quot;world&quot;]);</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// let of_rust: Vec&lt;_&gt; = words.collect();</span>
-    <span class="doccomment">/// assert_eq!(of_rust, [&amp;&quot;of&quot;, &amp;&quot;rust&quot;]);</span>
+    <span class="doccomment">/// assert_eq!(of_rust, [&quot;of&quot;, &quot;rust&quot;]);</span>
     <span class="doccomment">/// ```</span>
     <span class="attribute">#[<span class="ident">inline</span>]</span>
     <span class="kw">fn</span> <span class="ident">by_ref</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">Self</span> {
@@ -4229,9 +4225,9 @@
     <span class="doccomment">/// use pushgen::{IntoGenerator, GeneratorExt};</span>
     <span class="doccomment">/// let a = [1, 2, 3];</span>
     <span class="doccomment">///</span>
-    <span class="doccomment">/// assert_eq!(a.into_gen().position(|&amp;x| x == 2), Some(1));</span>
+    <span class="doccomment">/// assert_eq!(a.into_gen().position(|x| x == 2), Some(1));</span>
     <span class="doccomment">///</span>
-    <span class="doccomment">/// assert_eq!(a.into_gen().position(|&amp;x| x == 5), None);</span>
+    <span class="doccomment">/// assert_eq!(a.into_gen().position(|x| x == 5), None);</span>
     <span class="doccomment">/// ```</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// Stopping at first `true`:</span>
@@ -4242,13 +4238,13 @@
     <span class="doccomment">///</span>
     <span class="doccomment">/// let mut gen = a.into_gen();</span>
     <span class="doccomment">///</span>
-    <span class="doccomment">/// assert_eq!(gen.position(|&amp;x| x &gt;= 2), Some(1));</span>
+    <span class="doccomment">/// assert_eq!(gen.position(|x| x &gt;= 2), Some(1));</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// // we can still use `iter`, as there are more elements.</span>
-    <span class="doccomment">/// assert_eq!(gen.next(), Ok(&amp;3));</span>
+    <span class="doccomment">/// assert_eq!(gen.next(), Ok(3));</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// // The returned index depends on iterator state</span>
-    <span class="doccomment">/// assert_eq!(gen.position(|&amp;x| x == 4), Some(0));</span>
+    <span class="doccomment">/// assert_eq!(gen.position(|x| x == 4), Some(0));</span>
     <span class="doccomment">/// ```</span>
     <span class="doccomment">///</span>
     <span class="attribute">#[<span class="ident">inline</span>]</span>
@@ -4288,9 +4284,9 @@
     <span class="doccomment">/// use pushgen::{GeneratorExt, IntoGenerator};</span>
     <span class="doccomment">/// let a = [1, 2, 3];</span>
     <span class="doccomment">///</span>
-    <span class="doccomment">/// assert_eq!(a.into_gen().find(|&amp;&amp;x| x == 2), Some(&amp;2));</span>
+    <span class="doccomment">/// assert_eq!(a.into_gen().find(|&amp;x| x == 2), Some(2));</span>
     <span class="doccomment">///</span>
-    <span class="doccomment">/// assert_eq!(a.into_gen().find(|&amp;&amp;x| x == 5), None);</span>
+    <span class="doccomment">/// assert_eq!(a.into_gen().find(|&amp;x| x == 5), None);</span>
     <span class="doccomment">/// ```</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// Stopping at the first `true`:</span>
@@ -4301,10 +4297,10 @@
     <span class="doccomment">///</span>
     <span class="doccomment">/// let mut gen = a.into_gen();</span>
     <span class="doccomment">///</span>
-    <span class="doccomment">/// assert_eq!(gen.find(|&amp;&amp;x| x == 2), Some(&amp;2));</span>
+    <span class="doccomment">/// assert_eq!(gen.find(|&amp;x| x == 2), Some(2));</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// // we can still use `iter`, as there are more elements.</span>
-    <span class="doccomment">/// assert_eq!(gen.next(), Ok(&amp;3));</span>
+    <span class="doccomment">/// assert_eq!(gen.next(), Ok(3));</span>
     <span class="doccomment">/// ```</span>
     <span class="doccomment">///</span>
     <span class="attribute">#[<span class="ident">inline</span>]</span>
@@ -4424,7 +4420,7 @@
     <span class="doccomment">/// // Use scan to create a &quot;spuriously&quot; stopping generator.</span>
     <span class="doccomment">/// // Will generate the sequence [1, 2, *Stop*, 4].</span>
     <span class="doccomment">/// let gen = a.into_gen().scan((), |_, value| {</span>
-    <span class="doccomment">///     if *value == 3 {</span>
+    <span class="doccomment">///     if value == 3 {</span>
     <span class="doccomment">///         None</span>
     <span class="doccomment">///     }</span>
     <span class="doccomment">///     else {</span>
@@ -4465,7 +4461,7 @@
     <span class="doccomment">/// ```</span>
     <span class="doccomment">/// use pushgen::{IntoGenerator, GeneratorExt};</span>
     <span class="doccomment">/// let a = [(1, 2), (3, 4)];</span>
-    <span class="doccomment">/// let (left, right): (Vec&lt;_&gt;, Vec&lt;_&gt;) = a.into_gen().copied().unzip();</span>
+    <span class="doccomment">/// let (left, right): (Vec&lt;_&gt;, Vec&lt;_&gt;) = a.into_gen().unzip();</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// assert_eq!(left, [1, 3]);</span>
     <span class="doccomment">/// assert_eq!(right, [2, 4]);</span>
@@ -4485,7 +4481,7 @@
     <span class="doccomment">///         Some(val)</span>
     <span class="doccomment">///     }</span>
     <span class="doccomment">/// }</span>
-    <span class="doccomment">/// let (left, right): (Vec&lt;_&gt;, Vec&lt;_&gt;) = a.into_gen().copied().scan((), scan_fn).unzip();</span>
+    <span class="doccomment">/// let (left, right): (Vec&lt;_&gt;, Vec&lt;_&gt;) = a.into_gen().scan((), scan_fn).unzip();</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// assert_eq!(left, [1, 3]); // missing 5 and 7</span>
     <span class="doccomment">/// assert_eq!(right, [2, 4]); // missing 6 and 8</span>
@@ -4526,11 +4522,11 @@
     <span class="doccomment">/// let two = [1., 2.];</span>
     <span class="doccomment">/// let nan = [f64::NAN];</span>
     <span class="doccomment">///</span>
-    <span class="doccomment">/// assert_eq!(one.into_gen().partial_cmp(&amp;one), Some(Ordering::Equal));</span>
-    <span class="doccomment">/// assert_eq!(one.into_gen().partial_cmp(&amp;two), Some(Ordering::Less));</span>
-    <span class="doccomment">/// assert_eq!(two.into_gen().partial_cmp(&amp;one), Some(Ordering::Greater));</span>
+    <span class="doccomment">/// assert_eq!(one.into_gen().partial_cmp(one), Some(Ordering::Equal));</span>
+    <span class="doccomment">/// assert_eq!(one.into_gen().partial_cmp(two), Some(Ordering::Less));</span>
+    <span class="doccomment">/// assert_eq!(two.into_gen().partial_cmp(one), Some(Ordering::Greater));</span>
     <span class="doccomment">///</span>
-    <span class="doccomment">/// assert_eq!(nan.into_gen().partial_cmp(&amp;one), None);</span>
+    <span class="doccomment">/// assert_eq!(nan.into_gen().partial_cmp(one), None);</span>
     <span class="doccomment">/// ```</span>
     <span class="attribute">#[<span class="ident">inline</span>]</span>
     <span class="kw">fn</span> <span class="ident">partial_cmp</span><span class="op">&lt;</span><span class="ident">Rhs</span><span class="op">&gt;</span>(<span class="self">self</span>, <span class="ident">rhs</span>: <span class="ident">Rhs</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Ordering</span><span class="op">&gt;</span>
@@ -4558,15 +4554,15 @@
     <span class="doccomment">/// let ys = [1.0, 4.0, 9.0, 16.0];</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// assert_eq!(</span>
-    <span class="doccomment">///     xs.into_gen().partial_cmp_by(&amp;ys, |&amp;x, &amp;y| x.partial_cmp(&amp;y)),</span>
+    <span class="doccomment">///     (&amp;xs).into_gen().partial_cmp_by(&amp;ys, |&amp;x, &amp;y| x.partial_cmp(&amp;y)),</span>
     <span class="doccomment">///     Some(Ordering::Less)</span>
     <span class="doccomment">/// );</span>
     <span class="doccomment">/// assert_eq!(</span>
-    <span class="doccomment">///     xs.into_gen().partial_cmp_by(&amp;ys, |&amp;x, &amp;y| (x * x).partial_cmp(&amp;y)),</span>
+    <span class="doccomment">///     (&amp;xs).into_gen().partial_cmp_by(&amp;ys, |&amp;x, &amp;y| (x * x).partial_cmp(&amp;y)),</span>
     <span class="doccomment">///     Some(Ordering::Equal)</span>
     <span class="doccomment">/// );</span>
     <span class="doccomment">/// assert_eq!(</span>
-    <span class="doccomment">///     xs.into_gen().partial_cmp_by(&amp;ys, |&amp;x, &amp;y| (2.0 * x).partial_cmp(&amp;y)),</span>
+    <span class="doccomment">///     (&amp;xs).into_gen().partial_cmp_by(&amp;ys, |&amp;x, &amp;y| (2.0 * x).partial_cmp(&amp;y)),</span>
     <span class="doccomment">///     Some(Ordering::Greater)</span>
     <span class="doccomment">/// );</span>
     <span class="doccomment">/// ```</span>

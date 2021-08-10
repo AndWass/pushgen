@@ -18,9 +18,12 @@
 <span id="18">18</span>
 <span id="19">19</span>
 <span id="20">20</span>
+<span id="21">21</span>
+<span id="22">22</span>
 </pre><pre class="rust">
 <span class="doccomment">//! Implements various generators.</span>
 
+<span class="kw">pub</span> <span class="kw">use</span> <span class="ident">array_gen::ArrayGenerator</span>;
 <span class="kw">pub</span> <span class="kw">use</span> <span class="ident">from_fn::from_fn</span>;
 <span class="kw">pub</span> <span class="kw">use</span> <span class="ident">from_fn::FromFn</span>;
 <span class="kw">pub</span> <span class="kw">use</span> <span class="ident">from_iter::from_iter</span>;
@@ -28,6 +31,7 @@
 <span class="kw">pub</span> <span class="kw">use</span> <span class="ident">option::OptionGen</span>;
 <span class="kw">pub</span> <span class="kw">use</span> <span class="ident">slice_generator::SliceGenerator</span>;
 
+<span class="kw">mod</span> <span class="ident">array_gen</span>;
 <span class="kw">mod</span> <span class="ident">from_fn</span>;
 <span class="kw">mod</span> <span class="ident">from_iter</span>;
 <span class="kw">mod</span> <span class="ident">option</span>;

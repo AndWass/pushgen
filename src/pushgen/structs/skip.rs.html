@@ -369,7 +369,7 @@
         <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">gen</span> <span class="op">=</span> <span class="ident">Skip::new</span>(<span class="ident">a</span>.<span class="ident">into_gen</span>(), <span class="number">2</span>);
         <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">output</span> <span class="op">=</span> <span class="ident">Vec::new</span>();
         <span class="kw">let</span> <span class="ident">result</span> <span class="op">=</span> <span class="ident">gen</span>.<span class="ident">for_each</span>(<span class="op">|</span><span class="ident">x</span><span class="op">|</span> <span class="ident">output</span>.<span class="ident">push</span>(<span class="ident">x</span>));
-        <span class="macro">assert_eq!</span>(<span class="ident">output</span>, [<span class="kw-2">&amp;</span><span class="number">3</span>]);
+        <span class="macro">assert_eq!</span>(<span class="ident">output</span>, [<span class="number">3</span>]);
         <span class="macro">assert_eq!</span>(<span class="ident">result</span>, <span class="ident">GeneratorResult::Complete</span>);
     }
 
@@ -394,7 +394,7 @@
         <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">gen</span> <span class="op">=</span> <span class="ident">SkipWhile::new</span>(<span class="ident">a</span>.<span class="ident">into_gen</span>(), <span class="op">|</span><span class="ident">x</span><span class="op">|</span> <span class="ident">x</span>.<span class="ident">is_negative</span>());
         <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">output</span> <span class="op">=</span> <span class="ident">Vec::new</span>();
         <span class="kw">let</span> <span class="ident">result</span> <span class="op">=</span> <span class="ident">gen</span>.<span class="ident">for_each</span>(<span class="op">|</span><span class="ident">x</span><span class="op">|</span> <span class="ident">output</span>.<span class="ident">push</span>(<span class="ident">x</span>));
-        <span class="macro">assert_eq!</span>(<span class="ident">output</span>, [<span class="kw-2">&amp;</span><span class="number">0</span>, <span class="kw-2">&amp;</span><span class="number">1</span>]);
+        <span class="macro">assert_eq!</span>(<span class="ident">output</span>, [<span class="number">0</span>, <span class="number">1</span>]);
         <span class="macro">assert_eq!</span>(<span class="ident">result</span>, <span class="ident">GeneratorResult::Complete</span>);
     }
 
@@ -418,7 +418,7 @@
         <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">gen</span> <span class="op">=</span> <span class="ident">data</span>.<span class="ident">into_gen</span>().<span class="ident">skip</span>(<span class="number">3</span>);
         <span class="kw">let</span> <span class="ident">result</span> <span class="op">=</span> <span class="ident">gen</span>.<span class="ident">try_advance</span>(<span class="ident">NonZeroUsize::new</span>(<span class="number">2</span>).<span class="ident">unwrap</span>());
         <span class="macro">assert_eq!</span>(<span class="ident">result</span>, (<span class="number">2</span>, <span class="ident">GeneratorResult::Stopped</span>));
-        <span class="macro">assert_eq!</span>(<span class="ident">gen</span>.<span class="ident">next</span>(), <span class="prelude-val">Ok</span>(<span class="kw-2">&amp;</span><span class="number">5</span>));
+        <span class="macro">assert_eq!</span>(<span class="ident">gen</span>.<span class="ident">next</span>(), <span class="prelude-val">Ok</span>(<span class="number">5</span>));
     }
 
     <span class="attribute">#[<span class="ident">test</span>]</span>
