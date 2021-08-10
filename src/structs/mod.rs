@@ -3,6 +3,7 @@
 pub use chain::Chain;
 pub use cloned::Cloned;
 pub use copied::Copied;
+pub use cycle::Cycle;
 pub use dedup::Dedup;
 pub use enumerate::Enumerate;
 pub use filter::Filter;
@@ -21,6 +22,7 @@ pub use zip::Zip;
 mod chain;
 mod cloned;
 mod copied;
+mod cycle;
 mod dedup;
 mod enumerate;
 mod filter;

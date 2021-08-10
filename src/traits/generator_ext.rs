@@ -1,7 +1,7 @@
 use crate::structs::utility::InplaceUpdatable;
 use crate::structs::{
-    Chain, Cloned, Copied, Dedup, Enumerate, Filter, FilterMap, Flatten, Inspect, IteratorAdaptor,
-    Map, Reverse, Scan, Skip, SkipWhile, StepBy, Take, TakeWhile, Zip,
+    Chain, Cloned, Copied, Cycle, Dedup, Enumerate, Filter, FilterMap, Flatten, Inspect,
+    IteratorAdaptor, Map, Reverse, Scan, Skip, SkipWhile, StepBy, Take, TakeWhile, Zip,
 };
 use crate::traits::{FromGenerator, Product, Sum};
 use crate::{
@@ -128,6 +128,38 @@ pub trait GeneratorExt: Sealed + Generator + Sized {
             }
         });
         retval
+    }
+
+    /// Repeats a generator endlessly.
+    ///
+    /// Instead of stopping when a generator has completed, the generator will start over again
+    /// from the beginning.
+    ///
+    /// The generator will only start over once the source generator has completed. Spuriously
+    /// stopping generators will **not** cause the source to start over again.
+    ///
+    /// ## Examples
+    ///
+    /// Basic usage:
+    ///
+    /// ```
+    /// use pushgen::{GeneratorExt, IntoGenerator};
+    /// let data = [1, 2, 3];
+    /// let mut gen = data.into_gen().cycle();
+    /// assert_eq!(gen.next(), Ok(1));
+    /// assert_eq!(gen.next(), Ok(2));
+    /// assert_eq!(gen.next(), Ok(3));
+    /// assert_eq!(gen.next(), Ok(1));
+    /// assert_eq!(gen.next(), Ok(2));
+    /// assert_eq!(gen.next(), Ok(3));
+    /// assert_eq!(gen.next(), Ok(1));
+    /// ```
+    #[inline]
+    fn cycle(self) -> Cycle<Self>
+    where
+        Self: Clone,
+    {
+        Cycle::new(self)
     }
     /// Retrieve the next value from the generator
     ///
