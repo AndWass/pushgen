@@ -142,7 +142,7 @@ mod tests {
         let mut gen = Skip::new(a.into_gen(), 2);
         let mut output = Vec::new();
         let result = gen.for_each(|x| output.push(x));
-        assert_eq!(output, [&3]);
+        assert_eq!(output, [3]);
         assert_eq!(result, GeneratorResult::Complete);
     }
 
@@ -167,7 +167,7 @@ mod tests {
         let mut gen = SkipWhile::new(a.into_gen(), |x| x.is_negative());
         let mut output = Vec::new();
         let result = gen.for_each(|x| output.push(x));
-        assert_eq!(output, [&0, &1]);
+        assert_eq!(output, [0, 1]);
         assert_eq!(result, GeneratorResult::Complete);
     }
 
@@ -191,7 +191,7 @@ mod tests {
         let mut gen = data.into_gen().skip(3);
         let result = gen.try_advance(NonZeroUsize::new(2).unwrap());
         assert_eq!(result, (2, GeneratorResult::Stopped));
-        assert_eq!(gen.next(), Ok(&5));
+        assert_eq!(gen.next(), Ok(5));
     }
 
     #[test]

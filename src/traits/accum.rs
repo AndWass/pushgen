@@ -161,13 +161,13 @@ float_sum_product! { f32 f64 }
 #[cfg(test)]
 mod tests {
     use super::*;
-    use crate::{GeneratorExt, IntoGenerator};
+    use crate::{IntoGenerator, SliceGenerator};
 
     #[test]
     fn sum() {
         let data = [1, 2, 3, 4];
-        assert_eq!(i32::sum(data.into_gen().copied()), 10);
         assert_eq!(i32::sum(data.into_gen()), 10);
+        assert_eq!(i32::sum(SliceGenerator::new(&data)), 10);
 
         let data = [Wrapping(u32::MAX), Wrapping(1)];
         assert_eq!(Wrapping::<u32>::sum(data.into_gen()), Wrapping(0));
@@ -177,7 +177,7 @@ mod tests {
     fn product() {
         let data = [2, 3, 4];
         let expected = 2 * 3 * 4;
-        assert_eq!(i32::product(data.into_gen().copied()), expected);
         assert_eq!(i32::product(data.into_gen()), expected);
+        assert_eq!(i32::product(SliceGenerator::new(&data)), expected);
     }
 }

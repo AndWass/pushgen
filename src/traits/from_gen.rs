@@ -17,7 +17,7 @@ use crate::IntoGenerator;
 ///
 /// ```
 /// use pushgen::{FromGenerator, IntoGenerator, GeneratorExt};
-/// let v: Vec<i32> = FromGenerator::from_gen([1, 2, 3, 4].into_gen().copied());
+/// let v: Vec<i32> = FromGenerator::from_gen([1, 2, 3, 4].into_gen());
 /// assert_eq!(v, [1, 2, 3, 4]);
 /// ```
 ///
@@ -25,7 +25,7 @@ use crate::IntoGenerator;
 ///
 /// ```
 /// use pushgen::{FromGenerator, IntoGenerator, GeneratorExt};
-/// let v: Vec<i32> = [1, 2, 3, 4].into_gen().copied().collect();
+/// let v: Vec<i32> = [1, 2, 3, 4].into_gen().collect();
 /// assert_eq!(v, [1, 2, 3, 4]);
 /// ```
 ///
@@ -62,7 +62,7 @@ use crate::IntoGenerator;
 /// }
 ///
 /// // Now we can make a new iterator...
-/// let gen = [0, 1, 2, 3, 4].into_gen().copied();
+/// let gen = [0, 1, 2, 3, 4].into_gen();
 ///
 /// // ... and make a MyCollection out of it
 /// let c = MyCollection::from_gen(gen);
@@ -71,7 +71,7 @@ use crate::IntoGenerator;
 ///
 /// // collect works too!
 ///
-/// let gen = [0, 1, 2, 3, 4].into_gen().copied();
+/// let gen = [0, 1, 2, 3, 4].into_gen();
 /// let c: MyCollection = gen.collect();
 ///
 /// assert_eq!(c.0, vec![0, 1, 2, 3, 4]);
