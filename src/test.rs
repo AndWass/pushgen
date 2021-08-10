@@ -85,6 +85,7 @@ impl<'a, T> Generator for StoppingGen<'a, T> {
 /// assert_eq!(gen.next(), Ok(&2));
 /// assert_eq!(gen.next(), Err(GeneratorResult::Complete));
 /// ```
+#[derive(Clone)]
 pub struct MultiStoppingGen<'a, T> {
     index: usize,
     data: &'a [Option<T>],
