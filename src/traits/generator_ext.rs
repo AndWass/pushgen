@@ -2055,6 +2055,170 @@ pub trait GeneratorExt: Sealed + Generator + Sized {
 
         retval
     }
+
+    /// Determines if the values of this generator are lexicographically less than to those of another.
+    ///
+    /// ## Spuriously stopping generators
+    ///
+    /// `lt()` will not work properly with spuriously stopping generators.
+    ///
+    /// ## Examples
+    ///
+    /// Basic usage
+    ///
+    /// ```
+    /// use pushgen::{GeneratorExt, IntoGenerator};
+    /// assert_eq!([1].into_gen().lt(&[1]), false);
+    /// assert_eq!([1].into_gen().lt(&[1, 2]), true);
+    /// assert_eq!([1, 2].into_gen().lt(&[1]), false);
+    /// assert_eq!([1, 2].into_gen().lt(&[1, 2]), false);
+    /// ```
+    #[inline]
+    fn lt<Rhs>(self, rhs: Rhs) -> bool
+    where
+        Rhs: IntoGenerator,
+        Self::Output: PartialOrd<<Rhs as IntoGenerator>::Output>,
+    {
+        matches!(self.partial_cmp(rhs), Some(Ordering::Less))
+    }
+
+    /// Determines if the values of this generator are lexicographically lesser or equal to those of another.
+    ///
+    /// ## Spuriously stopping generators
+    ///
+    /// `le()` will not work properly with spuriously stopping generators.
+    ///
+    /// ## Examples
+    ///
+    /// Basic usage
+    ///
+    /// ```
+    /// use pushgen::{GeneratorExt, IntoGenerator};
+    /// assert_eq!([1].into_gen().le(&[1]), true);
+    /// assert_eq!([1].into_gen().le(&[1, 2]), true);
+    /// assert_eq!([1, 2].into_gen().le(&[1]), false);
+    /// assert_eq!([1, 2].into_gen().le(&[1, 2]), true);
+    /// ```
+    #[inline]
+    fn le<Rhs>(self, rhs: Rhs) -> bool
+    where
+        Rhs: IntoGenerator,
+        Self::Output: PartialOrd<<Rhs as IntoGenerator>::Output>,
+    {
+        matches!(
+            self.partial_cmp(rhs),
+            Some(Ordering::Less | Ordering::Equal)
+        )
+    }
+
+    /// Determines if the values of this generator are lexicographically greater or equal to those of another.
+    ///
+    /// ## Spuriously stopping generators
+    ///
+    /// `ge()` will not work properly with spuriously stopping generators.
+    ///
+    /// ## Examples
+    ///
+    /// Basic usage
+    ///
+    /// ```
+    /// use pushgen::{GeneratorExt, IntoGenerator};
+    /// assert_eq!([1].into_gen().ge(&[1]), true);
+    /// assert_eq!([1].into_gen().ge(&[1, 2]), false);
+    /// assert_eq!([1, 2].into_gen().ge(&[1]), true);
+    /// assert_eq!([1, 2].into_gen().ge(&[1, 2]), true);
+    /// ```
+    #[inline]
+    fn ge<Rhs>(self, rhs: Rhs) -> bool
+    where
+        Rhs: IntoGenerator,
+        Self::Output: PartialOrd<<Rhs as IntoGenerator>::Output>,
+    {
+        matches!(
+            self.partial_cmp(rhs),
+            Some(Ordering::Greater | Ordering::Equal)
+        )
+    }
+
+    /// Determines if the values of this generator are lexicographically greater than those of another.
+    ///
+    /// ## Spuriously stopping generators
+    ///
+    /// `gt()` will not work properly with spuriously stopping generators.
+    ///
+    /// ## Examples
+    ///
+    /// Basic usage
+    ///
+    /// ```
+    /// use pushgen::{GeneratorExt, IntoGenerator};
+    /// assert_eq!([1].into_gen().gt(&[1]), false);
+    /// assert_eq!([1].into_gen().gt(&[1, 2]), false);
+    /// assert_eq!([1, 2].into_gen().gt(&[1]), true);
+    /// assert_eq!([1, 2].into_gen().gt(&[1, 2]), false);
+    /// ```
+    #[inline]
+    fn gt<Rhs>(self, rhs: Rhs) -> bool
+    where
+        Rhs: IntoGenerator,
+        Self::Output: PartialOrd<<Rhs as IntoGenerator>::Output>,
+    {
+        matches!(self.partial_cmp(rhs), Some(Ordering::Greater))
+    }
+
+    /// Determines if the values from this generator are equal to those of another.
+    ///
+    /// ## Spuriously stopping generators
+    ///
+    /// `eq()` will not work properly with spuriously stopping generators.
+    ///
+    /// ## Examples
+    ///
+    /// Basic usage
+    ///
+    /// ```
+    /// use pushgen::{GeneratorExt, IntoGenerator};
+    /// assert_eq!([1].into_gen().eq(&[1]), true);
+    /// assert_eq!([1].into_gen().eq(&[1, 2]), false);
+    /// ```
+    #[inline]
+    fn eq<Rhs>(self, rhs: Rhs) -> bool
+    where
+        Rhs: IntoGenerator,
+        Self::Output: PartialEq<<Rhs as IntoGenerator>::Output>,
+    {
+        self.partial_cmp_by(rhs, |x, y| {
+            if x.eq(&y) {
+                Some(Ordering::Equal)
+            } else {
+                None
+            }
+        }) == Some(Ordering::Equal)
+    }
+
+    /// Determines if the values from this generator are unequal to those of another.
+    ///
+    /// ## Spuriously stopping generators
+    ///
+    /// `ne()` will not work properly with spuriously stopping generators.
+    ///
+    /// ## Examples
+    ///
+    /// Basic usage
+    ///
+    /// ```
+    /// use pushgen::{GeneratorExt, IntoGenerator};
+    /// assert_eq!([1].into_gen().ne(&[1]), false);
+    /// assert_eq!([1].into_gen().ne(&[1, 2]), true);
+    /// ```
+    #[inline]
+    fn ne<Rhs>(self, rhs: Rhs) -> bool
+    where
+        Rhs: IntoGenerator,
+        Self::Output: PartialEq<<Rhs as IntoGenerator>::Output>,
+    {
+        !self.eq(rhs)
+    }
 }
 
 impl<T: Generator> GeneratorExt for T {}
