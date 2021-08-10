@@ -4,7 +4,9 @@ use crate::structs::{
     Map, Reverse, Scan, Skip, SkipWhile, StepBy, Take, TakeWhile, Zip,
 };
 use crate::traits::{FromGenerator, Product, Sum};
-use crate::{Generator, GeneratorResult, ReverseGenerator, TryReduction, ValueResult};
+use crate::{
+    Generator, GeneratorResult, IntoGenerator, ReverseGenerator, TryReduction, ValueResult,
+};
 use core::cmp::Ordering;
 
 pub trait Sealed {}
@@ -1931,6 +1933,128 @@ pub trait GeneratorExt: Sealed + Generator + Sized {
         // substitute for now.
         self.iter().unzip()
     }
+
+    /// [Lexicographically](https://doc.rust-lang.org/std/cmp/trait.Ord.html#lexicographical-comparison)
+    /// compares the elements of this generator with those of another.
+    ///
+    /// ## Spuriously stopping generators
+    ///
+    /// `partial_cmp()` will not work properly with spuriously stopping generators.
+    ///
+    /// ## Examples
+    ///
+    /// ```
+    /// use std::cmp::Ordering;
+    /// use pushgen::{IntoGenerator, GeneratorExt};
+    ///
+    /// let one = [1.];
+    /// let two = [1., 2.];
+    /// let nan = [f64::NAN];
+    ///
+    /// assert_eq!(one.into_gen().partial_cmp(&one), Some(Ordering::Equal));
+    /// assert_eq!(one.into_gen().partial_cmp(&two), Some(Ordering::Less));
+    /// assert_eq!(two.into_gen().partial_cmp(&one), Some(Ordering::Greater));
+    ///
+    /// assert_eq!(nan.into_gen().partial_cmp(&one), None);
+    /// ```
+    #[inline]
+    fn partial_cmp<Rhs>(self, rhs: Rhs) -> Option<Ordering>
+    where
+        Rhs: IntoGenerator,
+        Self::Output: PartialOrd<<Rhs as IntoGenerator>::Output>,
+    {
+        self.partial_cmp_by(rhs, |x, y| x.partial_cmp(&y))
+    }
+
+    /// [Lexicographically](https://doc.rust-lang.org/std/cmp/trait.Ord.html#lexicographical-comparison)
+    /// compares the elements of this generator with those of another using a supplied comparison function.
+    ///
+    /// ## Spuriously stopping generators
+    ///
+    /// `partial_cmp_by()` will not work properly with spuriously stopping generators.
+    ///
+    /// ## Examples
+    ///
+    /// ```
+    /// use std::cmp::Ordering;
+    /// use pushgen::{IntoGenerator, GeneratorExt};
+    ///
+    /// let xs = [1.0, 2.0, 3.0, 4.0];
+    /// let ys = [1.0, 4.0, 9.0, 16.0];
+    ///
+    /// assert_eq!(
+    ///     xs.into_gen().partial_cmp_by(&ys, |&x, &y| x.partial_cmp(&y)),
+    ///     Some(Ordering::Less)
+    /// );
+    /// assert_eq!(
+    ///     xs.into_gen().partial_cmp_by(&ys, |&x, &y| (x * x).partial_cmp(&y)),
+    ///     Some(Ordering::Equal)
+    /// );
+    /// assert_eq!(
+    ///     xs.into_gen().partial_cmp_by(&ys, |&x, &y| (2.0 * x).partial_cmp(&y)),
+    ///     Some(Ordering::Greater)
+    /// );
+    /// ```
+    #[inline]
+    fn partial_cmp_by<Rhs, Cmp>(mut self, rhs: Rhs, mut cmp: Cmp) -> Option<Ordering>
+    where
+        Rhs: IntoGenerator,
+        Cmp: FnMut(Self::Output, Rhs::Output) -> Option<Ordering>,
+    {
+        let mut rhs = rhs.into_gen();
+        let mut retval = {
+            // Check the first element from both self and rhs.
+            let x = match self.next() {
+                Ok(x) => x,
+                Err(_) => {
+                    return if rhs.next().is_ok() {
+                        Some(Ordering::Less)
+                    } else {
+                        Some(Ordering::Equal)
+                    }
+                }
+            };
+
+            // One value extracted from self, so if no value is available from rhs then we are
+            // in fact greater
+            let y = match rhs.next() {
+                Ok(y) => y,
+                _ => return Some(Ordering::Greater),
+            };
+
+            // If first elements aren't equal we have a result immediately.
+            match cmp(x, y) {
+                Some(Ordering::Equal) => Some(Ordering::Equal),
+                non_eq => return non_eq,
+            }
+        };
+
+        // One element extracted from both self and rhs, and they are both equal.
+        // retval is always Some(Ordering::Equal) when we get here
+
+        self.run(|x| match rhs.next() {
+            Ok(y) => match cmp(x, y) {
+                Some(Ordering::Equal) => ValueResult::MoreValues,
+                non_eq => {
+                    retval = non_eq;
+                    ValueResult::Stop
+                }
+            },
+            _ => {
+                retval = Some(Ordering::Greater);
+                ValueResult::Stop
+            }
+        });
+
+        // If retval == Some(Ordering::Equal) we know that we have exhausted self
+        // (either to completion or spurious stop, but we don't care about that)
+        // but if then rhs contains more values we aren't actually equal, we are in fact less
+        if retval == Some(Ordering::Equal) && rhs.next().is_ok() {
+            retval = Some(Ordering::Less);
+        }
+
+        retval
+    }
 }
 
 impl<T: Generator> GeneratorExt for T {}
@@ -1941,6 +2065,45 @@ mod tests {
     use crate::{
         Generator, GeneratorExt, GeneratorResult, IntoGenerator, TryReduction, ValueResult,
     };
+    use std::cmp::Ordering;
+
+    #[test]
+    fn partial_cmp_by() {
+        fn check(lhs: &[f64], rhs: &[f64]) {
+            fn cmp<T: PartialOrd>(lhs: T, rhs: T) -> Option<Ordering> {
+                lhs.partial_cmp(&rhs)
+            }
+
+            assert_eq!(
+                lhs.into_gen().partial_cmp_by(rhs.into_gen(), cmp),
+                lhs.iter().partial_cmp(rhs.iter())
+            );
+        }
+
+        let a = [1.0];
+        let b = [1., 2.];
+        let empty: [f64; 0] = [];
+        let nan = [f64::NAN];
+
+        check(&a, &a);
+        check(&empty, &empty);
+        check(&a, &empty);
+        check(&empty, &a);
+
+        check(&b, &b);
+        check(&a, &b);
+        check(&b, &a);
+        check(&b, &empty);
+        check(&empty, &b);
+
+        check(&nan, &nan);
+        check(&nan, &empty);
+        check(&nan, &a);
+        check(&empty, &nan);
+        check(&a, &nan);
+        check(&nan, &b);
+        check(&b, &nan);
+    }
 
     #[test]
     fn for_each_stopped() {
