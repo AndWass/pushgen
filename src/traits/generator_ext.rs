@@ -2055,6 +2055,234 @@ pub trait GeneratorExt: Sealed + Generator + Sized {
 
         retval
     }
+
+    /// Lexicographically compares the values of this generator with those of another.
+    ///
+    /// ## Spuriously stopping generators
+    ///
+    /// `cmp()` does not work correctly with spuriously stopping generators.
+    ///
+    /// ## Examples
+    ///
+    /// ```
+    /// use pushgen::{GeneratorExt, IntoGenerator};
+    /// use std::cmp::Ordering;
+    /// assert_eq!((&[1]).into_gen().cmp(&[1]), Ordering::Equal);
+    /// assert_eq!((&[1]).into_gen().cmp(&[1, 2]), Ordering::Less);
+    /// assert_eq!((&[1, 2]).into_gen().cmp(&[1]), Ordering::Greater);
+    /// ```
+    #[inline]
+    fn cmp<Rhs>(self, rhs: Rhs) -> Ordering
+    where
+        Rhs: IntoGenerator<Output = Self::Output>,
+        Self::Output: Ord,
+    {
+        self.cmp_by(rhs, |x, y| x.cmp(&y))
+    }
+
+    /// Lexicographically compares the values of this generator with those of another with respect
+    /// to the specified comparison function.
+    ///
+    /// ## Spuriously stopping generators
+    ///
+    /// `cmp_by()` does not work correctly with spuriously stopping generators.
+    ///
+    /// ## Examples
+    ///
+    /// ```
+    /// use pushgen::{GeneratorExt, IntoGenerator};
+    /// use std::cmp::Ordering;
+    /// let xs = [1, 2, 3, 4];
+    /// let ys = [1, 4, 9, 16];
+    /// assert_eq!((&xs).into_gen().cmp_by(&ys, |&x, &y| x.cmp(&y)), Ordering::Less);
+    /// assert_eq!((&xs).into_gen().cmp_by(&ys, |&x, &y| (x * x).cmp(&y)), Ordering::Equal);
+    /// assert_eq!((&xs).into_gen().cmp_by(&ys, |&x, &y| (2 * x).cmp(&y)), Ordering::Greater);
+    /// ```
+    #[inline]
+    fn cmp_by<Rhs, Cmp>(self, rhs: Rhs, mut cmp: Cmp) -> Ordering
+    where
+        Rhs: IntoGenerator<Output = Self::Output>,
+        Cmp: FnMut(Self::Output, Self::Output) -> Ordering,
+    {
+        unsafe {
+            crate::structs::utility::unwrap_unchecked(
+                self.partial_cmp_by(rhs, move |x, y| Some(cmp(x, y))),
+            )
+        }
+    }
+
+    /// Determines if the values of this generator are lexicographically less than to those of another.
+    ///
+    /// ## Spuriously stopping generators
+    ///
+    /// `lt()` will not work properly with spuriously stopping generators.
+    ///
+    /// ## Examples
+    ///
+    /// Basic usage
+    ///
+    /// ```
+    /// use pushgen::{GeneratorExt, IntoGenerator};
+    ///
+    /// let one = [1];
+    /// let two = [1, 2];
+    /// assert_eq!((&one).into_gen().lt(&one), false);
+    /// assert_eq!((&one).into_gen().lt(&two), true);
+    /// assert_eq!((&two).into_gen().lt(&one), false);
+    /// assert_eq!((&two).into_gen().lt(&two), false);
+    /// ```
+    #[inline]
+    fn lt<Rhs>(self, rhs: Rhs) -> bool
+    where
+        Rhs: IntoGenerator,
+        Self::Output: PartialOrd<<Rhs as IntoGenerator>::Output>,
+    {
+        matches!(self.partial_cmp(rhs), Some(Ordering::Less))
+    }
+
+    /// Determines if the values of this generator are lexicographically lesser or equal to those of another.
+    ///
+    /// ## Spuriously stopping generators
+    ///
+    /// `le()` will not work properly with spuriously stopping generators.
+    ///
+    /// ## Examples
+    ///
+    /// Basic usage
+    ///
+    /// ```
+    /// use pushgen::{GeneratorExt, IntoGenerator};
+    ///
+    /// let one = [1];
+    /// let two = [1, 2];
+    ///
+    /// assert_eq!((&one).into_gen().le(&one), true);
+    /// assert_eq!((&one).into_gen().le(&two), true);
+    /// assert_eq!((&two).into_gen().le(&one), false);
+    /// assert_eq!((&two).into_gen().le(&two), true);
+    /// ```
+    #[inline]
+    fn le<Rhs>(self, rhs: Rhs) -> bool
+    where
+        Rhs: IntoGenerator,
+        Self::Output: PartialOrd<<Rhs as IntoGenerator>::Output>,
+    {
+        matches!(
+            self.partial_cmp(rhs),
+            Some(Ordering::Less | Ordering::Equal)
+        )
+    }
+
+    /// Determines if the values of this generator are lexicographically greater or equal to those of another.
+    ///
+    /// ## Spuriously stopping generators
+    ///
+    /// `ge()` will not work properly with spuriously stopping generators.
+    ///
+    /// ## Examples
+    ///
+    /// Basic usage
+    ///
+    /// ```
+    /// use pushgen::{GeneratorExt, IntoGenerator};
+    /// let one = &[1];
+    /// let two = &[1, 2];
+    /// assert_eq!(one.into_gen().ge(one.into_gen()), true);
+    /// assert_eq!(one.into_gen().ge(two.into_gen()), false);
+    /// assert_eq!(two.into_gen().ge(one.into_gen()), true);
+    /// assert_eq!(two.into_gen().ge(two.into_gen()), true);
+    /// ```
+    #[inline]
+    fn ge<Rhs>(self, rhs: Rhs) -> bool
+    where
+        Rhs: IntoGenerator,
+        Self::Output: PartialOrd<<Rhs as IntoGenerator>::Output>,
+    {
+        matches!(
+            self.partial_cmp(rhs),
+            Some(Ordering::Greater | Ordering::Equal)
+        )
+    }
+
+    /// Determines if the values of this generator are lexicographically greater than those of another.
+    ///
+    /// ## Spuriously stopping generators
+    ///
+    /// `gt()` will not work properly with spuriously stopping generators.
+    ///
+    /// ## Examples
+    ///
+    /// Basic usage
+    ///
+    /// ```
+    /// use pushgen::{GeneratorExt, IntoGenerator};
+    /// assert_eq!((&[1]).into_gen().gt(&[1]), false);
+    /// assert_eq!((&[1]).into_gen().gt(&[1, 2]), false);
+    /// assert_eq!((&[1, 2]).into_gen().gt(&[1]), true);
+    /// assert_eq!((&[1, 2]).into_gen().gt(&[1, 2]), false);
+    /// ```
+    #[inline]
+    fn gt<Rhs>(self, rhs: Rhs) -> bool
+    where
+        Rhs: IntoGenerator,
+        Self::Output: PartialOrd<<Rhs as IntoGenerator>::Output>,
+    {
+        matches!(self.partial_cmp(rhs), Some(Ordering::Greater))
+    }
+
+    /// Determines if the values from this generator are equal to those of another.
+    ///
+    /// ## Spuriously stopping generators
+    ///
+    /// `eq()` will not work properly with spuriously stopping generators.
+    ///
+    /// ## Examples
+    ///
+    /// Basic usage
+    ///
+    /// ```
+    /// use pushgen::{GeneratorExt, IntoGenerator};
+    /// assert_eq!((&[1]).into_gen().eq(&[1]), true);
+    /// assert_eq!((&[1]).into_gen().eq(&[1, 2]), false);
+    /// ```
+    #[inline]
+    fn eq<Rhs>(self, rhs: Rhs) -> bool
+    where
+        Rhs: IntoGenerator,
+        Self::Output: PartialEq<<Rhs as IntoGenerator>::Output>,
+    {
+        self.partial_cmp_by(rhs, |x, y| {
+            if x.eq(&y) {
+                Some(Ordering::Equal)
+            } else {
+                None
+            }
+        }) == Some(Ordering::Equal)
+    }
+
+    /// Determines if the values from this generator are unequal to those of another.
+    ///
+    /// ## Spuriously stopping generators
+    ///
+    /// `ne()` will not work properly with spuriously stopping generators.
+    ///
+    /// ## Examples
+    ///
+    /// Basic usage
+    ///
+    /// ```
+    /// use pushgen::{GeneratorExt, IntoGenerator};
+    /// assert_eq!((&[1]).into_gen().ne(&[1]), false);
+    /// assert_eq!((&[1]).into_gen().ne(&[1, 2]), true);
+    /// ```
+    #[inline]
+    fn ne<Rhs>(self, rhs: Rhs) -> bool
+    where
+        Rhs: IntoGenerator,
+        Self::Output: PartialEq<<Rhs as IntoGenerator>::Output>,
+    {
+        !self.eq(rhs)
+    }
 }
 
 impl<T: Generator> GeneratorExt for T {}
@@ -2129,14 +2357,14 @@ mod tests {
     #[test]
     fn basic_all() {
         let data = [1, 2, 2];
-        assert!(data.into_gen().all(|&x| x > 0));
-        assert!(!data.into_gen().all(|&x| x > 2));
+        assert!((&data).into_gen().all(|&x| x > 0));
+        assert!(!(&data).into_gen().all(|&x| x > 2));
     }
 
     #[test]
     fn shortcircuit_all() {
         let data = [1, 2, 3];
-        let mut gen = data.into_gen();
+        let mut gen = (&data).into_gen();
         assert!(!gen.all(|&x| x != 2));
         assert_eq!(gen.iter().next(), Some(&3));
     }
@@ -2156,7 +2384,7 @@ mod tests {
 
         assert_eq!(
             x.iter().copied().reduce(reducer),
-            x.into_gen().copied().reduce(reducer)
+            (&x).into_gen().copied().reduce(reducer)
         );
     }
 
@@ -2169,7 +2397,7 @@ mod tests {
 
         assert_eq!(
             x.iter().copied().reduce(reducer),
-            x.into_gen().copied().reduce(reducer)
+            (&x).into_gen().copied().reduce(reducer)
         );
     }
 
@@ -2182,7 +2410,7 @@ mod tests {
 
         assert_eq!(
             x.iter().copied().reduce(reducer),
-            x.into_gen().copied().reduce(reducer)
+            (&x).into_gen().copied().reduce(reducer)
         );
     }
 
@@ -2194,7 +2422,7 @@ mod tests {
         }
 
         assert_eq!(
-            x.into_gen().copied().try_reduce(None, reducer),
+            (&x).into_gen().copied().try_reduce(None, reducer),
             TryReduction::Complete(None)
         );
     }
@@ -2207,7 +2435,7 @@ mod tests {
         }
 
         assert_eq!(
-            x.into_gen().copied().try_reduce(None, reducer),
+            (&x).into_gen().copied().try_reduce(None, reducer),
             TryReduction::Complete(Some(1))
         );
     }
@@ -2220,7 +2448,7 @@ mod tests {
         }
 
         assert_eq!(
-            x.into_gen().copied().try_reduce(None, reducer),
+            (&x).into_gen().copied().try_reduce(None, reducer),
             TryReduction::Complete(Some(3))
         );
     }
@@ -2322,18 +2550,14 @@ mod tests {
     #[test]
     fn collect_vec() {
         let data = [0, 1, 2, 3, 4];
-        let out: Vec<i32> = data.into_gen().filter(|x| *x % 2 == 0).copied().collect();
+        let out: Vec<i32> = (&data).into_gen().copied().filter(|x| x % 2 == 0).collect();
         assert_eq!(out, [0, 2, 4]);
     }
 
     #[test]
     fn collect_string() {
         let data = ['a', 'B', 'c', 'D'];
-        let out: String = data
-            .into_gen()
-            .filter(|x| x.is_uppercase())
-            .copied()
-            .collect();
+        let out: String = data.into_gen().filter(|x| x.is_uppercase()).collect();
         assert_eq!(out, "BD");
 
         let data = ['f', 'G', 'H', 'i'];
