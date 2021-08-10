@@ -2056,6 +2056,61 @@ pub trait GeneratorExt: Sealed + Generator + Sized {
         retval
     }
 
+    /// Lexicographically compares the values of this generator with those of another.
+    /// 
+    /// ## Spuriously stopping generators
+    /// 
+    /// `cmp()` does not work correctly with spuriously stopping generators.
+    /// 
+    /// ## Examples
+    /// 
+    /// ```
+    /// use pushgen::{GeneratorExt, IntoGenerator};
+    /// use std::cmp::Ordering;
+    /// assert_eq!([1].into_gen().cmp([1]), Ordering::Equal);
+    /// assert_eq!([1].into_gen().cmp([1, 2]), Ordering::Less);
+    /// assert_eq!([1, 2].into_gen().cmp([1]), Ordering::Greater);
+    /// ```
+    #[inline]
+    fn cmp<Rhs>(self, rhs: Rhs) -> Ordering
+    where
+        Rhs: IntoGenerator<Output = Self::Output>,
+        Self::Output: Ord,
+    {
+        self.cmp_by(rhs, |x, y| x.cmp(&y))
+    }
+
+    /// Lexicographically compares the values of this generator with those of another with respect
+    /// to the specified comparison function.
+    ///
+    /// ## Spuriously stopping generators
+    ///
+    /// `cmp_by()` does not work correctly with spuriously stopping generators.
+    ///
+    /// ## Examples
+    ///
+    /// ```
+    /// use pushgen::{GeneratorExt, IntoGenerator};
+    /// use std::cmp::Ordering;
+    /// let xs = [1, 2, 3, 4];
+    /// let ys = [1, 4, 9, 16];
+    /// assert_eq!((&xs).into_gen().cmp_by(&ys, |&x, &y| x.cmp(&y)), Ordering::Less);
+    /// assert_eq!((&xs).into_gen().cmp_by(&ys, |&x, &y| (x * x).cmp(&y)), Ordering::Equal);
+    /// assert_eq!((&xs).into_gen().cmp_by(&ys, |&x, &y| (2 * x).cmp(&y)), Ordering::Greater);
+    /// ```
+    #[inline]
+    fn cmp_by<Rhs, Cmp>(self, rhs: Rhs, mut cmp: Cmp) -> Ordering
+    where
+        Rhs: IntoGenerator<Output = Self::Output>,
+        Cmp: FnMut(Self::Output, Self::Output) -> Ordering,
+    {
+        unsafe {
+            crate::structs::utility::unwrap_unchecked(
+                self.partial_cmp_by(rhs, move |x, y| Some(cmp(x, y))),
+            )
+        }
+    }
+
     /// Determines if the values of this generator are lexicographically less than to those of another.
     ///
     /// ## Spuriously stopping generators
