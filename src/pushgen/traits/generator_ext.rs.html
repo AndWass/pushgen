@@ -2570,11 +2570,43 @@
 <span id="2570">2570</span>
 <span id="2571">2571</span>
 <span id="2572">2572</span>
+<span id="2573">2573</span>
+<span id="2574">2574</span>
+<span id="2575">2575</span>
+<span id="2576">2576</span>
+<span id="2577">2577</span>
+<span id="2578">2578</span>
+<span id="2579">2579</span>
+<span id="2580">2580</span>
+<span id="2581">2581</span>
+<span id="2582">2582</span>
+<span id="2583">2583</span>
+<span id="2584">2584</span>
+<span id="2585">2585</span>
+<span id="2586">2586</span>
+<span id="2587">2587</span>
+<span id="2588">2588</span>
+<span id="2589">2589</span>
+<span id="2590">2590</span>
+<span id="2591">2591</span>
+<span id="2592">2592</span>
+<span id="2593">2593</span>
+<span id="2594">2594</span>
+<span id="2595">2595</span>
+<span id="2596">2596</span>
+<span id="2597">2597</span>
+<span id="2598">2598</span>
+<span id="2599">2599</span>
+<span id="2600">2600</span>
+<span id="2601">2601</span>
+<span id="2602">2602</span>
+<span id="2603">2603</span>
+<span id="2604">2604</span>
 </pre><pre class="rust">
 <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::structs::utility::InplaceUpdatable</span>;
 <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::structs</span>::{
-    <span class="ident">Chain</span>, <span class="ident">Cloned</span>, <span class="ident">Copied</span>, <span class="ident">Dedup</span>, <span class="ident">Enumerate</span>, <span class="ident">Filter</span>, <span class="ident">FilterMap</span>, <span class="ident">Flatten</span>, <span class="ident">Inspect</span>, <span class="ident">IteratorAdaptor</span>,
-    <span class="ident">Map</span>, <span class="ident">Reverse</span>, <span class="ident">Scan</span>, <span class="ident">Skip</span>, <span class="ident">SkipWhile</span>, <span class="ident">StepBy</span>, <span class="ident">Take</span>, <span class="ident">TakeWhile</span>, <span class="ident">Zip</span>,
+    <span class="ident">Chain</span>, <span class="ident">Cloned</span>, <span class="ident">Copied</span>, <span class="ident">Cycle</span>, <span class="ident">Dedup</span>, <span class="ident">Enumerate</span>, <span class="ident">Filter</span>, <span class="ident">FilterMap</span>, <span class="ident">Flatten</span>, <span class="ident">Inspect</span>,
+    <span class="ident">IteratorAdaptor</span>, <span class="ident">Map</span>, <span class="ident">Reverse</span>, <span class="ident">Scan</span>, <span class="ident">Skip</span>, <span class="ident">SkipWhile</span>, <span class="ident">StepBy</span>, <span class="ident">Take</span>, <span class="ident">TakeWhile</span>, <span class="ident">Zip</span>,
 };
 <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::traits</span>::{<span class="ident">FromGenerator</span>, <span class="ident">Product</span>, <span class="ident">Sum</span>};
 <span class="kw">use</span> <span class="kw">crate</span>::{
@@ -2701,6 +2733,38 @@
             }
         });
         <span class="ident">retval</span>
+    }
+
+    <span class="doccomment">/// Repeats a generator endlessly.</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// Instead of stopping when a generator has completed, the generator will start over again</span>
+    <span class="doccomment">/// from the beginning.</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// The generator will only start over once the source generator has completed. Spuriously</span>
+    <span class="doccomment">/// stopping generators will **not** cause the source to start over again.</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// ## Examples</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// Basic usage:</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// ```</span>
+    <span class="doccomment">/// use pushgen::{GeneratorExt, IntoGenerator};</span>
+    <span class="doccomment">/// let data = [1, 2, 3];</span>
+    <span class="doccomment">/// let mut gen = data.into_gen().cycle();</span>
+    <span class="doccomment">/// assert_eq!(gen.next(), Ok(1));</span>
+    <span class="doccomment">/// assert_eq!(gen.next(), Ok(2));</span>
+    <span class="doccomment">/// assert_eq!(gen.next(), Ok(3));</span>
+    <span class="doccomment">/// assert_eq!(gen.next(), Ok(1));</span>
+    <span class="doccomment">/// assert_eq!(gen.next(), Ok(2));</span>
+    <span class="doccomment">/// assert_eq!(gen.next(), Ok(3));</span>
+    <span class="doccomment">/// assert_eq!(gen.next(), Ok(1));</span>
+    <span class="doccomment">/// ```</span>
+    <span class="attribute">#[<span class="ident">inline</span>]</span>
+    <span class="kw">fn</span> <span class="ident">cycle</span>(<span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Cycle</span><span class="op">&lt;</span><span class="self">Self</span><span class="op">&gt;</span>
+    <span class="kw">where</span>
+        <span class="self">Self</span>: <span class="ident">Clone</span>,
+    {
+        <span class="ident">Cycle::new</span>(<span class="self">self</span>)
     }
     <span class="doccomment">/// Retrieve the next value from the generator</span>
     <span class="doccomment">///</span>
