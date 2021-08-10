@@ -92,7 +92,6 @@ impl<T, const N: usize> ArrayGenerator<T, N> {
 }
 
 impl<T: Clone, const N: usize> Clone for ArrayGenerator<T, N> {
-
     #[inline]
     fn clone(&self) -> Self {
         let mut new = Self {
