@@ -1,3 +1,5 @@
+use crate::generators::ArrayGenerator;
+
 /// Conversion to a generator.
 ///
 /// By implementing `IntoGenerator` for a type you define how that type will be converted to a
@@ -56,6 +58,16 @@ impl<'a, T, const N: usize> IntoGenerator for &'a [T; N] {
     #[inline]
     fn into_gen(self) -> Self::IntoGen {
         crate::SliceGenerator::new(self)
+    }
+}
+
+impl<'a, T, const N: usize> IntoGenerator for [T; N] {
+    type Output = T;
+    type IntoGen = ArrayGenerator<T, N>;
+
+    #[inline]
+    fn into_gen(self) -> Self::IntoGen {
+        ArrayGenerator::new(self)
     }
 }
 

@@ -73,8 +73,8 @@ pub trait Generator {
     /// let mut gen = data.into_gen();
     /// let advance_result = gen.try_advance(NonZeroUsize::new(3).unwrap());
     /// assert_eq!(advance_result, (3, GeneratorResult::Stopped));
-    /// assert_eq!(gen.next(), Ok(&4));
-    /// assert_eq!(gen.next(), Ok(&5));
+    /// assert_eq!(gen.next(), Ok(4));
+    /// assert_eq!(gen.next(), Ok(5));
     /// ```
     #[inline]
     fn try_advance(&mut self, n: NonZeroUsize) -> (usize, GeneratorResult) {

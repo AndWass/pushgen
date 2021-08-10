@@ -97,7 +97,7 @@ mod tests {
         });
 
         assert_eq!(result, GeneratorResult::Complete);
-        assert_eq!(output, [&0, &2, &4]);
+        assert_eq!(output, [0, 2, 4]);
     }
 
     #[test]
@@ -156,7 +156,7 @@ mod tests {
         });
 
         assert_eq!(result, GeneratorResult::Complete);
-        assert_eq!(output, [&0, &1, &2, &3, &4, &5]);
+        assert_eq!(output, [0, 1, 2, 3, 4, 5]);
     }
 
     #[test]
@@ -164,9 +164,9 @@ mod tests {
         let data = [0, 1, 2, 3, 4, 5];
 
         let mut gen = data.into_gen().step_by(2);
-        assert_eq!(gen.next(), Ok(&0));
-        assert_eq!(gen.next(), Ok(&2));
-        assert_eq!(gen.next(), Ok(&4));
+        assert_eq!(gen.next(), Ok(0));
+        assert_eq!(gen.next(), Ok(2));
+        assert_eq!(gen.next(), Ok(4));
     }
 
     #[test]

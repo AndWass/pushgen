@@ -43,8 +43,8 @@ pub trait GeneratorExt: Sealed + Generator + Sized {
     /// ```
     /// use pushgen::{IntoGenerator, GeneratorExt};
     /// let a = [1, 2, 3];
-    /// assert!(a.into_gen().all(|&x| x > 0));
-    /// assert!(!a.into_gen().all(|&x| x > 2));
+    /// assert!(a.into_gen().all(|x| x > 0));
+    /// assert!(!a.into_gen().all(|x| x > 2));
     /// ```
     ///
     /// Stopping at first false:
@@ -53,8 +53,8 @@ pub trait GeneratorExt: Sealed + Generator + Sized {
     /// use pushgen::{IntoGenerator, GeneratorExt};
     /// let a = [1, 2, 3];
     /// let mut gen = a.into_gen();
-    /// assert!(!gen.all(|&x| x != 2));
-    /// assert_eq!(gen.iter().next(), Some(&3));
+    /// assert!(!gen.all(|x| x != 2));
+    /// assert_eq!(gen.iter().next(), Some(3));
     /// ```
     #[inline]
     fn all<F>(&mut self, mut predicate: F) -> bool
@@ -95,9 +95,9 @@ pub trait GeneratorExt: Sealed + Generator + Sized {
     /// use pushgen::{IntoGenerator, GeneratorExt};
     /// let a = [1, 2, 3];
     ///
-    /// assert!(a.into_gen().any(|&x| x > 0));
+    /// assert!(a.into_gen().any(|x| x > 0));
     ///
-    /// assert!(!a.into_gen().any(|&x| x > 5));
+    /// assert!(!a.into_gen().any(|x| x > 5));
     /// ```
     ///
     /// Stopping at the first `true`:
@@ -108,10 +108,10 @@ pub trait GeneratorExt: Sealed + Generator + Sized {
     ///
     /// let mut gen = a.into_gen();
     ///
-    /// assert!(gen.any(|&x| x != 2));
+    /// assert!(gen.any(|x| x != 2));
     ///
     /// // we can still use `gen`, as there are more elements.
-    /// assert_eq!(gen.iter().next(), Some(&2));
+    /// assert_eq!(gen.iter().next(), Some(2));
     /// ```
     #[inline]
     fn any<F>(&mut self, mut predicate: F) -> bool
@@ -206,10 +206,10 @@ pub trait GeneratorExt: Sealed + Generator + Sized {
     /// use pushgen::GeneratorExt;
     ///
     /// let a = [1, 2, 3];
-    /// assert_eq!(a.into_gen().last(), Some(&3));
+    /// assert_eq!(a.into_gen().last(), Some(3));
     ///
     /// let a = [1, 2, 3, 4, 5];
-    /// assert_eq!(a.into_gen().last(), Some(&5));
+    /// assert_eq!(a.into_gen().last(), Some(5));
     /// ```
     #[inline]
     fn last(mut self) -> Option<Self::Output> {
@@ -407,7 +407,7 @@ pub trait GeneratorExt: Sealed + Generator + Sized {
     /// let a = [-1i32, 0, 1];
     /// let mut output = Vec::new();
     /// a.into_gen().skip_while(|x| x.is_negative()).for_each(|x| output.push(x));
-    /// assert_eq!(output, [&0, &1]);
+    /// assert_eq!(output, [0, 1]);
     /// ```
     #[inline]
     fn skip_while<P>(self, predicate: P) -> SkipWhile<Self, P>
@@ -448,7 +448,7 @@ pub trait GeneratorExt: Sealed + Generator + Sized {
     ///
     /// let mut gen_as_iter = a.into_gen().take_while(|x| x.is_negative()).iter();
     ///
-    /// assert_eq!(gen_as_iter.next(), Some(&-1));
+    /// assert_eq!(gen_as_iter.next(), Some(-1));
     /// assert_eq!(gen_as_iter.next(), None);
     /// ```
     #[inline]
@@ -710,9 +710,9 @@ pub trait GeneratorExt: Sealed + Generator + Sized {
     /// let a = [0, 1, 2, 3, 4, 5];
     /// let mut gen = a.into_gen().step_by(2);
     ///
-    /// assert_eq!(gen.next(), Ok(&0));
-    /// assert_eq!(gen.next(), Ok(&2));
-    /// assert_eq!(gen.next(), Ok(&4));
+    /// assert_eq!(gen.next(), Ok(0));
+    /// assert_eq!(gen.next(), Ok(2));
+    /// assert_eq!(gen.next(), Ok(4));
     /// assert_eq!(gen.next(), Err(GeneratorResult::Complete));
     /// ```
     #[inline]
@@ -845,7 +845,7 @@ pub trait GeneratorExt: Sealed + Generator + Sized {
     /// let a = [1, 2, 3];
     /// let b: Vec<u32> = Vec::new();
     ///
-    /// assert_eq!(a.into_gen().min(), Some(&1));
+    /// assert_eq!(a.into_gen().min(), Some(1));
     /// assert_eq!(b.into_gen().min(), None);
     /// ```
     #[inline]
@@ -876,7 +876,7 @@ pub trait GeneratorExt: Sealed + Generator + Sized {
     /// ```
     /// use pushgen::{GeneratorExt, IntoGenerator};
     /// let a = [-3_i32, 0, 1, 5, -10];
-    /// assert_eq!(*a.into_gen().min_by(|x, y| x.cmp(y)).unwrap(), -10);
+    /// assert_eq!(a.into_gen().min_by(|x, y| x.cmp(y)).unwrap(), -10);
     /// ```
     #[inline]
     fn min_by<F>(self, mut compare: F) -> Option<Self::Output>
@@ -901,7 +901,7 @@ pub trait GeneratorExt: Sealed + Generator + Sized {
     /// ```
     /// use pushgen::{GeneratorExt, IntoGenerator};
     /// let a = [-3_i32, 0, 1, 5, -10];
-    /// assert_eq!(a.into_gen().try_min_by(None, |x, y| x.cmp(y)).unwrap(), Some(&-10));
+    /// assert_eq!(a.into_gen().try_min_by(None, |x, y| x.cmp(y)).unwrap(), Some(-10));
     /// ```
     ///
     /// Stopping generator:
@@ -952,7 +952,7 @@ pub trait GeneratorExt: Sealed + Generator + Sized {
     /// ```
     /// use pushgen::{GeneratorExt, IntoGenerator};
     /// let a = [-3_i32, 0, 1, 5, -10];
-    /// assert_eq!(*a.into_gen().min_by_key(|x| x.abs()).unwrap(), 0);
+    /// assert_eq!(a.into_gen().min_by_key(|x| x.abs()).unwrap(), 0);
     /// ```
     #[inline]
     fn min_by_key<F, B>(self, f: F) -> Option<Self::Output>
@@ -997,7 +997,7 @@ pub trait GeneratorExt: Sealed + Generator + Sized {
     /// let a = [1, 2, 3];
     /// let b: Vec<u32> = Vec::new();
     ///
-    /// assert_eq!(a.into_gen().max(), Some(&3));
+    /// assert_eq!(a.into_gen().max(), Some(3));
     /// assert_eq!(b.into_gen().max(), None);
     /// ```
     #[inline]
@@ -1028,7 +1028,7 @@ pub trait GeneratorExt: Sealed + Generator + Sized {
     /// ```
     /// use pushgen::{GeneratorExt, IntoGenerator};
     /// let a = [-3_i32, 0, 1, 5, -10];
-    /// assert_eq!(*a.into_gen().max_by(|x, y| x.cmp(y)).unwrap(), 5);
+    /// assert_eq!(a.into_gen().max_by(|x, y| x.cmp(y)).unwrap(), 5);
     /// ```
     #[inline]
     fn max_by<F>(self, mut compare: F) -> Option<Self::Output>
@@ -1053,7 +1053,7 @@ pub trait GeneratorExt: Sealed + Generator + Sized {
     /// ```
     /// use pushgen::{GeneratorExt, IntoGenerator};
     /// let a = [-3_i32, 0, 1, 5, -10];
-    /// assert_eq!(a.into_gen().try_min_by(None, |x, y| x.cmp(y)).unwrap(), Some(&-10));
+    /// assert_eq!(a.into_gen().try_min_by(None, |x, y| x.cmp(y)).unwrap(), Some(-10));
     /// ```
     ///
     /// Stopping generator:
@@ -1104,7 +1104,7 @@ pub trait GeneratorExt: Sealed + Generator + Sized {
     /// ```
     /// use pushgen::{GeneratorExt, IntoGenerator};
     /// let a = [-3_i32, 0, 1, 5, -10];
-    /// assert_eq!(*a.into_gen().max_by_key(|x| x.abs()).unwrap(), -10);
+    /// assert_eq!(a.into_gen().max_by_key(|x| x.abs()).unwrap(), -10);
     /// ```
     #[inline]
     fn max_by_key<F, B>(self, f: F) -> Option<Self::Output>
@@ -1201,7 +1201,7 @@ pub trait GeneratorExt: Sealed + Generator + Sized {
     /// let a = [1, 2, 3];
     ///
     /// // the checked sum of all of the elements of the array
-    /// let sum = a.into_gen().try_fold(0i8, |acc, &x| acc.checked_add(x).ok_or(()));
+    /// let sum = a.into_gen().try_fold(0i8, |acc, x| acc.checked_add(x).ok_or(()));
     ///
     /// assert_eq!(sum, Ok(TryReduction::Complete(6)));
     /// ```
@@ -1214,13 +1214,13 @@ pub trait GeneratorExt: Sealed + Generator + Sized {
     /// let mut gen = a.into_gen();
     ///
     /// // This sum overflows when adding the 100 element
-    /// let sum = gen.try_fold(0i8, |acc, &x| acc.checked_add(x).ok_or(()));
+    /// let sum = gen.try_fold(0i8, |acc, x| acc.checked_add(x).ok_or(()));
     /// assert_eq!(sum, Err(()));
     ///
     /// // Because it short-circuited, the remaining elements are still
     /// // available through the iterator.
-    /// assert_eq!(gen.next(), Ok(&40));
-    /// assert_eq!(gen.next(), Ok(&50));
+    /// assert_eq!(gen.next(), Ok(40));
+    /// assert_eq!(gen.next(), Ok(50));
     /// assert_eq!(gen.next(), Err(GeneratorResult::Complete));
     /// ```
     ///
@@ -1269,7 +1269,7 @@ pub trait GeneratorExt: Sealed + Generator + Sized {
     /// use pushgen::{GeneratorResult, IntoGenerator, GeneratorExt};
     /// let a = [1, 2, 3];
     ///
-    /// let mut gen = a.into_gen().scan(1, |state, &x| {
+    /// let mut gen = a.into_gen().scan(1, |state, x| {
     ///     *state = *state * x;
     ///
     ///     // yield negation of the state.
@@ -1288,7 +1288,7 @@ pub trait GeneratorExt: Sealed + Generator + Sized {
     /// use pushgen::{IntoGenerator, GeneratorExt, GeneratorResult};
     /// let a = [1, 2, 3];
     ///
-    /// let mut gen = a.into_gen().scan(1, |state, &x| {
+    /// let mut gen = a.into_gen().scan(1, |state, x| {
     ///     *state = *state * x;
     ///     if x == 2 {
     ///         None  // Will cause the generator to stop here!
@@ -1343,7 +1343,7 @@ pub trait GeneratorExt: Sealed + Generator + Sized {
     /// let a = [10, 20, 5, -23, 0];
     /// let b: [u32; 0] = [];
     ///
-    /// assert_eq!(find_max(a.into_gen()), Some(&20));
+    /// assert_eq!(find_max(a.into_gen()), Some(20));
     /// assert_eq!(find_max(b.into_gen()), None);
     /// ```
     ///
@@ -1402,7 +1402,7 @@ pub trait GeneratorExt: Sealed + Generator + Sized {
     /// let a = [10, 20, 5, -23, 0];
     /// let b: [u32; 0] = [];
     ///
-    /// assert_eq!(find_max(&mut a.into_gen()).unwrap(), Some(&20));
+    /// assert_eq!(find_max(&mut a.into_gen()).unwrap(), Some(20));
     /// assert_eq!(find_max(&mut b.into_gen()).unwrap(), None);
     /// ```
     ///
@@ -1481,7 +1481,7 @@ pub trait GeneratorExt: Sealed + Generator + Sized {
     /// let a = [1, 2, 3];
     ///
     /// let doubled: Vec<i32> = a.into_gen()
-    ///                          .map(|&x| x * 2)
+    ///                          .map(|x| x * 2)
     ///                          .collect();
     ///
     /// assert_eq!(vec![2, 4, 6], doubled);
@@ -1543,7 +1543,6 @@ pub trait GeneratorExt: Sealed + Generator + Sized {
     ///
     /// // this iterator sequence is complex.
     /// let sum = a.into_gen()
-    ///     .cloned()
     ///     .filter(|x| x % 2 == 0)
     ///     .fold(0, |sum, i| sum + i);
     ///
@@ -1551,7 +1550,6 @@ pub trait GeneratorExt: Sealed + Generator + Sized {
     ///
     /// // let's add some inspect() calls to investigate what's happening
     /// let sum = a.into_gen()
-    ///     .cloned()
     ///     .inspect(|x| println!("about to filter: {}", x))
     ///     .filter(|x| x % 2 == 0)
     ///     .inspect(|x| println!("made it through filter: {}", x))
@@ -1592,9 +1590,9 @@ pub trait GeneratorExt: Sealed + Generator + Sized {
     ///
     /// let mut gen = a.into_gen().rev();
     ///
-    /// assert_eq!(gen.next(), Ok(&3));
-    /// assert_eq!(gen.next(), Ok(&2));
-    /// assert_eq!(gen.next(), Ok(&1));
+    /// assert_eq!(gen.next(), Ok(3));
+    /// assert_eq!(gen.next(), Ok(2));
+    /// assert_eq!(gen.next(), Ok(1));
     ///
     /// assert_eq!(gen.next(), Err(GeneratorResult::Complete));
     /// ```
@@ -1620,10 +1618,10 @@ pub trait GeneratorExt: Sealed + Generator + Sized {
     /// let mut words = ["hello", "world", "of", "rust"].into_gen();
     ///
     /// let hello_world: Vec<_> = words.by_ref().take(2).collect();
-    /// assert_eq!(hello_world, [&"hello", &"world"]);
+    /// assert_eq!(hello_world, ["hello", "world"]);
     ///
     /// let of_rust: Vec<_> = words.collect();
-    /// assert_eq!(of_rust, [&"of", &"rust"]);
+    /// assert_eq!(of_rust, ["of", "rust"]);
     /// ```
     #[inline]
     fn by_ref(&mut self) -> &mut Self {
@@ -1654,9 +1652,9 @@ pub trait GeneratorExt: Sealed + Generator + Sized {
     /// use pushgen::{IntoGenerator, GeneratorExt};
     /// let a = [1, 2, 3];
     ///
-    /// assert_eq!(a.into_gen().position(|&x| x == 2), Some(1));
+    /// assert_eq!(a.into_gen().position(|x| x == 2), Some(1));
     ///
-    /// assert_eq!(a.into_gen().position(|&x| x == 5), None);
+    /// assert_eq!(a.into_gen().position(|x| x == 5), None);
     /// ```
     ///
     /// Stopping at first `true`:
@@ -1667,13 +1665,13 @@ pub trait GeneratorExt: Sealed + Generator + Sized {
     ///
     /// let mut gen = a.into_gen();
     ///
-    /// assert_eq!(gen.position(|&x| x >= 2), Some(1));
+    /// assert_eq!(gen.position(|x| x >= 2), Some(1));
     ///
     /// // we can still use `iter`, as there are more elements.
-    /// assert_eq!(gen.next(), Ok(&3));
+    /// assert_eq!(gen.next(), Ok(3));
     ///
     /// // The returned index depends on iterator state
-    /// assert_eq!(gen.position(|&x| x == 4), Some(0));
+    /// assert_eq!(gen.position(|x| x == 4), Some(0));
     /// ```
     ///
     #[inline]
@@ -1713,9 +1711,9 @@ pub trait GeneratorExt: Sealed + Generator + Sized {
     /// use pushgen::{GeneratorExt, IntoGenerator};
     /// let a = [1, 2, 3];
     ///
-    /// assert_eq!(a.into_gen().find(|&&x| x == 2), Some(&2));
+    /// assert_eq!(a.into_gen().find(|&x| x == 2), Some(2));
     ///
-    /// assert_eq!(a.into_gen().find(|&&x| x == 5), None);
+    /// assert_eq!(a.into_gen().find(|&x| x == 5), None);
     /// ```
     ///
     /// Stopping at the first `true`:
@@ -1726,10 +1724,10 @@ pub trait GeneratorExt: Sealed + Generator + Sized {
     ///
     /// let mut gen = a.into_gen();
     ///
-    /// assert_eq!(gen.find(|&&x| x == 2), Some(&2));
+    /// assert_eq!(gen.find(|&x| x == 2), Some(2));
     ///
     /// // we can still use `iter`, as there are more elements.
-    /// assert_eq!(gen.next(), Ok(&3));
+    /// assert_eq!(gen.next(), Ok(3));
     /// ```
     ///
     #[inline]
@@ -1849,7 +1847,7 @@ pub trait GeneratorExt: Sealed + Generator + Sized {
     /// // Use scan to create a "spuriously" stopping generator.
     /// // Will generate the sequence [1, 2, *Stop*, 4].
     /// let gen = a.into_gen().scan((), |_, value| {
-    ///     if *value == 3 {
+    ///     if value == 3 {
     ///         None
     ///     }
     ///     else {
@@ -1890,7 +1888,7 @@ pub trait GeneratorExt: Sealed + Generator + Sized {
     /// ```
     /// use pushgen::{IntoGenerator, GeneratorExt};
     /// let a = [(1, 2), (3, 4)];
-    /// let (left, right): (Vec<_>, Vec<_>) = a.into_gen().copied().unzip();
+    /// let (left, right): (Vec<_>, Vec<_>) = a.into_gen().unzip();
     ///
     /// assert_eq!(left, [1, 3]);
     /// assert_eq!(right, [2, 4]);
@@ -1910,7 +1908,7 @@ pub trait GeneratorExt: Sealed + Generator + Sized {
     ///         Some(val)
     ///     }
     /// }
-    /// let (left, right): (Vec<_>, Vec<_>) = a.into_gen().copied().scan((), scan_fn).unzip();
+    /// let (left, right): (Vec<_>, Vec<_>) = a.into_gen().scan((), scan_fn).unzip();
     ///
     /// assert_eq!(left, [1, 3]); // missing 5 and 7
     /// assert_eq!(right, [2, 4]); // missing 6 and 8
@@ -1951,11 +1949,11 @@ pub trait GeneratorExt: Sealed + Generator + Sized {
     /// let two = [1., 2.];
     /// let nan = [f64::NAN];
     ///
-    /// assert_eq!(one.into_gen().partial_cmp(&one), Some(Ordering::Equal));
-    /// assert_eq!(one.into_gen().partial_cmp(&two), Some(Ordering::Less));
-    /// assert_eq!(two.into_gen().partial_cmp(&one), Some(Ordering::Greater));
+    /// assert_eq!(one.into_gen().partial_cmp(one), Some(Ordering::Equal));
+    /// assert_eq!(one.into_gen().partial_cmp(two), Some(Ordering::Less));
+    /// assert_eq!(two.into_gen().partial_cmp(one), Some(Ordering::Greater));
     ///
-    /// assert_eq!(nan.into_gen().partial_cmp(&one), None);
+    /// assert_eq!(nan.into_gen().partial_cmp(one), None);
     /// ```
     #[inline]
     fn partial_cmp<Rhs>(self, rhs: Rhs) -> Option<Ordering>
@@ -1983,15 +1981,15 @@ pub trait GeneratorExt: Sealed + Generator + Sized {
     /// let ys = [1.0, 4.0, 9.0, 16.0];
     ///
     /// assert_eq!(
-    ///     xs.into_gen().partial_cmp_by(&ys, |&x, &y| x.partial_cmp(&y)),
+    ///     (&xs).into_gen().partial_cmp_by(&ys, |&x, &y| x.partial_cmp(&y)),
     ///     Some(Ordering::Less)
     /// );
     /// assert_eq!(
-    ///     xs.into_gen().partial_cmp_by(&ys, |&x, &y| (x * x).partial_cmp(&y)),
+    ///     (&xs).into_gen().partial_cmp_by(&ys, |&x, &y| (x * x).partial_cmp(&y)),
     ///     Some(Ordering::Equal)
     /// );
     /// assert_eq!(
-    ///     xs.into_gen().partial_cmp_by(&ys, |&x, &y| (2.0 * x).partial_cmp(&y)),
+    ///     (&xs).into_gen().partial_cmp_by(&ys, |&x, &y| (2.0 * x).partial_cmp(&y)),
     ///     Some(Ordering::Greater)
     /// );
     /// ```
