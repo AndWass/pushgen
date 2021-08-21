@@ -8,7 +8,7 @@ use crate::{
     Generator, GeneratorResult, IntoGenerator, ReverseGenerator, TryReduction, ValueResult,
 };
 use core::cmp::Ordering;
-use std::num::NonZeroUsize;
+use core::num::NonZeroUsize;
 
 pub trait Sealed {}
 
