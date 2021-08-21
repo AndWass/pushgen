@@ -8,6 +8,7 @@ use crate::{
     Generator, GeneratorResult, IntoGenerator, ReverseGenerator, TryReduction, ValueResult,
 };
 use core::cmp::Ordering;
+use core::num::NonZeroUsize;
 
 pub trait Sealed {}
 
@@ -2313,6 +2314,37 @@ pub trait GeneratorExt: Sealed + Generator + Sized {
     {
         !self.eq(rhs)
     }
+
+    /// Returns the `nth` value from the generator.
+    ///
+    /// Like [`Iterator::nth`], the count starts from zero, so `nth(0)` returns the first value,
+    /// `nth(1)` the second and so on.
+    ///
+    /// ## Spuriously stopping generators
+    ///
+    /// `nth()` will not work properly with spuriously stopping generators.
+    ///
+    /// ## Examples
+    ///
+    /// Basic usage:
+    ///
+    /// ```
+    /// use pushgen::{ GeneratorExt, IntoGenerator };
+    /// let a = [1, 2, 3];
+    /// assert_eq!((&a).into_gen().nth(1), Some(&2));
+    /// ```
+    ///
+    #[inline]
+    fn nth(&mut self, n: usize) -> Option<Self::Output> {
+        if n == 0 {
+            self.next().ok()
+        } else {
+            match self.try_advance(unsafe { NonZeroUsize::new_unchecked(n) }) {
+                (x, _) if n == x => self.next().ok(),
+                _ => None,
+            }
+        }
+    }
 }
 
 impl<T: Generator> GeneratorExt for T {}
@@ -2321,7 +2353,8 @@ impl<T: Generator> GeneratorExt for T {}
 mod tests {
     use crate::test::StoppingGen;
     use crate::{
-        Generator, GeneratorExt, GeneratorResult, IntoGenerator, TryReduction, ValueResult,
+        Generator, GeneratorExt, GeneratorResult, IntoGenerator, SliceGenerator, TryReduction,
+        ValueResult,
     };
     use std::cmp::Ordering;
 
@@ -2600,5 +2633,24 @@ mod tests {
         let data: [i32; 0] = [];
         assert_eq!(data.into_gen().count(), 0);
         assert_eq!([0, 1, 2, 3].into_gen().count(), 4);
+    }
+
+    #[test]
+    fn nth() {
+        let data = [1, 2, 3];
+        let gen_data = SliceGenerator::new(&data)
+            .scan((), |_, x| if *x % 2 == 0 { None } else { Some(x) })
+            .nth(1);
+
+        let iter_data = data
+            .iter()
+            .scan((), |_, x| if *x % 2 == 0 { None } else { Some(x) })
+            .nth(1);
+        assert_eq!(gen_data, iter_data);
+
+        assert_eq!((&data).into_gen().nth(0), data.iter().nth(0));
+        assert_eq!((&data).into_gen().nth(1), data.iter().nth(1));
+        assert_eq!((&data).into_gen().nth(2), data.iter().nth(2));
+        assert_eq!((&data).into_gen().nth(4), data.iter().nth(4));
     }
 }
