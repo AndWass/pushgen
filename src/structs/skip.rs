@@ -22,7 +22,7 @@ where
     type Output = Gen::Output;
 
     #[inline]
-    fn run(&mut self, mut output: impl FnMut(Self::Output) -> ValueResult) -> GeneratorResult {
+    fn run(&mut self, output: impl FnMut(Self::Output) -> ValueResult) -> GeneratorResult {
         if self.amount > 0 {
             // Safety: checked by if clause
             match self
@@ -42,7 +42,7 @@ where
             }
         }
 
-        self.generator.run(|value| output(value))
+        self.generator.run(output)
     }
 
     #[inline]
@@ -125,7 +125,7 @@ where
                 return GeneratorResult::Stopped;
             }
         }
-        self.source.run(|x| output(x))
+        self.source.run(output)
     }
 }
 

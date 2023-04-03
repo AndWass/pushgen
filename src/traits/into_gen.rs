@@ -61,7 +61,7 @@ impl<'a, T, const N: usize> IntoGenerator for &'a [T; N] {
     }
 }
 
-impl<'a, T, const N: usize> IntoGenerator for [T; N] {
+impl<T, const N: usize> IntoGenerator for [T; N] {
     type Output = T;
     type IntoGen = ArrayGenerator<T, N>;
 

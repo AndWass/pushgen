@@ -83,7 +83,7 @@ mod tests {
 
     fn do_zip(left: &[i32], right: &[i32]) -> (Vec<(i32, i32)>, GeneratorResult) {
         let mut output: Vec<(i32, i32)> = Vec::new();
-        let result = Zip::new(SliceGenerator::new(&left), SliceGenerator::new(&right))
+        let result = Zip::new(SliceGenerator::new(left), SliceGenerator::new(right))
             .for_each(|(a, b)| output.push((*a, *b)));
         (output, result)
     }

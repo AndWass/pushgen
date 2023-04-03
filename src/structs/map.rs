@@ -72,7 +72,7 @@ mod tests {
             assert_eq!(result, GeneratorResult::Stopped);
             let result = gen.for_each(|x| output.push(x));
             assert_eq!(result, GeneratorResult::Complete);
-            assert_eq!(output, [2 * 1, 2 * 2, 2 * 3]);
+            assert_eq!(output, [2, 2 * 2, 2 * 3]);
         }
     }
 

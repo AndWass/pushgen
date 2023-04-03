@@ -1,11 +1,10 @@
 use criterion::{black_box, criterion_group, criterion_main, Criterion};
 use itertools::Itertools;
 
-fn run_iterator_for_each(data: &Vec<Vec<i32>>) {
+fn run_iterator_for_each(data: &[Vec<i32>]) {
     let mut result = 0i32;
     data.iter()
-        .map(|x| x.iter().dedup())
-        .flatten()
+        .flat_map(|x| x.iter().dedup())
         .filter(|x| *x % 2 == 0)
         .map(|x| x * 3)
         .for_each(|x| result = result.wrapping_add(x));

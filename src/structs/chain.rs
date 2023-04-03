@@ -29,13 +29,13 @@ where
     #[inline]
     fn run(&mut self, mut output: impl FnMut(Self::Output) -> ValueResult) -> GeneratorResult {
         if self.first_active {
-            let result = self.first.run(|x| output(x));
+            let result = self.first.run(&mut output);
             if result == GeneratorResult::Stopped {
                 return GeneratorResult::Stopped;
             }
             self.first_active = false;
         }
-        self.second.run(|x| output(x))
+        self.second.run(output)
     }
 }
 
@@ -46,7 +46,7 @@ where
 {
     #[inline]
     fn run_back(&mut self, mut output: impl FnMut(Self::Output) -> ValueResult) -> GeneratorResult {
-        match self.second.run_back(|x| output(x)) {
+        match self.second.run_back(&mut output) {
             GeneratorResult::Stopped => return GeneratorResult::Stopped,
             GeneratorResult::Complete => {}
         }

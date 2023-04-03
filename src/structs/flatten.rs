@@ -57,14 +57,14 @@ where
     #[inline]
     fn run(&mut self, mut output: impl FnMut(Self::Output) -> ValueResult) -> GeneratorResult {
         if let Some(current) = self.current_generator.as_mut() {
-            if current.run(|x| output(x)) == GeneratorResult::Stopped {
+            if current.run(&mut output) == GeneratorResult::Stopped {
                 return GeneratorResult::Stopped;
             }
         }
 
         let current_generator = &mut self.current_generator;
         let result = self.source.run(|x| {
-            match set_some(current_generator, x.into_gen()).run(|value| output(value)) {
+            match set_some(current_generator, x.into_gen()).run(&mut output) {
                 GeneratorResult::Stopped => ValueResult::Stop,
                 GeneratorResult::Complete => ValueResult::MoreValues,
             }
@@ -94,7 +94,7 @@ where
     #[inline]
     fn run_back(&mut self, mut output: impl FnMut(Self::Output) -> ValueResult) -> GeneratorResult {
         if let Some(mut current) = self.current_back_generator.take() {
-            if current.run_back(|x| output(x)) == GeneratorResult::Stopped {
+            if current.run_back(&mut output) == GeneratorResult::Stopped {
                 self.current_back_generator = Some(current);
                 return GeneratorResult::Stopped;
             }
@@ -102,7 +102,7 @@ where
 
         let current = &mut self.current_back_generator;
         let result = self.source.run_back(|x| {
-            match set_some(current, x.into_gen()).run_back(|value| output(value)) {
+            match set_some(current, x.into_gen()).run_back(&mut output) {
                 GeneratorResult::Stopped => ValueResult::Stop,
                 GeneratorResult::Complete => ValueResult::MoreValues,
             }
