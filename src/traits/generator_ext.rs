@@ -2054,7 +2054,11 @@ pub trait GeneratorExt: Sealed + Generator + Sized {
             };
 
             // If first elements aren't equal we have a result immediately.
-            cmp(x, y)
+            #[allow(clippy::needless_match)]
+            match cmp(x, y) {
+                Some(Ordering::Equal) => Some(Ordering::Equal),
+                non_eq => return non_eq,
+            }
         };
 
         // One element extracted from both self and rhs, and they are both equal.
