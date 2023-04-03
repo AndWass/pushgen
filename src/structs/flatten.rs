@@ -63,12 +63,13 @@ where
         }
 
         let current_generator = &mut self.current_generator;
-        let result = self.source.run(|x| {
-            match set_some(current_generator, x.into_gen()).run(&mut output) {
-                GeneratorResult::Stopped => ValueResult::Stop,
-                GeneratorResult::Complete => ValueResult::MoreValues,
-            }
-        });
+        let result =
+            self.source.run(
+                |x| match set_some(current_generator, x.into_gen()).run(&mut output) {
+                    GeneratorResult::Stopped => ValueResult::Stop,
+                    GeneratorResult::Complete => ValueResult::MoreValues,
+                },
+            );
 
         if result == GeneratorResult::Complete {
             if let Some(mut last) = self.current_back_generator.take() {
@@ -101,12 +102,13 @@ where
         }
 
         let current = &mut self.current_back_generator;
-        let result = self.source.run_back(|x| {
-            match set_some(current, x.into_gen()).run_back(&mut output) {
-                GeneratorResult::Stopped => ValueResult::Stop,
-                GeneratorResult::Complete => ValueResult::MoreValues,
-            }
-        });
+        let result =
+            self.source.run_back(
+                |x| match set_some(current, x.into_gen()).run_back(&mut output) {
+                    GeneratorResult::Stopped => ValueResult::Stop,
+                    GeneratorResult::Complete => ValueResult::MoreValues,
+                },
+            );
 
         if result == GeneratorResult::Complete {
             if let Some(mut last) = self.current_generator.take() {
