@@ -2054,6 +2054,7 @@ pub trait GeneratorExt: Sealed + Generator + Sized {
             };
 
             // If first elements aren't equal we have a result immediately.
+            #[allow(clippy::needless_match)]
             match cmp(x, y) {
                 Some(Ordering::Equal) => Some(Ordering::Equal),
                 non_eq => return non_eq,
@@ -2536,7 +2537,7 @@ mod tests {
             match gen.try_reduce(partial, |a, b| if a < b { a } else { b }) {
                 TryReduction::Complete(x) => assert_eq!(x, Some(&1)),
                 TryReduction::Partial(_) => {
-                    assert!(false);
+                    unreachable!()
                 }
             }
         }
@@ -2558,11 +2559,9 @@ mod tests {
             ) -> GeneratorResult {
                 static DATA: [i32; 4] = [0, 1, 2, 3];
                 while self.index < DATA.len() {
-                    if self.index == 2 {
-                        if self.num_stops < 2 {
-                            self.num_stops += 1;
-                            return GeneratorResult::Stopped;
-                        }
+                    if self.index == 2 && self.num_stops < 2 {
+                        self.num_stops += 1;
+                        return GeneratorResult::Stopped;
                     }
 
                     let old = self.index;
@@ -2584,14 +2583,14 @@ mod tests {
         let result = gen.try_reduce(None, |a, b| a + b);
         assert!(result.is_partial());
         let partial = result.unwrap();
-        assert_eq!(partial, Some(0 + 1));
+        assert_eq!(partial, Some(1));
         let result = gen.try_reduce(partial, |a, b| a + b);
         assert!(result.is_partial());
         let partial = result.unwrap();
-        assert_eq!(partial, Some(0 + 1));
+        assert_eq!(partial, Some(1));
         let result = gen.try_reduce(partial, |a, b| a + b);
         assert!(result.is_complete());
-        assert_eq!(result.unwrap(), Some(0 + 1 + 2 + 3));
+        assert_eq!(result.unwrap(), Some(1 + 2 + 3));
     }
 
     #[test]
@@ -2648,7 +2647,7 @@ mod tests {
             .nth(1);
         assert_eq!(gen_data, iter_data);
 
-        assert_eq!((&data).into_gen().nth(0), data.iter().nth(0));
+        assert_eq!((&data).into_gen().nth(0), data.first());
         assert_eq!((&data).into_gen().nth(1), data.iter().nth(1));
         assert_eq!((&data).into_gen().nth(2), data.iter().nth(2));
         assert_eq!((&data).into_gen().nth(4), data.iter().nth(4));

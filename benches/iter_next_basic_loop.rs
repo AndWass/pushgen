@@ -1,6 +1,6 @@
 use criterion::{black_box, criterion_group, criterion_main, Criterion};
 
-fn function_under_bench(data: &Vec<i32>) {
+fn function_under_bench(data: &[i32]) {
     let mut result = 0i32;
 
     for x in data.iter() {
@@ -19,7 +19,7 @@ pub fn make_data(amount: usize) -> Vec<i32> {
 }
 
 pub fn benchmarks(c: &mut Criterion) {
-    let data = make_data(1000_000);
+    let data = make_data(1_000_000);
     c.bench_function("iterator_next_basic_loop", |b| {
         b.iter(|| function_under_bench(black_box(&data)))
     });

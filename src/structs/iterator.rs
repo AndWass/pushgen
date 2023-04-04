@@ -88,9 +88,7 @@ mod tests {
     fn fold() {
         let data = [1, 2, 3, 4, 5];
 
-        let sum = SliceGenerator::new(&data)
-            .iter()
-            .fold(0i32, |acc, elem| acc + elem);
+        let sum: i32 = SliceGenerator::new(&data).iter().sum();
 
         assert_eq!(sum, data.iter().sum())
     }

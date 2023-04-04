@@ -1,6 +1,6 @@
 use criterion::{black_box, criterion_group, criterion_main, Criterion};
 
-fn run_iterator_for_each(data: &Vec<i32>) {
+fn run_iterator_for_each(data: &[i32]) {
     let mut result = 0i32;
     data.iter()
         .zip(data.iter().map(|x| x * 3))
@@ -20,7 +20,7 @@ pub fn make_data(amount: usize) -> Vec<i32> {
 }
 
 pub fn benchmarks(c: &mut Criterion) {
-    let data = make_data(1000_000);
+    let data = make_data(1_000_000);
     c.bench_function("iterator_for_each_transrangers_test6", |b| {
         b.iter(|| run_iterator_for_each(black_box(&data)))
     });

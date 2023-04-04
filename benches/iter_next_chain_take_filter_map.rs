@@ -24,7 +24,7 @@ pub fn make_data(amount: usize) -> Vec<i32> {
 }
 
 pub fn benchmarks(c: &mut Criterion) {
-    let data = make_data(1000_000);
+    let data = make_data(1_000_000);
     c.bench_function("iterator_next_chain_take_filter_map", |b| {
         b.iter(|| function_under_bench(black_box(&data)))
     });
