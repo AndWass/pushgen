@@ -1,3 +1,3 @@
-(function() {var implementors = {};
-implementors["pushgen"] = [{"text":"impl&lt;T, const N:&nbsp;<a class=\"primitive\" href=\"https://doc.rust-lang.org/nightly/std/primitive.usize.html\">usize</a>&gt; <a class=\"trait\" href=\"https://doc.rust-lang.org/nightly/core/ops/drop/trait.Drop.html\" title=\"trait core::ops::drop::Drop\">Drop</a> for <a class=\"struct\" href=\"pushgen/generators/struct.ArrayGenerator.html\" title=\"struct pushgen::generators::ArrayGenerator\">ArrayGenerator</a>&lt;T, N&gt;","synthetic":false,"types":["pushgen::generators::array_gen::ArrayGenerator"]}];
-if (window.register_implementors) {window.register_implementors(implementors);} else {window.pending_implementors = implementors;}})()
+(function() {var implementors = {
+"pushgen":[["impl&lt;T, const N: <a class=\"primitive\" href=\"https://doc.rust-lang.org/nightly/std/primitive.usize.html\">usize</a>&gt; <a class=\"trait\" href=\"https://doc.rust-lang.org/nightly/core/ops/drop/trait.Drop.html\" title=\"trait core::ops::drop::Drop\">Drop</a> for <a class=\"struct\" href=\"pushgen/generators/struct.ArrayGenerator.html\" title=\"struct pushgen::generators::ArrayGenerator\">ArrayGenerator</a>&lt;T, N&gt;"]]
+};if (window.register_implementors) {window.register_implementors(implementors);} else {window.pending_implementors = implementors;}})()
